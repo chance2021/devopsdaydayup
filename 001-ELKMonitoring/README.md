@@ -73,3 +73,8 @@ c. Select "[Metricbeat System] Host overview ECS" and you should be able to see 
 # Reference
 https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
+https://kifarunix.com/monitor-linux-system-metrics-with-elk-stack/
+
+https://logging.dev.pilot.indocresearch.org/app/home#/tutorial/nginxLogs
+
+https://github.com/elastic/beats/issues/29175
