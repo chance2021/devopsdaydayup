@@ -4,6 +4,9 @@ This instruction shows how to setup a ELK (Elasticsearch/Logstash/Kibana) stack 
 # Project Goal
 Learn how to deploy a ELK with docker-compose, as well as configuring metricbeat service to collect the system metric from a server and present them in Kibana.
 
+# Learning Resources
+https://www.elastic.co/training/free
+
 # Prerequisites
 - Ubuntu 20.04 OS
 - [Docker](https://docs.docker.com/engine/install/ubuntu/)
