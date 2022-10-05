@@ -1,7 +1,8 @@
 # Project Name: ELK Monitoring
-This instruction shows how to setup a ELK (Elasticsearch/Logstash/Kibana) stack to monitor a Linux (Ubuntu 20.04) server.
+This instruction shows how to setup a ELK (Elasticsearch/Logstash/Kibana) stack to monitor a server.
 
 # Project Goal
+Learn how to deploy a ELK with docker-compose, as well as configuring metricbeat service to collect the system metric from a server to present in Kibana.
 
 # Prerequisites
 - Ubuntu 20.04 OS
