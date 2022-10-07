@@ -10,9 +10,7 @@ pipeline {
             steps {
                 // 
                 script {
-                    sh "pwd"
-                    sh "ls"
-                    dockerImage = docker.build registryUrl + ":$commitID"
+                    dockerImage = docker.build("$registryUrl:$commitID","./002-JenkinsCICD")
                 }
             }
         }
