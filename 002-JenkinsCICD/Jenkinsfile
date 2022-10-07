@@ -1,7 +1,7 @@
 pipeline {
     agent any 
     environment{
-        registryUrl = "https://ghcr.io/chance2021/devopsdaydayup"
+        registryUrl = "ghcr.io/chance2021/devopsdaydayup"
         registryCredentialsId = '<dockerhub-credential-name>'        
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
     }

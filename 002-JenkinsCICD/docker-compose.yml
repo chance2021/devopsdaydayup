@@ -10,6 +10,8 @@ services:
       - JENKINS_USERNAME=user
     volumes:
       - 'jenkins_data:/bitnami/jenkins'
+      - '/usr/bin/docker:/usr/bin/docker'
+      - '/var/run/docker.sock:/var/run/docker.sock'
 
 volumes:
   jenkins_data:
