@@ -10,7 +10,7 @@ pipeline {
             steps {
                 // 
                 script {
-                    dockerImage = docker.build registry + ":$commitID"
+                    dockerImage = docker.build registryUrl + ":$commitID"
                 }
             }
         }
