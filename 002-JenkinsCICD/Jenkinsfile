@@ -9,6 +9,7 @@ pipeline {
         stage('Build Image') { 
             steps {
                 // 
+                sh"whoami"
                 script {
                     dockerImage = docker.build("$registryUrl:$commitID","./002-JenkinsCICD")
                 }
@@ -24,6 +25,10 @@ pipeline {
             steps {
                 // 
                 echo "This is Deploy"
+               // script {
+               //     docker.withRegistry( '', registryCredential ) {
+               //     dockerImage.push()
+               // }
             }
         }
     }
