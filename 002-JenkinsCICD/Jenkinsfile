@@ -10,7 +10,7 @@ pipeline {
         stage('Build Image') { 
             steps {
                 // 
-                echo $commitID
+                echo commitID
             }
         }
         stage('Test') { 
