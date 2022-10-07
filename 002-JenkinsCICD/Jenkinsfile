@@ -1,17 +1,17 @@
 pipeline {
     agent any 
     environment{
-        registryUrl = "<dockerhub-username>/<repo-name>"
+        registryUrl = "https://ghcr.io/chance2021/devopsdaydayup"
         registryCredentialsId = '<dockerhub-credential-name>'        
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
-        commitIDDescribe = sh(script: 'git describe --always', returnStdout:true).trim()
     }
     stages {
         stage('Build Image') { 
             steps {
                 // 
-                echo commitID
-                echo commitIDDescribe
+                script {
+                    dockerImage = docker.build registry + ":$commitID"
+                }
             }
         }
         stage('Test') { 
