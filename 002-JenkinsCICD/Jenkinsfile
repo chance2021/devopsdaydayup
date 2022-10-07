@@ -10,6 +10,8 @@ pipeline {
             steps {
                 // 
                 script {
+                    pwd
+                    ls
                     dockerImage = docker.build registryUrl + ":$commitID"
                 }
             }
