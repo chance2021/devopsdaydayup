@@ -4,7 +4,7 @@ pipeline {
         registryUrl = "<dockerhub-username>/<repo-name>"
         registryCredentialsId = '<dockerhub-credential-name>'        
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
-        #commitID = sh(script: 'git describe --always', returnStdout:true).trim()
+        //commitID = sh(script: 'git describe --always', returnStdout:true).trim()
     }
     stages {
         stage('Build Image') { 
