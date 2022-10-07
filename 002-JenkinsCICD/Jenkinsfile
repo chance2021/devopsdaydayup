@@ -1,0 +1,28 @@
+pipeline {
+    agent any 
+    environment{
+        registryUrl = "<dockerhub-username>/<repo-name>"
+        registryCredentialsId = '<dockerhub-credential-name>'        
+        commitID = sh(script: """git rev-parse --short HEAD""", returnStdout:true)
+    }
+    stages {
+        stage('Build Image') { 
+            steps {
+                // 
+                echo $commitID
+            }
+        }
+        stage('Test') { 
+            steps {
+                // 
+                echo "This is Test"
+            }
+        }
+        stage('Deploy') { 
+            steps {
+                // 
+                echo "This is Deploy"
+            }
+        }
+    }
+}
