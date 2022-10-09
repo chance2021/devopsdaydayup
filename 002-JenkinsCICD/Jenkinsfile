@@ -15,7 +15,7 @@ pipeline {
                 }
             }
         }
-        stage('Test') { 
+        stage('Push Image') { 
             steps {
                 // 
                 echo "This is Test"

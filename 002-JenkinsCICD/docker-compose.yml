@@ -9,6 +9,7 @@ services:
     environment:
       - JENKINS_PASSWORD=bitnami
       - JENKINS_USERNAME=user
+      - JENKINS_USER=root
     volumes:
       - 'jenkins_data:/bitnami/jenkins'
       - '/usr/bin/docker:/usr/bin/docker'
