@@ -5,6 +5,7 @@ pipeline {
         registryUrl = "ghcr.io/chance2021/devopsdaydayup"
         registryCredentialsId = 'github-token'
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
+        containerName = "color-web"
     }
     stages {
         stage('Build and Push Image') { 
@@ -19,14 +20,16 @@ pipeline {
                 }
             }
         }
+        stage('Cleaning Up') { 
+            steps {
+                sh "docker rmi --force $registryUrl:$commitID"
+            }
+        }
         stage('Deploy') { 
             steps {
-                // 
-                echo "This is Deploy"
-               // script {
-               //     docker.withRegistry( '', registryCredential ) {
-               //     dockerImage.push()
-               // }
+                sh "docker stop $containerName", returnStatus: true
+                sh "docker rm $containerName", returnStatus: true
+                sh "docker run -d --name $containerName $registryUrl:$commitID"
             }
         }
     }

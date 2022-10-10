@@ -1,3 +1,4 @@
+# docker run -p 8080:8080 --name color-web color-web:init
 FROM python:3.8-alpine
 
 RUN mkdir /app
