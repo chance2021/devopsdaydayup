@@ -2,7 +2,7 @@ pipeline {
     agent any 
     environment{
         registryUrl = "ghcr.io/chance2021/devopsdaydayup"
-        #registryCredentialsId = credentials('github-token')
+        //registryCredentialsId = credentials('github-token')
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
     }
     stages {
