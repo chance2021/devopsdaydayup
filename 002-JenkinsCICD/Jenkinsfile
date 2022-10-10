@@ -2,7 +2,7 @@ pipeline {
     agent any 
     environment{
         registryUrl = "ghcr.io/chance2021/devopsdaydayup"
-        registryCredentialsId = '<dockerhub-credential-name>'        
+        registryCredentialsId = credentials('github-token')
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
     }
     stages {
@@ -17,8 +17,11 @@ pipeline {
         }
         stage('Push Image') { 
             steps {
-                // 
-                echo "This is Test"
+                script {
+                    docker.withRegistry("$registryUrl:$commitID", registryCredentialsId) {
+                        dockerImage.push()
+                    }
+                }
             }
         }
         stage('Deploy') { 
