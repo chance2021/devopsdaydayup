@@ -1,25 +1,20 @@
 pipeline {
     agent any 
     environment{
+        registryUrlBase = "https://ghcr.io"
         registryUrl = "ghcr.io/chance2021/devopsdaydayup"
-        //registryCredentialsId = credentials('github-token')
+        registryCredentialsId = 'github-token'
         commitID = sh(script: 'git rev-parse --short HEAD', returnStdout:true).trim()
     }
     stages {
-        stage('Build Image') { 
+        stage('Build and Push Image') { 
             steps {
                 // 
                 sh"whoami"
                 script {
-                    dockerImage = docker.build("$registryUrl:$commitID","./002-JenkinsCICD")
-                }
-            }
-        }
-        stage('Push Image') { 
-            steps {
-                script {
-                    docker.withRegistry("$registryUrl:$commitID", "github-token") {
-                        dockerImage.push()
+                    docker.withRegistry(registryUrlBase, registryCredentialsId) {
+                        dockerImage = docker.build("$registryUrl:$commitID","./002-JenkinsCICD")
+			dockerImage.push()
                     }
                 }
             }
