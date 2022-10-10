@@ -18,7 +18,7 @@ pipeline {
         stage('Push Image') { 
             steps {
                 script {
-                    docker.withRegistry("$registryUrl:$commitID", github-token) {
+                    docker.withRegistry("$registryUrl:$commitID", "github-token") {
                         dockerImage.push()
                     }
                 }
