@@ -29,7 +29,7 @@ pipeline {
             steps {
                 sh "docker stop $containerName"
                 sh "docker rm $containerName"
-                sh "docker run -d --name $containerName $registryUrl:$commitID"
+                sh "docker run -d -p 8080:8080 --name $containerName $registryUrl:$commitID"
             }
         }
     }
