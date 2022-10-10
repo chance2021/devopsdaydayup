@@ -27,8 +27,8 @@ pipeline {
         }
         stage('Deploy') { 
             steps {
-                sh "docker stop $containerName", returnStatus: true
-                sh "docker rm $containerName", returnStatus: true
+                sh "docker stop $containerName"
+                sh "docker rm $containerName"
                 sh "docker run -d --name $containerName $registryUrl:$commitID"
             }
         }
