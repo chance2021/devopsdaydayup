@@ -20,16 +20,16 @@ pipeline {
                 }
             }
         }
-        stage('Cleaning Up') { 
-            steps {
-                sh "docker rmi --force $registryUrl:$commitID"
-            }
-        }
         stage('Deploy') { 
             steps {
                 sh "docker stop $containerName"
                 sh "docker rm $containerName"
                 sh "docker run -d -p 8080:8080 --name $containerName $registryUrl:$commitID"
+            }
+        }
+        stage('Clean Up') { 
+            steps {
+                sh "docker rmi --force $registryUrl:$commitID"
             }
         }
     }
