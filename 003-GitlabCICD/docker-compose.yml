@@ -1,0 +1,38 @@
+version: '3.6'
+services:
+  web:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.chance20221011.com'
+    environment:
+      GITLAB_ROOT_PASSWORD: "changeme"
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.chance20221011.com'
+        # Add any other gitlab.rb configuration here, each on its own line
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8822:22'
+    volumes:
+      - 'gitlab_config:/etc/gitlab'
+      - 'gitlab_log:/var/log/gitlab'
+      - 'gitlab_data:/var/opt/gitlab'
+    shm_size: '256m'
+  gitlab-runner:
+    image: 'gitlab/gitlab-runner:latest'
+    restart: always
+    user: root
+    volumes:
+      - 'gitlab_runner_config:/etc/gitlab-runner'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/usr/bin/docker:/usr/bin/docker'
+      - '/etc/hosts:/etc/hosts'
+volumes:
+  gitlab_data:
+    driver: local
+  gitlab_log:
+    driver: local
+  gitlab_config:
+    driver: local
+  gitlab_runner_config:
+    driver: local

@@ -11,3 +11,4 @@ https://www.jenkins.io/doc/book/pipeline/docker/
 https://hub.docker.com/r/bitnami/jenkins/
 
 https://www.jenkins.io/doc/book/pipeline/getting-started/
+https://www.jenkins.io/doc/book/pipeline/jenkinsfile/
