@@ -1,18 +1,23 @@
+
+
 # Project Name: Jenkins CICD Pipeline
 This project will setup a Jenkins CICD pipeline, which will pull the source code from github and re-deploy the docker container in your local host.
 
 # Project Goal
 Understand how to setup/configure Jenkins as CICD pipeline. Familarize with Jenkinsfile.
 
-# Learning Resource
-https://www.jenkins.io/doc/book/pipeline/
+# Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Project Steps](#project_steps)
+3. [Troubleshooting](#troubleshooting)
+4. [Reference](#reference)
 
-# Prerequisites
+# Prerequisites  <a name="prerequisites"></a>
 - Ubuntu 20.04 OS
 - Docker
 - Docker Compose
 
-# Project Steps
+# Project Steps <a name="project_steps"></a>
 1. Deploy a Jenkins docker container with **docker-compose**
 ```
 git clone https://github.com/chance2021/devopsdaydayup.git
@@ -36,7 +41,7 @@ docker-compose up -d
 
     d. **"Credentials"**: If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
 
-> Note: In order to get a github token, you can go to your github account and select "Setting" once you click your account icon in the top right. Go to "Developer settings" in the very bottom left lane and go to "Personal access tokens", and then click "Generate new token" to create a new token for above step.
+    **Note**: In order to get a github token, you can go to your github account and select "Setting" once you click your account icon in the top right. Go to "Developer settings" in the very bottom left lane and go to "Personal access tokens", and then click "Generate new token" to create a new token for above step.
 
 
     e. **"ID"**: Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
@@ -67,7 +72,7 @@ docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
 
 9. Make a change into `app.py`. For example, change "Hello world" to "Hello world 2". And then click "Build" again to trigger the pipeline to deploy the change. Once it is done, you should be able to see your change in [here](http://localhost:8080)
 
-# Troubleshooting
+# Troubleshooting <a name="troubleshooting"></a>
 ## Issue 1:  No such property: docker for class
 When you run the pipeline, it fails with below error:
 ```
@@ -155,7 +160,8 @@ Run below command to grant access to `docker.sock` for the Jenkins pipeline job 
 docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
 ```
 
-# Reference
+# Reference <a name="reference"></a>
+https://www.jenkins.io/doc/book/pipeline/
 
 https://www.jenkins.io/doc/book/pipeline/docker/
 
