@@ -20,27 +20,45 @@ cd devopsdaydayup/002-JenkinsCICD
 docker-compose up -d
 ```
 
-2. Open your browser and go to the Jenkins UI website (http://<JenkinsHostIP>). If you install the Jenkins in your local host, you can go [here](http://0.0.0.0). Login to the Jenkins with the username/password defined in your `docker-compose.yaml`.
+2. Open your **browser** and go to the Jenkins UI website (http://<JenkinsHostIP>). If you install the Jenkins in your local host, you can go [here](http://0.0.0.0). Login to the Jenkins with the username/password defined in your `docker-compose.yaml`.
 
-3. Go to **"Manage Jenkins"** in the left lane and go to **"Manage Plugins"**. Click **"Available"** tab in the "Plugin Manager" page and type "pipeline" in the search bar. Select "Pipeline" and click "Download now and install after restart".
+3. Go to **"Manage Jenkins"** in the left lane and go to **"Manage Plugins"**. Click **"Available"** tab in the **"Plugin Manager"** page and type **"pipeline"** in the search bar. Select **"Pipeline"** and click **"Download now and install after restart"**.
 
-4. Follow the same step above and install "git" and "docker" as plugins.
+4. Follow the same step above and install **"git"** and **"Docker Pipeline"** as plugins.
 
-5. Once the plugin is installed and the Jenkins is restarted, go to the main page of the Jenkins website and click "New Item" in the left. Type the name of your project (i.g. first-project) and select "Pipeline" and click "OK". In the Configuration page, make sure below fields in "Pipeline" section are filled:
-a. "Definition": select "Pipeline script from SCM" 
-b. "SCM": select "Git" 
-c. "Repository URL": Enter the URL of the repo which has Jenkinsfile, for example, https://github.com/chance2021/devopsdaydayup. (Note: You can fork "devopsdaydayup" repo to your github account and enter the URL accordingly)
-d. "Credentials": If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
+5. Once the plugin is installed and the Jenkins is restarted, go to the main page of the Jenkins website and click **"New Item"** in the left. Type the name of your project (i.g. first-project) and select **"Pipeline"** and click **"OK"**. In the Configuration page, make sure below fields in **"Pipeline"** section are filled:
+a. **"Definition"**: select "Pipeline script from SCM" 
+
+b. **"SCM"**: select "Git" 
+
+c. **"Repository URL"**: Enter the URL of the repo which has Jenkinsfile, for example, https://github.com/chance2021/devopsdaydayup. (Note: You can fork "devopsdaydayup" repo to your github account and enter the URL accordingly)
+
+d. **"Credentials"**: If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
 > Note: In order to get a github token, you can go to your github account and select "Setting" once you click your account icon in the top right. Go to "Developer settings" in the very bottom left lane and go to "Personal access tokens", and then click "Generate new token" to create a new token for above step.
-e. "ID": Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
-f. "Branch Specifier (blank for 'any')": Enter the branch which has your Jenkinsfile, for example, `*/main`
-g. "Script Path": Enter the relative path for the Jenkinsfile in your repo, for example, 002-JenkinsCICD/Jenkinsfile
-h. Unselect "Lightweight checkout"
+
+e. **"ID"**: Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
+
+f. **"Branch Specifier (blank for 'any')"**: Enter the branch which has your Jenkinsfile, for example, `*/main`
+
+g. **"Script Path"**: Enter the relative path for the Jenkinsfile in your repo, for example, 002-JenkinsCICD/Jenkinsfile
+
+h. Unselect **"Lightweight checkout"**
+
 ![JenkinsPipeline](images/jenkinspipeline.png)
 
+Save above change.
 
+6. Run a container before trigger your pipeline
+```
+docker build -t color-web:init .
+docker run -d -p 8080:8080 --name color-web color-web:init
+```
 
+7. Click "Build" to trigger your first pipeline
+> Note: If you encounter with any docker execute permission issue, you may need to run below command to apply a proper permission on `docker.sock` 
+```
 docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
+```
 
 # Troubleshooting
 ## Issue 1:  No such property: docker for class
@@ -91,7 +109,38 @@ groovy.lang.MissingPropertyException: No such property: docker for class: groovy
 	at java.base/java.lang.Thread.run(Thread.java:829)
 Finished: FAILURE
 ```
-Solution:
+**Solution**
+Make sure "Docker-Pipeline" plugin is installed
+
+## Issue 2: Error response from daemon: No such container: color-web
+When running the pipeline, below error is showed
+```
++ docker stop color-web
+Error response from daemon: No such container: color-web
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Clean Up)
+Stage "Clean Up" skipped due to earlier failure(s)
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
+```
+
+**Solution**
+Make sure the `color-web` container is running
+```
+docker run -p 8080:8080 --name color-web color-web:init
+```
+
 
 # Reference
 
