@@ -27,6 +27,7 @@ docker-compose up -d
 4. Follow the same step above and install **"git"** and **"Docker Pipeline"** as plugins.
 
 5. Once the plugin is installed and the Jenkins is restarted, go to the main page of the Jenkins website and click **"New Item"** in the left. Type the name of your project (i.g. first-project) and select **"Pipeline"** and click **"OK"**. In the Configuration page, make sure below fields in **"Pipeline"** section are filled:
+
 a. **"Definition"**: select "Pipeline script from SCM" 
 
 b. **"SCM"**: select "Git" 
