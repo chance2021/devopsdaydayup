@@ -121,7 +121,7 @@ groovy.lang.MissingPropertyException: No such property: docker for class: groovy
 	at java.base/java.lang.Thread.run(Thread.java:829)
 Finished: FAILURE
 ```
-**Solution**
+**Solution:**
 Make sure "Docker-Pipeline" plugin is installed
 
 ## Issue 2: Error response from daemon: No such container: color-web
@@ -147,14 +147,14 @@ ERROR: script returned exit code 1
 Finished: FAILURE
 ```
 
-**Solution**
+**Solution:**
 Make sure the `color-web` container is running
 ```
 docker run -p 8080:8080 --name color-web color-web:init
 ```
 ## Issue 3: Cannot run docker inside of Jenkins pipeline job container
 
-**Solution**
+**Solution:**
 Run below command to grant access to `docker.sock` for the Jenkins pipeline job container
 ```
 docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
