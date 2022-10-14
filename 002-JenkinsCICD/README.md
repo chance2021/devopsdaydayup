@@ -48,13 +48,13 @@ h. Unselect **"Lightweight checkout"**
 
 Save above change.
 
-6. Run a container before trigger your pipeline
+6. Run a container **before** trigger your pipeline
 ```
 docker build -t color-web:init .
 docker run -d -p 8080:8080 --name color-web color-web:init
 ```
 
-7. Click "Build" to trigger your first pipeline
+7. Click **"Build"** to trigger your first pipeline
 > Note: If you encounter with any docker execute permission issue, you may need to run below command to apply a proper permission on `docker.sock` 
 ```
 docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
