@@ -60,6 +60,10 @@ docker run -d -p 8080:8080 --name color-web color-web:init
 docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
 ```
 
+8. You should be able to see the hello world page in [here](http://localhost:8080)
+
+9. Make a change into `app.py`. For example, change "Hello world" to "Hello world 2". And then click "Build" again to trigger the pipeline to deploy the change. Once it is done, you should be able to see your change in [here](http://localhost:8080)
+
 # Troubleshooting
 ## Issue 1:  No such property: docker for class
 When you run the pipeline, it fails with below error:
