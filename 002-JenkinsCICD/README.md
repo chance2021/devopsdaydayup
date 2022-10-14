@@ -28,22 +28,22 @@ docker-compose up -d
 
 5. Once the plugin is installed and the Jenkins is restarted, go to the main page of the Jenkins website and click **"New Item"** in the left. Type the name of your project (i.g. first-project) and select **"Pipeline"** and click **"OK"**. In the Configuration page, make sure below fields in **"Pipeline"** section are filled:
 
-a. **"Definition"**: select "Pipeline script from SCM" 
+    a. **"Definition"**: select "Pipeline script from SCM" 
 
-b. **"SCM"**: select "Git" 
+    b. **"SCM"**: select "Git" 
 
-c. **"Repository URL"**: Enter the URL of the repo which has Jenkinsfile, for example, https://github.com/chance2021/devopsdaydayup. (Note: You can fork "devopsdaydayup" repo to your github account and enter the URL accordingly)
+    c. **"Repository URL"**: Enter the URL of the repo which has Jenkinsfile, for example, https://github.com/chance2021/devopsdaydayup. (Note: You can fork "devopsdaydayup" repo to your github account and enter the URL accordingly)
 
-d. **"Credentials"**: If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
+    d. **"Credentials"**: If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
 > Note: In order to get a github token, you can go to your github account and select "Setting" once you click your account icon in the top right. Go to "Developer settings" in the very bottom left lane and go to "Personal access tokens", and then click "Generate new token" to create a new token for above step.
 
-e. **"ID"**: Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
+    e. **"ID"**: Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
 
-f. **"Branch Specifier (blank for 'any')"**: Enter the branch which has your Jenkinsfile, for example, `*/main`
+    f. **"Branch Specifier (blank for 'any')"**: Enter the branch which has your Jenkinsfile, for example, `*/main`
 
-g. **"Script Path"**: Enter the relative path for the Jenkinsfile in your repo, for example, 002-JenkinsCICD/Jenkinsfile
+    g. **"Script Path"**: Enter the relative path for the Jenkinsfile in your repo, for example, 002-JenkinsCICD/Jenkinsfile
 
-h. Unselect **"Lightweight checkout"**
+    h. Unselect **"Lightweight checkout"**
 
 ![JenkinsPipeline](images/jenkinspipeline.png)
 
