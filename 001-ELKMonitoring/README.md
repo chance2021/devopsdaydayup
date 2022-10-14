@@ -27,7 +27,7 @@ As the communication between Elasticsearch and metricbeat is using tls, you need
 
 a. Copy the CA certificate from one of Elasticsearch containers
 ```
-docker exec -it <elasticsearch 01/02/03> openssl x509 -fingerprint -sha256 -in /usr/share/elasticsearch/config/certs/ca/ca.crt
+docker exec -it <elasticsearch 01> openssl x509 -fingerprint -sha256 -in /usr/share/elasticsearch/config/certs/ca/ca.crt
 ```
 
 b.  Go to the host which you want to monitor and run below command:
