@@ -144,7 +144,13 @@ Make sure the `color-web` container is running
 ```
 docker run -p 8080:8080 --name color-web color-web:init
 ```
+## Issue 3: Cannot run docker inside of Jenkins pipeline job container
 
+**Solution**
+Run below command to grant access to `docker.sock` for the Jenkins pipeline job container
+```
+docker exec <jenkinsContainerID> chmod 777 /var/run/docker.sock
+```
 
 # Reference
 
