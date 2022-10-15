@@ -1,39 +1,59 @@
+# Project Name: Gitlab CICD Pipeline
+This project will setup a Gitlab CICD pipeline, which will build the source code to a docker image and push to container registory in Gitlab and then re-deploy the docker container with the latest image in your local host.
 
+# Project Goal
+Understand how to setup/configure Gitlab as CICD pipeline. Familarize with gitlab pipeline.
 
+# Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Project Steps](#project_steps)
+3. [Troubleshooting](#troubleshooting)
+4. [Reference](#reference)
 
+# Prerequisites  <a name="prerequisites"></a>
+- Ubuntu 20.04 OS
+- Docker
+- Docker Compose
 
-/etc/gitlab/initial_root_password
+# Project Steps <a name="project_steps"></a>
+1. Run the docker container with docker-compose
+```bash
+git clone https://github.com/chance2021/devopsdaydayup.git
+cd devopsdaydayup/003-GitlabCICD
+docker-compose up -d
+```
 
-docker exec <gitlab runner container> -it bash
-curl --request POST -k "https://gitlab.chance20221011.com/api/v4/runners" \
-     --form "token=GR1348941Pjv5QzazEy4-32MPsArC" --form "description=test-20221010" \
-     --form "tag_list=test"
+2. Open your browser and go to https://<your_gitlab_host_IP> (If you deploy it in your local, you can click [here](https://0.0.0.0))
 
-# gitlab
+3. Login to the Gitlab with username `root` and the password defined in your `docker-compose.yaml`. Click "New project" to create your first project.
+
+4. Since the initial Gitlab CA certificate is missing some info and cannot be used by gitlab runner, we may have to regenerate/configure a new one. Run below commands:
+```bash
+docker exec -it <gitlab_web_containerID> bash
+mkdir /etc/gitlab/ssl_backup
+mv /etc/gitlab/ssl/* /etc/gitlab/ssl_backup
 cd /etc/gitlab/ssl
-mkdir backup
-mv * backup
 openssl genrsa -out ca.key 2048
 openssl req -new -x509 -days 365 -key ca.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=Acme Root CA" -out ca.crt
-openssl req -newkey rsa:2048 -nodes -keyout gitlab.chance20221011.com.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=*.chance20221011.com" -out gitlab.chance20221011.com.csr
-openssl x509 -req -extfile <(printf "subjectAltName=DNS:chance20221011.com,DNS:gitlab.chance20221011.com") -days 365 -in gitlab.chance20221011.com.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gitlab.chance20221011.com.crt
+openssl req -newkey rsa:2048 -nodes -keyout gitlab.<YOUR_GITLAB_DOMAIN>.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=*.<YOUR_GITLAB_DOMAIN>.com" -out gitlab.<YOUR_GITLAB_DOMAIN>.com.csr
+openssl x509 -req -extfile <(printf "subjectAltName=DNS:<YOUR_GITLAB_DOMAIN>.com,DNS:gitlab.<YOUR_GITLAB_DOMAIN>.com") -days 365 -in gitlab.<YOUR_GITLAB_DOMAIN>.com.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gitlab.<YOUR_GITLAB_DOMAIN>.com.crt
 
+# For example
+#openssl req -newkey rsa:2048 -nodes -keyout gitlab.chance20221011.com.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=*.chance20221011.com" -out gitlab.chance20221011.com.csr
+#openssl x509 -req -extfile <(printf "subjectAltName=DNS:chance20221011.com,DNS:gitlab.chance20221011.com") -days 365 -in gitlab.chance20221011.com.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gitlab.chance20221011.com.crt
 
+# Reconfigure the gitlab to apply above change
 gitlab-cli reconfigure
 gitlab-cli restart
-
-
-# gitlab runner
-docker exec <gitlab container> cat /etc/gitlab/ssl/gitlab.chance20221011.com.crt
-
-docker exec <gitlab runner container> echo <above crt> > /usr/local/share/ca-certificates/gitlab.chance20221011.com.crt
-docker exec <gitlab runner container> update-ca-certificates
-# gitlab-runner register 
-Runtime platform                                    arch=amd64 os=linux pid=4667 revision=43b2dc3d version=15.4.0
-Running in system-mode.                            
-                                                   
-Enter the GitLab instance URL (for example, https://gitlab.com/):
-https://gitlab.chance20221011.com/
+cat /etc/gitlab/ssl/gitlab.<YOUR_GITLAB_DOMAIN>.com.crt
+# For example: cat /etc/gitlab/ssl/gitlab.chance20221011.com.crt
+exit
+docker exec <gitlab runner container> -it bash
+vi /usr/local/share/ca-certificates/gitlab.<YOUR_GITLAB_DOMAIN>.com.crt
+# Paste above certificate content copied from gitlab server
+update-ca-certificates
+gitlab-runner register 
+# Enter the GitLab instance URL (for example, https://<YOUR_GITLAB_DOMAIN>(i.g. https://gitlab.chance20221011.com)
 Enter the registration token:
 GR1348941Pjv5QzazEy4-32MPsArC
 Enter a description for the runner:
