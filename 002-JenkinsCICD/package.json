@@ -1,0 +1,11 @@
+{
+  "name": "@yongyuca/002-jenkinscicd",
+  "version": "1.0.0",
+  "description": "This project will setup a Jenkins CICD pipeline, which will pull the source code from github and re-deploy the docker container in your local host.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
