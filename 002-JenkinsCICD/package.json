@@ -1,3 +1,6 @@
+"publishConfig": {
+   "@yongyuca:registry": "https://npm.pkg.github.com"
+ }
 {
   "name": "@yongyuca/002-jenkinscicd",
   "version": "1.0.0",

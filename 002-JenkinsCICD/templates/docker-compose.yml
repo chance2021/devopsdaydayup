@@ -2,7 +2,7 @@ version: '2'
 
 services:
   jenkins:
-    image: jenkins/jenkins:2.346.3-2-lts-jdk11
+    image: docker.io/bitnami/jenkins:2
     user: root
     ports:
       - '80:8080'
@@ -10,6 +10,7 @@ services:
       - JENKINS_PASSWORD=bitnami
       - JENKINS_USERNAME=user
       - JENKINS_USER=root
+      - TZ=America/Toronto
     volumes:
       - 'jenkins_data:/bitnami/jenkins'
       - '/usr/bin/docker:/usr/bin/docker'

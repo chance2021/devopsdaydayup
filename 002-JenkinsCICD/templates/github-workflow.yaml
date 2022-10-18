@@ -1,0 +1,8 @@
+#name: CICD
+#run-name: ${{ github.actor }} is running CICD 
+#on: [push]
+#jobs:
+#  trigger-jenkins-cicd:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - run: curl -X POST --user JENKINS_USER:JENKINS_TOKEN http://0.0.0.0:80/job/hello-world/build
