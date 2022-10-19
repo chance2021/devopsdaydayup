@@ -13,6 +13,7 @@ services:
       - '80:80'
       - '443:443'
       - '8822:22'
+      - '5005:5005'
     volumes:
       - 'gitlab_config:/etc/gitlab'
       - 'gitlab_log:/var/log/gitlab'
