@@ -32,7 +32,8 @@ Once it is done, open your **browser** and go to https://<your_gitlab_domain_nam
 # 192.168.2.61 gitlab.chance20221020.com registry.gitlab.chance20221020.com
 ```
 
-## 3. Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GILTAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. 
+## 3. Login to your gitlab web.
+Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GILTAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. <br/>
 Click **"New project"** to create your first project -> Click **"Create blank project"** -> Type your project name in **"Project Name"** -> Select **"Public"** and click **"Create project"** -> Go to the new project you just created, and go to **"Setting"** -> **"CI/CD"** -> expand **"Runners"** section. **Make a note** of **"URL** and **registration token** in **"Specific runners"** section for below runner installation used
 
 ## 4. Update certificates
