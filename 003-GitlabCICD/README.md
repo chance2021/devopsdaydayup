@@ -244,10 +244,8 @@ You need to enable your runner without tags. Go to your project and go to "Setti
 
 
 # <a name="reference">Reference</a>
-[Install Gitlab using docker compose](https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose)
-[Runner Cannot Register with error: x509: certificate relies on legacy Common Name field, use SANs instead](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/28841)
-
-[Enable Container Registry](https://blog.programster.org/dockerized-gitlab-enable-container-registry)
-
-[List all Gitlab pipeline environment variables](https://docs.gitlab.com/ee/ci/variables/)
+[Install Gitlab using docker compose](https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose) <br/>
+[Runner Cannot Register with error: x509: certificate relies on legacy Common Name field, use SANs instead](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/28841)<br/>
+[Enable Container Registry](https://blog.programster.org/dockerized-gitlab-enable-container-registry)<br/>
+[List all Gitlab pipeline environment variables](https://docs.gitlab.com/ee/ci/variables/)<br/>
 
