@@ -2,6 +2,8 @@ cicd:
   # Use the official docker image.
   image: docker:latest
   stage: build
+  tags:
+    - test
   services:
     - docker:dind
   before_script:
@@ -16,8 +18,8 @@ cicd:
     - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
     - docker rmi "$CI_REGISTRY_IMAGE${tag}"
-    - docker rm -f $(docker ps -f name=color-web -q)
-    - docker run -d -p 8080:8080 --name color-web "$CI_REGISTRY_IMAGE${tag}"
+    - docker rm -f $(docker ps -f name=hello-world -q)
+    - docker run -d -p 8080:8080 --name hello-world "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH

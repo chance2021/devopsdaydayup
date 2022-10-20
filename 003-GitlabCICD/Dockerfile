@@ -1,4 +1,4 @@
-# docker run -p 8080:8080 --name color-web color-web:init
+# docker run -p 8080:8080 --name color-web ghcr.io/chance2021/devopsdaydayup:colorweb
 FROM python:3.8-alpine
 
 RUN mkdir /app
