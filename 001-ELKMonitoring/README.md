@@ -4,15 +4,20 @@ This instruction shows how to setup a ELK (Elasticsearch/Logstash/Kibana) stack 
 # Project Goal
 Learn how to deploy a ELK with docker-compose, as well as configuring metricbeat service to collect the system metric from a server and present them in Kibana.
 
-# Learning Resources
-https://www.elastic.co/training/free
+# Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Project Steps](#project_steps)
+3. [Post Project](#post_project)
+4. [Troubleshooting](#troubleshooting)
+5. [Reference](#reference)
 
-# Prerequisites
+
+# <a name="prerequisites">Prerequisites</a>
 - Ubuntu 20.04 OS
 - [Docker](https://docs.docker.com/engine/install/ubuntu/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-# Project Steps
+# <a name="project_steps">Project Steps</a>
 ## 1. Deploy a ELK stack
 Clone the github repo and run the docker compose to start up the ELK stack
 ```
@@ -73,9 +78,21 @@ c. Select "[Metricbeat System] Host overview ECS" and you should be able to see 
 ![kibana](./images/1.jpg)
 ![kibana](./images/2.jpg)
 
-# Reference
+# <a name="post_project">Post Project</a>
+Run below commands to remove docker containers and volumes
+```
+docker-compose down -v
+sudo systemctl stop metricbeat
+sudo systemctl disable metricbeat
+sudo apt remove metricbeat
+```
+# <a name="troubleshooting">Troubleshooting</a>
+
+# <a name="reference">Reference</a>
 https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
 https://kifarunix.com/monitor-linux-system-metrics-with-elk-stack/
 
 https://github.com/elastic/beats/issues/29175
+
+https://www.elastic.co/training/free

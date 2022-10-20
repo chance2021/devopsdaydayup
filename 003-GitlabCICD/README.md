@@ -17,24 +17,26 @@ Understand how to setup/configure Gitlab as CICD pipeline. Familarize with gitla
 - Docker Compose
 
 # <a name="project_steps">Project Steps</a>
-1. Run the docker containers with **docker-compose**
+## 1. Run the docker containers with **docker-compose**
 ```bash
 git clone https://github.com/chance2021/devopsdaydayup.git
 cd devopsdaydayup/003-GitlabCICD
 docker-compose up -d
 ```
 
-2. Add below entry in your **hosts** file (i.g. `/etc/hosts`). Once it is done, open your **browser** and go to https://<your_gitlab_domain_name>  (i.g. https://gitlab.chance20221020.com/)
+## 2. Add below entry in your **hosts** file (i.g. `/etc/hosts`). 
+Once it is done, open your **browser** and go to https://<your_gitlab_domain_name>  (i.g. https://gitlab.chance20221020.com/)
 ```
 <GITLAB SERVER IP>  <YOUR DOMAIN NAME in docker-compose.yaml> 
 # For example
 # 192.168.2.61 gitlab.chance20221020.com registry.gitlab.chance20221020.com
 ```
 
-3. Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GILTAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. <br/>
+## 3. Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GILTAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. 
 Click **"New project"** to create your first project -> Click **"Create blank project"** -> Type your project name in **"Project Name"** -> Select **"Public"** and click **"Create project"** -> Go to the new project you just created, and go to **"Setting"** -> **"CI/CD"** -> expand **"Runners"** section. **Make a note** of **"URL** and **registration token** in **"Specific runners"** section for below runner installation used
 
-4. Since the initial Gitlab server **certificate** is missing some info and cannot be used by gitlab runner, we may have to **regenerate** a new one and **reconfigure** in the gitlab server. Run below commands:
+## 4. Update certificates
+Since the initial Gitlab server **certificate** is missing some info and cannot be used by gitlab runner, we may have to **regenerate** a new one and **reconfigure** in the gitlab server. Run below commands:
 ```bash
 docker exec -it $(docker ps -f name=web -q) bash
 mkdir /etc/gitlab/ssl_backup
@@ -55,7 +57,7 @@ openssl x509 -req -extfile <(printf "subjectAltName=DNS:$YOUR_GITLAB_DOMAIN,DNS:
 
 exit
 ```
-5. Enable **container register** <br/> 
+## 5. Enable **container register** 
 Add below lines in the bottom of the file `/etc/gitlab/gitlab.rb`.
 ```bash
 docker exec -it $(docker ps -f name=web -q) bash
@@ -90,7 +92,8 @@ gitlab-ctl reconfigure
 gitlab-ctl restart
 exit
 ```
-6. In order to make **docker login** work, you need to add the **certificate** in docker certs folder
+## 6. Update certificates for docker client
+In order to make **docker login** work, you need to add the **certificate** in docker certs folder
 ```
 # Login the host you are going to run the docker commands
 export YOUR_GITLAB_DOMAIN=chance20221020.com
@@ -113,7 +116,7 @@ Login Succeeded
 
 ```
 ![container-registry](images/container-registry.png)
-7. Configure **gitlab-runner** <br/>
+## 7. Configure **gitlab-runner** 
 Login to gitlab-runner and run commands below:
 ```bash
 export YOUR_GITLAB_DOMAIN=chance20221020.com
@@ -158,7 +161,8 @@ root@bad518d25b44:/usr/local/share/ca-certificates# cat /etc/gitlab-runner/confi
 Once you finish above step, you should be able to see an available running in the project's CICD Runners section (see below screenshoot).
 ![gitlab-runner](images/gitlab-runner.jpg)
 
-8. **Git clone** from your gitlab project repo to your local and copy necessary files from our devopsdaydayup lab repo (in the same folder as this README.md)
+## 8. Copy necessary files into gitlab project repo.
+**Git clone** from your gitlab project repo to your local and copy necessary files from our devopsdaydayup lab repo (in the same folder as this README.md)
 ```
 git clone <URL from your gitlab server repo>
 cd <your project name folder>
@@ -170,13 +174,14 @@ git push
 Once you push the code, you should be able to see the pipeline is automatically triggered under the project -> "CI/CD" -> "Jobs"
 ![gitlab-ci-pipeline](images/gitlab-ci-pipeline.png)
 
-9. **Verification**
+## 9. Verification
 
   a. Check your hello-world container by visiting the **website** http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
   b. In your **gitlab repo**, update `return "Hello World!"` in `app.py` file. For example, update to `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`.<br/> 
   c. Once the CICD pipeline is completed, you can visit your hello-world web again to see if the content is changed. http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
 
-# Post Project<a name="troubleshooting">Troubleshooting</a>
+# <a name="post_project">Post Project</a>
+
 # <a name="troubleshooting">Troubleshooting</a>
 
 ## Issue 1: check that a DNS record exists for this domain
