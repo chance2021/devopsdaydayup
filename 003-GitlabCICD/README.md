@@ -16,25 +16,24 @@ Understand how to setup/configure Gitlab as CICD pipeline. Familarize with gitla
 - Docker Compose
 
 # <a name="project_steps">Project Steps</a>
-1. Run the docker container with docker-compose
+1. Run the docker containers with **docker-compose**
 ```bash
 git clone https://github.com/chance2021/devopsdaydayup.git
 cd devopsdaydayup/003-GitlabCICD
 docker-compose up -d
 ```
 
-2. Add below entry in your hosts file (i.g. `/etc/hosts`). Once it is done, open your browser and go to https://<your_gitlab_domain_name>  (i.g. https://gitlab.chance20221020.com/)
+2. Add below entry in your **hosts** file (i.g. `/etc/hosts`). Once it is done, open your **browser** and go to https://<your_gitlab_domain_name>  (i.g. https://gitlab.chance20221020.com/)
 ```
 <GITLAB SERVER IP>  <YOUR DOMAIN NAME in docker-compose.yaml> 
 # For example
 # 192.168.2.61 gitlab.chance20221020.com registry.gitlab.chance20221020.com
 ```
 
-3. Wait for 5 mins until the server is fully starting up. Then login to the Gitlab with username `root` and the password defined in your `docker-compose.yaml` ,which should be the value for env varible `GITLAB_ROOT_PASSWORD`. 
-Click **"New project"** to create your first project (**"Create blank project"** -> Type your project name in **"Project Name"** -> Select  **"Public"** and click **"Create project"** -> Go to the new project you just create, and go to **"Setting"** -> **"CI/CD"** -> expand **"Runners"** section. Make a note of **"URL** and **registration token** in **"Specific runners"** section for below runner installation used).
+3. Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GILTAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. <br/>
+Click **"New project"** to create your first project -> Click **"Create blank project"** -> Type your project name in **"Project Name"** -> Select **"Public"** and click **"Create project"** -> Go to the new project you just created, and go to **"Setting"** -> **"CI/CD"** -> expand **"Runners"** section. **Make a note** of **"URL** and **registration token** in **"Specific runners"** section for below runner installation used
 
-4. Since the initial Gitlab CA certificate is missing some info and cannot be used by gitlab runner, we may have to regenerate a new one and configure in the gitlab server. 
-Run below commands:
+4. Since the initial Gitlab server **certificate** is missing some info and cannot be used by gitlab runner, we may have to **regenerate** a new one and **reconfigure** in the gitlab server. Run below commands:
 ```bash
 docker exec -it $(docker ps -f name=web -q) bash
 mkdir /etc/gitlab/ssl_backup
@@ -44,6 +43,7 @@ openssl genrsa -out ca.key 2048
 openssl req -new -x509 -days 365 -key ca.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=Acme Root CA" -out ca.crt
 
 # Note: Make sure to replace below `YOUR_GITLAB_DOMAIN` with your own domain name. For example, chance20221020.com.
+
 export YOUR_GITLAB_DOMAIN=chance20221020.com
 openssl req -newkey rsa:2048 -nodes -keyout gitlab.$YOUR_GITLAB_DOMAIN.key -subj "/C=CN/ST=GD/L=SZ/O=Acme, Inc./CN=*.$YOUR_GITLAB_DOMAIN" -out gitlab.$YOUR_GITLAB_DOMAIN.csr
 openssl x509 -req -extfile <(printf "subjectAltName=DNS:$YOUR_GITLAB_DOMAIN,DNS:gitlab.$YOUR_GITLAB_DOMAIN") -days 365 -in gitlab.$YOUR_GITLAB_DOMAIN.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out gitlab.$YOUR_GITLAB_DOMAIN.crt
@@ -54,7 +54,7 @@ openssl x509 -req -extfile <(printf "subjectAltName=DNS:$YOUR_GITLAB_DOMAIN,DNS:
 
 exit
 ```
-5. Enable container register 
+5. Enable **container register** <br/> 
 Add below lines in the bottom of the file `/etc/gitlab/gitlab.rb`.
 ```bash
 docker exec -it $(docker ps -f name=web -q) bash
@@ -89,14 +89,15 @@ gitlab-ctl reconfigure
 gitlab-ctl restart
 exit
 ```
-6. In order to make docker login work, you need to add the certificate in docker certs folder
+6. In order to make **docker login** work, you need to add the **certificate** in docker certs folder
 ```
+# Login the host you are going to run the docker commands
 export YOUR_GITLAB_DOMAIN=chance20221020.com
 sudo mkdir -p /etc/docker/certs.d/registry.gitlab.$YOUR_GITLAB_DOMAIN:5005
 sudo docker cp $(docker ps -f name=web -q):/etc/gitlab/ssl/registry.gitlab.$YOUR_GITLAB_DOMAIN.crt /etc/docker/certs.d/registry.gitlab.$YOUR_GITLAB_DOMAIN:5005/
 sudo ls /etc/docker/certs.d/registry.gitlab.$YOUR_GITLAB_DOMAIN:5005
 
-# Test with docker login and you should be able to login now
+# Test docker login and you should be able to login now
 docker login registry.gitlab.$YOUR_GITLAB_DOMAIN:5005
 Username: root
 Password: 
@@ -106,13 +107,13 @@ https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 
 Login Succeeded
 
-# You can also test if the docker image push works for you once login successfully
-# Login to your gitlab server web UI and go to the project you created, and then go to "Packages and registries" -> "Container Registry", you should be able to see the valid registry URL you suppose to use in order to build and push your image. For example, `docker build -t registry.gitlab.chance20221020.com:5005/gitlab-instance-d350f73c/first-projct .`
+# You can also test if the docker image push works once login successfully
+# Login to your gitlab server web UI and go to the project you created, and then go to "Packages and registries" -> "Container Registry", you should be able to see the valid registry URL you suppose to use in order to build and push your image. For example, `docker build -t registry.gitlab.chance20221020.com:5005/gitlab-instance-d350f73c/first-projct .` (See below screenshot)
 
 ```
 ![container-registry](images/container-registry.png)
-7. Configure gitlab-runner
-Login to gitlab-runner and run commands below
+7. Configure **gitlab-runner** <br/>
+Login to gitlab-runner and run commands below:
 ```bash
 export YOUR_GITLAB_DOMAIN=chance20221020.com
 docker exec $(docker ps -f name=web -q) cat /etc/gitlab/ssl/gitlab.$YOUR_GITLAB_DOMAIN.crt
@@ -146,18 +147,17 @@ Registering runner... succeeded                     runner=GR1348941Pjv5Qzaz
 Enter an executor: ssh, docker+machine, docker-ssh, docker, parallels, shell, virtualbox, docker-ssh+machine, kubernetes, custom:
 shell
 ```
-If successful, you will see below message:
+If success, you will see below message:
 ```
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
 
 Configuration (with the authentication token) was saved in "/etc/gitlab-runner/config.toml" 
 root@bad518d25b44:/usr/local/share/ca-certificates# cat /etc/gitlab-runner/config.toml 
 ```
+Once you finish above step, you should be able to see an available running in the project's CICD Runners section (see below screenshoot).
+![gitlab-runner](images/gitlab-runner.jpg)
 
-Once you finish above step, you should be able to see an available running in the project's CICD Runners section.
-![gitlab-runner](images/gitlab-runner.png)
-
-8. Git clone the project repo, which you created in your gitlab server, to your local and copy `.gitlab-ci.yml` from our labs repo (same folder as this README.md)
+8. **Git clone** from your gitlab project repo to your local and copy necessary files from our devopsdaydayup lab repo (in the same folder as this README.md)
 ```
 git clone <URL from your gitlab server repo>
 cd <your project name folder>
@@ -165,24 +165,30 @@ cp /path/to/devopsdaydayup/003-GitlabCICD/{app.py,Dockerfile,requirements.txt}  
 git add .
 git commit -am "First commit"
 git push
- 
 ```
-Once you push the code, you should be able to see the pipeline under the project -> "CI/CD" -> "Jobs"
+Once you push the code, you should be able to see the pipeline is automatically triggered under the project -> "CI/CD" -> "Jobs"
+![gitlab-ci-pipeline](images/gitlab-ci-pipeline.png)
 
-9. Verification
+9. **Verification**
 
-  a. Check your hello-world container by visiting the website http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
-  b. In your gitlab repo, update `return "Hello World!"` in `app.py`. For example, `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`.<br/> 
-  c. Once the CICD pipeline is completed, you can visit your hello-world web again to see if the content is changed. http://<HOST IP which is running the docker-compose.yaml>:8080
+  a. Check your hello-world container by visiting the **website** http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
+  b. In your **gitlab repo**, update `return "Hello World!"` in `app.py` file. For example, update to `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`.<br/> 
+  c. Once the CICD pipeline is completed, you can visit your hello-world web again to see if the content is changed. http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
 
 
 # Troubelshooting
-## Issue 1: Letencrypt DNS issue
-**Soluton:**
-Chnage hostname to .com and wait for 1 hour
+
+## Issue 1: check that a DNS record exists for this domain
+Error out when starting up or reconfigure the gitlab server 
+
+```
+RuntimeError: letsencrypt_certificate[gitlab.chance20221020.com] (letsencrypt::http_authorization line 6) had an error: RuntimeError: acme_certificate[staging] (letsencrypt::http_authorization line 43) had an error: RuntimeError: ruby_block[create certificate for gitlab.chance20221020.com] (letsencrypt::http_authorization line 110) had an error: RuntimeError: [gitlab.chance20221020.com] Validation failed, unable to request certificate, Errors: [{url: https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/4042412034/SuXaFQ, status: invalid, error: {"type"=>"urn:ietf:params:acme:error:dns", "detail"=>"DNS problem: NXDOMAIN looking up A for gitlab.chance20221020.com - check that a DNS record exists for this domain; DNS problem: NXDOMAIN looking up AAAA for gitlab.chance20221020.com - check that a DNS record exists for this domain", "status"=>400}} ]
+```
+**Solution:**
+Sometimes it will occur when letsencrypt is requesting for a old/used DNS record. Just give it another 15 mins to see if it will figure it out by itself. If no, You can try to reconfigure/restart the gitlab server without any change. If it doesn't work either, you can replace your gitlab domain name in `docker-compose.yaml` with more unique name and then reconfigure/restart your gitlab server.
 
 ## Issue 2: Cannot register gitlab-runner: connection refused
-When run `gitlab-register`, it shows below error:
+When running `gitlab-register`, it shows below error:
 
 ```
 ERROR: Registering runner... failed                 runner=GR1348941oqts-yxX status=couldn't execute POST against https://gitlab.chance20221020.com/api/v4/runners: Post "https://gitlab.chance20221020.com/api/v4/runners": dial tcp 0.0.0.0:443: connect: connection refused
@@ -192,7 +198,7 @@ ERROR: Registering runner... failed                 runner=GR1348941oqts-yxX sta
 Make sure to follow step 4 to regerate a new certificate with proper info and update it in gitlab-runner host/container
 
 ## Issue 3: Cannot login docker registry: x509: certificate signed by unknown authority
-Cannot log in to the gitlab container registry. Below error is returned
+Cannot `docker login` to the gitlab container registry. Below error is returned
 
 ```
 $ docker login registry.gitlab.chance20221020.com:5005
@@ -235,15 +241,7 @@ You need to enable your runner without tags. Go to your project and go to "Setti
 
 > Refer to: https://stackoverflow.com/questions/53370840/this-job-is-stuck-because-the-project-doesnt-have-any-runners-online-assigned
 
-## Issue 6: check that a DNS record exists for this domain
-Error out when starting up or reconfigure the gitlab server 
 
-```
-RuntimeError: letsencrypt_certificate[gitlab.chance20221020.com] (letsencrypt::http_authorization line 6) had an error: RuntimeError: acme_certificate[staging] (letsencrypt::http_authorization line 43) had an error: RuntimeError: ruby_block[create certificate for gitlab.chance20221020.com] (letsencrypt::http_authorization line 110) had an error: RuntimeError: [gitlab.chance20221020.com] Validation failed, unable to request certificate, Errors: [{url: https://acme-staging-v02.api.letsencrypt.org/acme/chall-v3/4042412034/SuXaFQ, status: invalid, error: {"type"=>"urn:ietf:params:acme:error:dns", "detail"=>"DNS problem: NXDOMAIN looking up A for gitlab.chance20221020.com - check that a DNS record exists for this domain; DNS problem: NXDOMAIN looking up AAAA for gitlab.chance20221020.com - check that a DNS record exists for this domain", "status"=>400}} ]
-```
-
-**Solution:**
-Sometimes it will occur when letsencrypt is requesting for a old/used DNS record. You can try to restart/reconfigure the gitlab server. If it doesn't work, you can replace your gitlab domain name in `docker-compose.yaml` with more unique naming. Or just wait for 15 mins to have it figure it out by itself.
 
 #<a name="reference">Reference</a>
 https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose
@@ -252,9 +250,4 @@ https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compo
 [Enable Container Registry](https://blog.programster.org/dockerized-gitlab-enable-container-registry)
 
 [List all Gitlab pipeline environment variables](https://docs.gitlab.com/ee/ci/variables/)
-
-# In your host
-vi /usr/local/share/ca-certificates/gitlab-server.crt
-# Paste above certificate content copied from gitlab server
-update-ca-certificates
 
