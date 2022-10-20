@@ -1,6 +1,4 @@
-variables:
-  CI_REGISTRY: "registry.gitlab.chance20221011.com:5005"
-docker-build:
+cicd:
   # Use the official docker image.
   image: docker:latest
   stage: build
@@ -12,15 +10,14 @@ docker-build:
   # All other branches are tagged with the escaped branch name (commit ref slug)
   script:
     - |
-      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
-        tag=""
-        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
-      else
-        tag=":$CI_COMMIT_REF_SLUG"
-        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
-      fi
+      export tag=":$CI_COMMIT_SHORT_SHA"
+      echo "testing..."
+      echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
     - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
     - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker rmi "$CI_REGISTRY_IMAGE${tag}"
+    - docker rm -f $(docker ps -f name=color-web -q)
+    - docker run -d -p 8080:8080 --name color-web "$CI_REGISTRY_IMAGE${tag}"
   # Run this job in a branch where a Dockerfile exists
   rules:
     - if: $CI_COMMIT_BRANCH

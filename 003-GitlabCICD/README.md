@@ -182,10 +182,28 @@ export YOUR_GITLAB_CONTAINER=<Gitlab Container ID>
 sudo mkdir -p /etc/docker/certs.d/registry.gitlab.$YOUR_GITLAB_DOMAIN:5005
 sudo docker cp $YOUR_GITLAB_CONTAINER:/etc/gitlab/ssl/ca.crt /etc/docker/certs.d/registry.gitlab.$YOUR_GITLAB_DOMAIN:5005
 ```
+
+## Issue 4:
+gitlab-runner registry
+```
+ERROR: Registering runner... failed                 runner=GR1348941oqts-yxX status=couldn't execute POST against https://gitlab.chance20221011.com/api/v4/runners: Post "https://gitlab.chance20221011.com/api/v4/runners": x509: certificate signed by unknown authority
+```
 > Refer to:
 > https://www.ibm.com/docs/en/cloud-paks/cp-management/2.2.x?topic=tcnm-logging-into-your-docker-registry-fails-x509-certificate-signed-by-unknown-authority-error
 > https://7thzero.com/blog/private-docker-registry-x509-certificate-signed-by-unknown-authority
 
+## Issue 5: This job is stuck because the project doesn't have any runners online assigned to it.
+When running the gitlab pipeline, the job gets stuck with below error
+```
+This job is stuck because the project doesn't have any runners online assigned to it
+```
+**Cause:**
+Check if any gitlab runner is online. If so, most likely the job is stuck because your unners have tags but your jobs don't.
+
+**Solution:**
+You need to enable your runner without tags. Go to your project and go to "Settings" -> "CI/CD" -> Click the online gitlab runner -> Check "Indicates whether this runner can pick jobs without tags". Then your pipeline should be able to pick this runner.
+
+> Refer to: https://stackoverflow.com/questions/53370840/this-job-is-stuck-because-the-project-doesnt-have-any-runners-online-assigned
 #<a name="reference">Reference</a>
 https://docs.gitlab.com/ee/install/docker.html#install-gitlab-using-docker-compose
 [Runner Cannot Register with error: x509: certificate relies on legacy Common Name field, use SANs instead](https://gitlab.com/gitlab-org/gitlab-runner/-/issues/28841)

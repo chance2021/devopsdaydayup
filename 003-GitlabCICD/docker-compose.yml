@@ -19,6 +19,10 @@ services:
       - 'gitlab_log:/var/log/gitlab'
       - 'gitlab_data:/var/opt/gitlab'
     shm_size: '256m'
+#  color-web:
+#    image: ghcr.io/chance2021/devopsdaydayup:colorweb
+#    ports:
+#    - 8080:8080
   gitlab-runner:
     image: 'gitlab/gitlab-runner:latest'
     restart: always
