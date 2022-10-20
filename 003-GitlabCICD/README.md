@@ -170,8 +170,9 @@ git push
 Once you push the code, you should be able to see the pipeline under the project -> "CI/CD" -> "Jobs"
 
 9. Verification
-  a. Check your hello-world container by visiting the website http://<HOST IP which is running the docker-compose.yaml>:8080
-  b. In your gitlab repo, update `return "Hello World!"` in `app.py`. For example, `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`. 
+
+  a. Check your hello-world container by visiting the website http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
+  b. In your gitlab repo, update `return "Hello World!"` in `app.py`. For example, `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`.<br/> 
   c. Once the CICD pipeline is completed, you can visit your hello-world web again to see if the content is changed. http://<HOST IP which is running the docker-compose.yaml>:8080
 
 
