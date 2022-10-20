@@ -7,8 +7,9 @@ Understand how to setup/configure Gitlab as CICD pipeline. Familarize with gitla
 # Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Project Steps](#project_steps)
-3. [Troubleshooting](#troubleshooting)
-4. [Reference](#reference)
+3. [Post Project](#post_project)
+4. [Troubleshooting](#troubleshooting)
+5. [Reference](#reference)
 
 # <a name="prerequisites">Prerequisites</a>
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
@@ -175,8 +176,8 @@ Once you push the code, you should be able to see the pipeline is automatically 
   b. In your **gitlab repo**, update `return "Hello World!"` in `app.py` file. For example, update to `return "Hello World 2022!"`. Save the change and `git add .` and `git commit -am "Update code"` and then `git push`.<br/> 
   c. Once the CICD pipeline is completed, you can visit your hello-world web again to see if the content is changed. http://<HOST IP which is running the docker-compose.yaml>:8080 <br/>
 
-
-# Troubelshooting
+# Post Project<a name="troubleshooting">Troubleshooting</a>
+# <a name="troubleshooting">Troubleshooting</a>
 
 ## Issue 1: check that a DNS record exists for this domain
 Error out when starting up or reconfigure the gitlab server 
