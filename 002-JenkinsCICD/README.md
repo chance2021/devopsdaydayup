@@ -194,6 +194,13 @@ services:
       - ./data:/var/jenkins_home
       # but not /usr/bin/docker
 ```
+## Issue 5: ERROR: Failed to program FILTER chain: iptables failed: iptables --wait -I FORWARD -o br-6a98sdf0s -j DOCKER: iptables v1.4.21: Couldn't load target : No such file or directory
+When creating the docker-compose, above error showing
+**Solution:**
+Restart your docker engine and try to create again
+```
+sudo systemctl restart docker
+```
 
 > Refer to https://jtuto.com/getting-glibc_2-32-and-glibc_2-34-not-found-in-jenkins-docker-with-dind-on-ubuntu-22-04/
 
