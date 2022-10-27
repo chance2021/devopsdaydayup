@@ -41,7 +41,8 @@ docker-compose up -d
 
     d. **"Credentials"**: If you don't have any credential, click "Add" -> "Jenkins", in "Kind" field select "Username with password". In "Scope" field select "Global(Jenkins, nodes, items, all child items, etc)". In "Username", type your github account username. In "Password", type your github account token. 
 
-    **Note**: In order to get a github token, you can go to your github account and select "Setting" once you click your account icon in the top right. Go to "Developer settings" in the very bottom left lane and go to "Personal access tokens", and then click "Generate new token" to create a new token for above step.
+    **Note**: In order to get a github token, you can go to your github account and select **"Setting"** once you click your account icon in the top right. Go to **"Developer settings"** in the very bottom left lane and go to **"Personal access tokens"** -> **"Tokens(classic)"**, and then click "Generate new token" to create a new token for above step, making sure the token has at lease `write:packages` and `read:packages` so that it can upload/download packages to GitHub Package Registry.
+![github-personal-token](images/github-personal-token.png)
 
 
     e. **"ID"**: Enter the name of this credential, which will be referred in the Pipeline later. For example, github-token.
