@@ -1,3 +1,4 @@
+env=$1
 if [ -z "$env" ]; then
     read -p $'Please enter the environment you wanted to deploy to: \n(example: test)\n' env
 fi
@@ -9,7 +10,7 @@ else
     echo "You are going to deploy to $env now!"
 fi
 
-terraform init -backend-config=config/$env/config.tf
+terraform init -backend-config=config/$env/config.tfbackend
 
 terraform plan -var-file=config/$env/$env.tfvars -out deploy.tfplan
 

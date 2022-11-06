@@ -28,3 +28,6 @@ In this article, you will create a docker container via a terraform script
 
 # <a name="reference">Reference</a>
 [Build Infrastructure - Terraform Docker Example](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build)
+[Backends Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
+[Vault Docker Image](https://hub.docker.com/_/vault)
+
