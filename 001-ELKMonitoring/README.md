@@ -24,6 +24,9 @@ Clone the github repo and run the docker compose to start up the ELK stack
 git clone https://github.com/chance2021/devopsdaydayup.git
 cd devopsdaydayup/001-ELKMonitoring
 sudo sysctl -w vm.max_map_count=262144
+
+# remember to update password in .env file
+
 sudo docker-compose up -d
 ```
 
@@ -63,6 +66,10 @@ output.elasticsearch:
   password: "changeme"
 
 sudo metricbeat setup -e
+
+# if you are in wsl use following command
+# sudo service metricbeat start
+# sudo service metricbeat status
 sudo systemctl start metricbeat
 sudo systemctl status metricbeat
 ```
@@ -70,7 +77,7 @@ sudo systemctl status metricbeat
 
 ## 4. Go to Kibana. In Dashboard, select "[Metricbeat System] Host overview ECS"
 
-a. Open your browser and go to [http://0.0.0.0:5601/](http://0.0.0.0:5601/) (if the metricbeat is installed in your local host). Enter the username/passwors set in `docker-compose.yaml`.
+a. Open your browser and go to [http://0.0.0.0:5601/](http://0.0.0.0:5601/) (if the metricbeat is installed in your local host). Enter the username(default is elastic)/passwors set in `.env`.
 
 b. Click the menu icon in the top left and go to "Dashboard"
 
