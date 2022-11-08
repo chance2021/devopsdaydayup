@@ -1,3 +1,24 @@
-#namespace        = "terraform"
-#secret_suffix    = "tf-state"
-#load_config_file = true
+# export PROJECT_ID="<gitlab-project-id>"
+# export TF_USERNAME="<gitlab-username>"
+# export TF_PASSWORD="<gitlab-personal-access-token>"
+# export TF_ADDRESS="https://gitlab.com/api/v4/projects/${PROJECT_ID}/terraform/state/old-state-name"
+# Note: Please replace above variables into below
+# ---
+#address=${TF_ADDRESS}
+#lock_address=${TF_ADDRESS}/lock
+#unlock_address=${TF_ADDRESS}/lock
+#username=${TF_USERNAME}
+#password=${TF_PASSWORD}
+#lock_method=POST
+#unlock_method=DELETE
+#retry_wait_min=5
+
+address="https://gitlab.example20221106.com/api/v4/projects/34/terraform/state/old-state-name"
+lock_address="https://gitlab.example20221106.com/api/v4/projects/34/terraform/state/old-state-name/lock"
+unlock_address="https://gitlab.example20221106.com/api/v4/projects/34/terraform/state/old-state-name/lock"
+username="root"
+password="glpat-UbibV5QmyAtA1t-bzFUE"
+lock_method="POST"
+unlock_method="DELETE"
+retry_wait_min=5
+
