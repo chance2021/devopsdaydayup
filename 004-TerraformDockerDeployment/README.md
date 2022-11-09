@@ -112,7 +112,7 @@ You should be able to visit the website via `http://0.0.0.0:8080`
 # <a name="post_project">Post Project</a>
 Delete the terraform infra
 ```bash
-terraform destroy
+terraform destroy -var-file=config/test/test.tfvars 
 ```
 Delete the gitlab container, as well as the volumes mounted
 ```bash
