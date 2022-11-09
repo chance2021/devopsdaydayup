@@ -90,7 +90,7 @@ terraform init -backend-config=config/test/config.tfbackend
 ```
 **Plan**
 ```
-terraform plan -var-file=config/$env/$env.tfvars -out deploy.tfplan
+terraform plan -var-file=config/test/test.tfvars -out deploy.tfplan
 ```
 **Apply**
 ```
