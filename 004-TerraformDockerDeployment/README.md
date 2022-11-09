@@ -72,8 +72,10 @@ sudo docker cp gitlab:/etc/gitlab/ssl/gitlab.$YOUR_GITLAB_DOMAIN.crt /usr/local/
 sudo update-ca-certificates
 ```
 
-## 5. Create a new project in your Gitlab server
-Login to your Gitlab server website (`https://<Your_Gitlab_Hostname>`) and Click **"Project"** -> **"Setting""** -> **"Access Token"** -> Type a customized token name in **"terraform-token"** field, Select a role **"Maintainer"**, Select scopes **"api/read_api/read_repositry/write_repository"** </br>
+## 5. Create a new project in your Gitlab server and generate a personal access token
+Login to your Gitlab server website (`https://<Your_Gitlab_Hostname>`) and Click **"New project"** -> **"Create blank project"** -> Type a project name in **"Project name"**, i.g. *first_project*  , select **"Public"** in **Visiblity Level** section -> Click **"Create project"** </br>
+
+Once the project is create, go to the new project -> **"Setting""** -> **"Access Tokens"** -> Type a customized token name in **Token name** field, i.ig  *terraform-token* , Select a role **"Maintainer"** in *Select a role field*, Select scopes **"api/read_api/read_repositry/write_repository"** </br>
 
 Make a note of the new token generated as you will need to apply it in the next step
 
@@ -81,10 +83,10 @@ Make a note of the new token generated as you will need to apply it in the next 
 Before running `terraform init`, you have to update `config/test/config.tfbackend` file with the credential/gitlab server info accordingly. The below is the definition for the variables:</br>
 
 **PROJECT_ID:** Go to the project and head to **"Setting"** -> **"General"**, and you will see **"Project ID"** in the page. </br>
-**TF_USERNAME:** If you haven't created your own user, the default user should be **root** </br>
+**TF_USERNAME:** If you haven't created your own user, the default user should be `root` </br>
 **TF_PASSWORD:** This is the gitlab **personal access token**, which you can fetch from previous step </br>
 **TF_ADDRESS:** This is URL to store your **terraform state file**. The pattern is like `https://<your gitlab server url>/api/v4/projects/<your project id>/terraform/state/old-state-name`. For example: 
-https://gitlab.com/api/v4/projects/${PROJECT_ID}/terraform/state/old-state-name
+`https://gitlab.com/api/v4/projects/${PROJECT_ID}/terraform/state/old-state-name`
 
 ## 7. Run terraform script to deploy the infra
 **Init**
@@ -102,6 +104,7 @@ terraform apply deploy.tfplan
 
 ## 8. Verification
 You should be able to visit the website via `http://0.0.0.0:8080`
+![hello-world](images/hello-world.png)
 
 
 # <a name="post_project">Post Project</a>
