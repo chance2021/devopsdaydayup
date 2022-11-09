@@ -39,6 +39,8 @@ echo "${Your_Local_Host_IP}  gitlab.<Your_Gitlab_Hostname>" |sudo tee -a /etc/ho
 i.g.
 echo "${Your_Local_Host_IP}  gitlab.example20221106.com" |sudo tee -a /etc/hosts
 ```
+Then you should be able to access the Gitlab website via `https://<Your_Gitlab_Hostname>`
+
 ## 3. Update the Gitlab original Certificate
 Since the initial Gitlab server **certificate** is missing some info, you may have to **regenerate** a new one and **reconfigure** in the gitlab server. Run below commands:
 ```bash
@@ -71,12 +73,13 @@ sudo update-ca-certificates
 ```
 
 ## 5. Create a new project in your Gitlab server
-Login to your Gitlab server website and Click **"Project"** -> **"Setting""** -> **"Access Token"** -> Type token name in **"terraform-token"** field, Select a role **"Maintainer"**, Select scopes **"api/read_api/read_repositry/write_repository"** <\br>
+Login to your Gitlab server website (`https://<Your_Gitlab_Hostname>`) and Click **"Project"** -> **"Setting""** -> **"Access Token"** -> Type a customized token name in **"terraform-token"** field, Select a role **"Maintainer"**, Select scopes **"api/read_api/read_repositry/write_repository"** </br>
 
-Make a note of the new token generated and you will apply it in below step
+Make a note of the new token generated as you will apply it in the next step
 
 ## 6. Update `config.tfbackend`
-Before running `terraform init`, you have to update `config/test/config.tfbackend` file with the credential/gitlab server info accordingly. The below is the definition for the variables:
+Before running `terraform init`, you have to update `config/test/config.tfbackend` file with the credential/gitlab server info accordingly. The below is the definition for the variables:</br>
+
 **PROJECT_ID:** Go to the project and head to "Setting" -> "General", and you will see "Project ID" in the page. </br>
 **TF_USERNAME:** If you haven't created your own user, the default user should be `root` </br>
 **TF_PASSWORD:** This is the gitlab personal access token, which you can fetch from previous step </br>
@@ -109,6 +112,10 @@ terraform destroy
 Delete the gitlab container, as well as the volumes mounted
 ```bash
 docker-compose down -v
+```
+Delete the test container if exists
+```bash
+docker rm -f terraform-docker-example
 ```
 
 
