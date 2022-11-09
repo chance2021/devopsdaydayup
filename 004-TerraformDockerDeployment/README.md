@@ -80,10 +80,10 @@ Make a note of the new token generated as you will need to apply it in the next 
 ## 6. Update `config.tfbackend`
 Before running `terraform init`, you have to update `config/test/config.tfbackend` file with the credential/gitlab server info accordingly. The below is the definition for the variables:</br>
 
-**PROJECT_ID:** Go to the project and head to "Setting" -> "General", and you will see "Project ID" in the page. </br>
-**TF_USERNAME:** If you haven't created your own user, the default user should be `root` </br>
-**TF_PASSWORD:** This is the gitlab personal access token, which you can fetch from previous step </br>
-**TF_ADDRESS:** This is URL to store your terraform state file. The pattern is like `https://<your gitlab server url>/api/v4/projects/<your project id>/terraform/state/old-state-name`. For example: 
+**PROJECT_ID:** Go to the project and head to **"Setting"** -> **"General"**, and you will see **"Project ID"** in the page. </br>
+**TF_USERNAME:** If you haven't created your own user, the default user should be **root** </br>
+**TF_PASSWORD:** This is the gitlab **personal access token**, which you can fetch from previous step </br>
+**TF_ADDRESS:** This is URL to store your **terraform state file**. The pattern is like `https://<your gitlab server url>/api/v4/projects/<your project id>/terraform/state/old-state-name`. For example: 
 https://gitlab.com/api/v4/projects/${PROJECT_ID}/terraform/state/old-state-name
 
 ## 7. Run terraform script to deploy the infra
