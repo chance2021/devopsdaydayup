@@ -123,9 +123,9 @@ FATAL: RuntimeError: letsencrypt_certificate[gitlab.example20221106.com] (letsen
 The issue should be fixed by restarting the container (by default it will restart by itself once fail). If still doesn't work, just remove the container as well as the volumes, and then redeploy the docker compose again.
 
 # <a name="reference">Reference</a>
-[Build Infrastructure - Terraform Docker Example](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build)
-[Backends Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)
-[Install Gitlab Docker Compose](https://docs.gitlab.com/ee/install/docker.html)
-[GitLab-managed Terraform state](https://docs.gitlab.com/ee/user/infrastructure/iac/terraform_state.html)
-[Terraform state administration](https://docs.gitlab.com/ee/administration/terraform_state.html)
-[Terraform Setttings Backends http](https://developer.hashicorp.com/terraform/language/settings/backends/http)
+[Build Infrastructure - Terraform Docker Example](https://developer.hashicorp.com/terraform/tutorials/docker-get-started/docker-build) </br>
+[Backends Configuration](https://developer.hashicorp.com/terraform/language/settings/backends/configuration)</br>
+[Install Gitlab Docker Compose](https://docs.gitlab.com/ee/install/docker.html)</br>
+[GitLab-managed Terraform state](https://docs.gitlab.com/ee/user/infrastructure/iac/terraform_state.html)</br>
+[Terraform state administration](https://docs.gitlab.com/ee/administration/terraform_state.html)</br>
+[Terraform Setttings Backends http](https://developer.hashicorp.com/terraform/language/settings/backends/http)</br>
