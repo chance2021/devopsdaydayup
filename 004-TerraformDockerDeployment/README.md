@@ -75,7 +75,7 @@ sudo update-ca-certificates
 ## 5. Create a new project in your Gitlab server
 Login to your Gitlab server website (`https://<Your_Gitlab_Hostname>`) and Click **"Project"** -> **"Setting""** -> **"Access Token"** -> Type a customized token name in **"terraform-token"** field, Select a role **"Maintainer"**, Select scopes **"api/read_api/read_repositry/write_repository"** </br>
 
-Make a note of the new token generated as you will apply it in the next step
+Make a note of the new token generated as you will need to apply it in the next step
 
 ## 6. Update `config.tfbackend`
 Before running `terraform init`, you have to update `config/test/config.tfbackend` file with the credential/gitlab server info accordingly. The below is the definition for the variables:</br>
