@@ -103,6 +103,9 @@ services:
       memlock:
         soft: -1
         hard: -1
+      nofile:
+        soft: 65535
+        hard: 65535
     healthcheck:
       test:
         [
@@ -144,6 +147,9 @@ services:
       memlock:
         soft: -1
         hard: -1
+      nofile:
+        soft: 65535
+        hard: 65535
     healthcheck:
       test:
         [
@@ -185,6 +191,9 @@ services:
       memlock:
         soft: -1
         hard: -1
+      nofile:
+        soft: 65535
+        hard: 65535
     healthcheck:
       test:
         [
