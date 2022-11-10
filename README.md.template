@@ -1,0 +1,27 @@
+# Project Name: 
+
+# Project Goal
+
+# Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Project Steps](#project_steps)
+3. [Post Project](#post_project)
+4. [Troubleshooting](#troubleshooting)
+5. [Reference](#reference)
+
+# <a name="prerequisites">Prerequisites</a>
+- Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
+- Docker(see installation guide [here](https://docs.docker.com/get-docker/))
+- Docker Compose(see installation guide [here](https://docs.docker.com/compose/install/))
+
+# <a name="project_steps">Project Steps</a>
+
+## 1. Step 1
+
+## 2. Step 2
+
+# <a name="post_project">Post Project</a>
+
+# <a name="troubleshooting">Troubleshooting</a>
+
+# <a name="reference">Reference</a>

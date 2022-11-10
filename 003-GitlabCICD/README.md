@@ -167,7 +167,7 @@ Once you finish above step, you should be able to see an available running in th
 ```
 git clone <URL from your gitlab server repo>
 cd <your project name folder>
-cp /path/to/devopsdaydayup/003-GitlabCICD/{app.py,Dockerfile,requirements.txt}  <your gitlab repo>
+cp /path/to/devopsdaydayup/003-GitlabCICD/{app.py,Dockerfile,requirements.txt,.gitlab-ci.yaml,.gitlab-ci.yml}  <your gitlab repo>
 git add .
 git commit -am "First commit"
 git push
