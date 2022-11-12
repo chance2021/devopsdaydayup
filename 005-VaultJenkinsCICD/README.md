@@ -31,13 +31,19 @@ storage "raft" {
 }
 
 listener "tcp" {
-  address     = "127.0.0.1:8200"
+  address     = "0.0.0.0:8200"
   tls_disable = "true"
+  #tls_cert_file = "/vault/vault.crt"
+  #tls_key_file  = "/vault/vault.key"
+  #tls_client_ca_file = "/vault/vault.ca"
 }
 
 api_addr = "http://127.0.0.1:8200"
 cluster_addr = "https://127.0.0.1:8201"
 ui = true
+disable_mlock = true
+max_lease_ttl = "8784h"
+default_lease_ttl = "8784h"
 
 EOF
 ```
@@ -150,16 +156,17 @@ vault kv get -mount=kv-v2 devops-secret/team-1
 # Enable approle
 vault auth enable approle
 vault write auth/approle/role/first-role \
-    secret_id_ttl=10m \
+    secret_id_ttl=10000m \
     token_num_uses=10 \
-    token_ttl=20m \
-    token_max_ttl=30m \
+    token_ttl=20000m \
+    token_max_ttl=30000m \
     secret_id_num_uses=40 \
     token_policies=first-policy
 
 # Check the role id
 vault read -field=role_id auth/approle/role/my-role/role-id
 export ROLE_ID="$(vault read -field=role_id auth/approle/role/first-role/role-id)"
+echo $ROLE_ID
 
 # Check the secret id
 export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/first-role/secret-id)"
@@ -174,9 +181,22 @@ vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID"
 ## 4. Install necessary Jenkins pluglin
 Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Plugin Manager"** and head to "Available" tab. Install following plugins:
 - credentials
+- HashiCorp Vault
+- Hashicorp Vault Pipeline
 - pipeline
 ## 5. Add the role id/secret id in Jenkins
-Login to your Jenkins website and go to **"Manage Jenkins"** -> 
+> Refer to https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential
+Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:
+**Kind:** Vault App Role Credential
+**Scope:** Global (Jenkins,nodes,items,all child items,etc)
+**Role ID:** <ROLE_ID from previous step>
+**Secret ID:** <SECRET_ID from previous step>
+**Path:** approle
+**Namespace:** <Leave it blank>
+**ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-appi-role>
+**Description:** Vault: AppRole Authentication
+
+
 # <a name="post_project">Post Project</a>
 
 # <a name="troubleshooting">Troubleshooting</a>
