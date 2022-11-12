@@ -12,7 +12,7 @@ node {
     // (e.g. folder or global) will be used
     def configuration = [vaultUrl: 'http://vault:8200',
                          vaultCredentialId: 'vault-appi-role',
-                         engineVersion: 2]
+                         engineVersion: 1]
     // inside this block your credentials will be available as env variables
     withVault([configuration: configuration, vaultSecrets: secrets]) {
         sh 'echo $testing'
