@@ -1,3 +1,4 @@
-.terraform
+.terraform*
 terraform.tfstate
 deploy.tfplan
+.env
