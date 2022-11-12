@@ -184,6 +184,7 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Plugin Manage
 - HashiCorp Vault
 - Hashicorp Vault Pipeline
 - pipeline
+- git
 ## 5. Add the role id/secret id in Jenkins
 > Refer to https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential
 Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:
@@ -196,6 +197,8 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-appi-role>
 **Description:** Vault: AppRole Authentication
 
+## 6. Add github credential in Jenkins
+Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:
 
 # <a name="post_project">Post Project</a>
 
