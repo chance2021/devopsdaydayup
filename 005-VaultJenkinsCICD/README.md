@@ -203,6 +203,8 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 # <a name="post_project">Post Project</a>
 
 # <a name="troubleshooting">Troubleshooting</a>
+## Issue 1: Access denied to Vault Secrets at 'kv-v2/devops-secret/team-1'
+
 
 # <a name="reference">Reference</a>
 [Vault Getting Started Deploy](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-deploy)
