@@ -32,7 +32,7 @@ Once it is done, open your **browser** and go to https://<your_gitlab_domain_nam
 # 192.168.2.61 gitlab.chance20221020.com registry.gitlab.chance20221020.com
 ```
 
-NOTE: if you are trying to use localhost as domain name, you have to use following command to get the ip mapping of the host. see detail in [post](https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach): 
+NOTE: if you are trying to use `localhost` as domain name, you have to use following command to get the ip mapping of the host. see detail in [post](https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach): 
 
 ```
 # in the host machine
@@ -51,7 +51,7 @@ In the example, `inet 172.17.42.1/16` will be the mapping of host machine. Then 
 # 172.17.42.1 gitlab.localhost  registry.gitlab.localhost
 ```
 
-The main reason here is `localhost` or `127.0.0.1` will also be specified by containers network. if you update `127.0.0.1  localhost gitlab.localhost  registry.gitlab.localhost`, the container will try to treat itself as `localhost` in stead of host machine.
+The main reason here is `localhost` or `127.0.0.1` will also be specified by containers network. if you update `/etc/hosts` with `127.0.0.1  localhost gitlab.localhost  registry.gitlab.localhost`, the container will try to treat itself as `localhost` in stead of host machine.
 
 ## 3. Login to your gitlab web.
 Wait for about **5 mins** for the server to fully start up. Then login to the **Gitlab website (https://<YOUR_GITLAB_SERVER_IP>)** with the username `root` and the password defined in your `docker-compose.yaml`, which should be the value for env varible `GITLAB_ROOT_PASSWORD`. <br/>
@@ -277,12 +277,14 @@ You need to enable your runner without tags. Go to your project and go to "Setti
 
 ## Issue 6: New runner. Has not connected yet.
 
+**Cause:**
 sometimes you might see the waring icon at the left side of runner. It is due to unverified runner been setup.
 
 ![runner-is-not-ready-yet](images/issue6-runner-is-not-ready-yet.png)
 
+**
 Solution:
-
+**
 ```
 docker exec -it $(docker ps -f name=gitlab-runner -q) bash
 gitlab-runner verify --delete
