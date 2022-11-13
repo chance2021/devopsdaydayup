@@ -20,6 +20,7 @@ node {
         sh 'env'
         sh 'cat testing.txt'
         sh 'echo "hello \n world" > hello_world.txt'
+        sh ' echo $testing >> hello_world.txt'
         sh 'cat hello_world.txt'
         sh 'echo $testing_again|tee testing_again.txt'
         sh 'cat testing_again.txt'
