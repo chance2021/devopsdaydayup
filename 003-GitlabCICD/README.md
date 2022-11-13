@@ -282,9 +282,7 @@ sometimes you might see the waring icon at the left side of runner. It is due to
 
 ![runner-is-not-ready-yet](images/issue6-runner-is-not-ready-yet.png)
 
-**
-Solution:
-**
+**Solution:**
 ```
 docker exec -it $(docker ps -f name=gitlab-runner -q) bash
 gitlab-runner verify --delete
