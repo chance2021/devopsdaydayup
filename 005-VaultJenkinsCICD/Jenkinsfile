@@ -16,6 +16,8 @@ node {
     // inside this block your credentials will be available as env variables
     withVault([configuration: configuration, vaultSecrets: secrets]) {
         sh 'echo $testing|tee testing.txt'
+        sh 'export TESTING=$testing'
+        sh 'env'
         sh 'cat testing.txt'
         sh 'echo $testing_again|tee testing_again.txt'
         sh 'cat testing_again.txt'
