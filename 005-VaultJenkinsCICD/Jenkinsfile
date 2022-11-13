@@ -3,7 +3,7 @@ node {
     // engine version can be defined on secret, job, folder or global.
     // the default is engine version 2 unless otherwise specified globally.
     def secrets = [
-        [path: 'kv-v2/devops-secret/team-1', engineVersion: 2, secretValues: [
+        [path: 'kv-v2/data/devops-secret/team-1', engineVersion: 2, secretValues: [
             [envVar: 'testing', vaultKey: 'username2'],
             [envVar: 'testing_again', vaultKey: 'password2']]],
     ]
