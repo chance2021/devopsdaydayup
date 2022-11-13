@@ -204,6 +204,19 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 
 # <a name="troubleshooting">Troubleshooting</a>
 ## Issue 1: Access denied to Vault Secrets at 'kv-v2/devops-secret/team-1'
+**Solution:**
+If you see an information in the log like `[INFO]  expiration: revoked lease`, that means your secret is expired and you may need to renew it by running below command:
+```
+vault write -f -field=secret_id auth/approle/role/first-role/secret-id
+```
+Then, you can update your new secret in corresponding Jenkins credential.
+
+Sometime this may be a general error which indicates something wrong in your Jenkinsfile configuration. One thing worth to mention is that, in the Jenkinsfile, `secrets` should use `engineVersion:2`, while `configuration` should use engineVersion:1`. This is because `engineVersion:2` in `secrets` is referring to kv version, which is version 2 in our lab. However the `engineVersion` in `configuration` is referringto the API version, which should be version 1. You can tell this in below API call:
+```
+curl  --header "X-Vault-Token: hvs.CAESI..."     http://vault:8200/v1/kv-v2/devops-secret/team-1
+```
+
+You can see `http://vault:8200/v1` which means the API version is `1`. This is referring to the `engineVersion` in `configuration`. Also, my secret actual path is `kv-v2/data/devops-secret/team-1`, `/data` is just prefix for kv 2 secret path, so that is why `engineVersion` is `2` in `secret` as it is reffering to the kv version, not API version. 
 
 
 # <a name="reference">Reference</a>
