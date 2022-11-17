@@ -156,7 +156,7 @@ vault kv get -mount=kv-v2 devops-secret/team-1
 ## 4. Add the role id/secret id in Jenkins
 > Refer to https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential
 
-Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection: </br>
+Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page in below selection: </br>
 **Kind:** Vault App Role Credential</br>
 **Scope:** Global (Jenkins,nodes,items,all child items,etc)</br>
 **Role ID:** <ROLE_ID from previous step></br>
@@ -207,6 +207,6 @@ You can see `http://vault:8200/v1` which means the API version is `1`. This is r
 
 
 # <a name="reference">Reference</a>
-[Vault Getting Started Deploy](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-deploy)
-[Vault Store The Google API Key](https://developer.hashicorp.com/vault/tutorials/secrets-management/static-secrets#store-the-google-api-key)
-[Vault Signed SSH Certificates](https://developer.hashicorp.com/vault/docs/secrets/ssh/signed-ssh-certificates
+[Vault Getting Started Deploy](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-deploy)</br>
+[Vault Store The Google API Key](https://developer.hashicorp.com/vault/tutorials/secrets-management/static-secrets#store-the-google-api-key)</br>
+[Vault Signed SSH Certificates](https://developer.hashicorp.com/vault/docs/secrets/ssh/signed-ssh-certificates)</br>
