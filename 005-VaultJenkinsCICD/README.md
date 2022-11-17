@@ -163,7 +163,7 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **Secret ID:** <SECRET_ID from previous step></br>
 **Path:** approle</br>
 **Namespace:** (Leave it blank) </br>
-**ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role></br>
+**ID:** (the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role)</br>
 **Description:** Vault: AppRole Authentication</br>
 
 ## 5. Add github credential in Jenkins
