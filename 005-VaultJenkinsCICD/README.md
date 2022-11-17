@@ -131,7 +131,7 @@ echo $ROLE_ID
 ```
 > Note: Please make a note as it will be needed when configuring Jenkins credential
 
-d. Create a secret id via the previous role
+d. Create a **secret id** via the previous role
 ```
 export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/first-role/secret-id)"
 echo $SECRET_ID
@@ -162,7 +162,7 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **Role ID:** <ROLE_ID from previous step></br>
 **Secret ID:** <SECRET_ID from previous step></br>
 **Path:** approle</br>
-**Namespace:** <Leave it blank> </br>
+**Namespace:** (Leave it blank) </br>
 **ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role></br>
 **Description:** Vault: AppRole Authentication</br>
 
