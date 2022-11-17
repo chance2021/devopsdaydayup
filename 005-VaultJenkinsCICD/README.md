@@ -17,21 +17,18 @@
 # <a name="project_steps">Project Steps</a>
 
 ## 1. Initiate Vault
-### a. Login to Vault container
+a. **Initializing** the Vault
 ```bash
 docker exec -it $(docker ps -f name=vault_1 -q) sh
-```
-### b. Initializing the Vault
-```
 export VAULT_ADDR='http://127.0.0.1:8200'
 vault operator init
 ```
-Make a note of the output. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
+**Make a note of the output**. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
 
-### c. Unsealing the vault
-Type `vault operator unseal <unseal key>` and pick 3 unseal keys from above output to unseal the vault.
+b. **Unsealing** the vault </br>
+Type `vault operator unseal <unseal key>` and pick **3 unseal keys** from above output to unseal the vault. </br>
 
-When the value for Sealed changes to 'false', the Vault is unsealed. Then you should see below similar output
+When the value for Sealed changes to **false**, the Vault is unsealed. Then you should see below similar output
 
 ```
 Unseal Key (will be hidden): 
@@ -54,7 +51,7 @@ Active Node Address     <none>
 Raft Committed Index    31
 Raft Applied Index      31
 ```
-### d. Login to vault with root 
+c. Signin to vault with **root** 
 Type `vault login` and enter the `Initial Root Token` retrieving from previous output
 ```
 / # vault login
@@ -82,7 +79,7 @@ vault secrets enable -version=2 kv-v2
 vault kv put -mount=kv-v2 devops-secret username=root password=changeme
 
 ```
-You can read the data by running this:
+You can **read** the data by running this:
 ```
 vault kv get -mount=kv-v2 devops-secret
 ```
@@ -100,8 +97,9 @@ username    root
 
 
 ## 3. Write a Vault Policy and create a token
+
+a. **Write** a policy
 ```
-# Write a policy
 cat > policy.hcl  <<EOF
 path "kv-v2/data/devops-secret/*" {
   capabilities = ["create", "update","read"]
@@ -110,9 +108,15 @@ EOF
 vault policy write first-policy policy.hcl
 vault policy list
 vault policy read first-policy
+```
 
-# Enable approle
+b. **Enable approle**
+```
 vault auth enable approle
+```
+
+c. Create an **role**
+```
 vault write auth/approle/role/first-role \
     secret_id_ttl=10000m \
     token_num_uses=10 \
@@ -124,20 +128,26 @@ vault write auth/approle/role/first-role \
 # Check the role id
 export ROLE_ID="$(vault read -field=role_id auth/approle/role/first-role/role-id)"
 echo $ROLE_ID
+```
 > Note: Please make a note as it will be needed when configuring Jenkins credential
 
-# Check the secret id
+d. Create a secret id via the previous role
+```
 export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/first-role/secret-id)"
 echo $SECRET_ID
+```
 > Note: Please make a note as it will be needed when configuring Jenkins credential
 
-# Create a token with the role ID and secret ID
+e. Create a **token** with the role ID and secret ID
+```
 apk add jq
 export VAULT_TOKEN=$(vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID" -format=json|jq .auth.client_token)
 echo $VAULT_TOKEN
 vault token lookup | grep policies
+```
 
-# Write a secret with the new token
+f. Write a **secret** via the new token
+```
 vault kv put -mount=kv-v2 devops-secret/team-1 username2=root2 password2=changemeagain
 vault kv get -mount=kv-v2 devops-secret/team-1
 
@@ -145,36 +155,39 @@ vault kv get -mount=kv-v2 devops-secret/team-1
 
 ## 4. Add the role id/secret id in Jenkins
 > Refer to https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential
-Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:
-**Kind:** Vault App Role Credential
-**Scope:** Global (Jenkins,nodes,items,all child items,etc)
-**Role ID:** <ROLE_ID from previous step>
-**Secret ID:** <SECRET_ID from previous step>
-**Path:** approle
-**Namespace:** <Leave it blank>
-**ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role>
-**Description:** Vault: AppRole Authentication
+Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection: </br>
+**Kind:** Vault App Role Credential</br>
+**Scope:** Global (Jenkins,nodes,items,all child items,etc)</br>
+**Role ID:** <ROLE_ID from previous step></br>
+**Secret ID:** <SECRET_ID from previous step></br>
+**Path:** approle</br>
+**Namespace:** <Leave it blank></br>
+**ID:** <the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role></br>
+**Description:** Vault: AppRole Authentication</br>
 
 ## 5. Add github credential in Jenkins
-Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:
+Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:</br>
 **Scope:** Global (Jenkins,nodes,items,all child items,etc) </br>
 **Username:** <your github username></br>
 **Password:** <your github personal access token> (please refer to [here](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)</br>
-**ID:** <the id which will be referred in Jenkinsfile, i.g. github-token>
-**Description:** Github token
+**ID:** <the id which will be referred in Jenkinsfile, i.g. github-token></br>
+**Description:** Github token</br>
 
 ## 6. Create a Jenkins Pipeline
-a. In the Jenkins portal, click "New Item" in the left navigation lane, and type the item name (i.g. first-project) and select "Pipeline". Click "OK" to configure the pipeline. 
-b. Go to "Pipeline" section and select "Pipeline script from SCM" in the "Definition" field
-c. Select "Git" in "SCM" field
-d. Add `https://github.com/chance2021/devopsdaydayup.git` in "Repository URL" field
-e. Select your github credential in "Credentials"
-f. Type `*/main` in "Branch Specifier" field
-g. Type `005-VaultJenkinsCICD/Jenkinsfile` in "Script Path"
-h. Unselect "Lightweight checkout"
+a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline. 
+b. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field
+c. Select **"Git"** in **"SCM"** field
+d. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field
+e. Select your github credential in **"Credentials"**
+f. Type `*/main` in **"Branch Specifier"** field
+g. Type `005-VaultJenkinsCICD/Jenkinsfile` in **"Script Path"**
+h. Unselect **"Lightweight checkout"**
 
 # <a name="post_project">Post Project</a>
-
+Delete the docker-compose containers, as well as the volumes associated
+```
+docker-compose down -v
+```
 # <a name="troubleshooting">Troubleshooting</a>
 ## Issue 1: Access denied to Vault Secrets at 'kv-v2/devops-secret/team-1'
 **Solution:**
