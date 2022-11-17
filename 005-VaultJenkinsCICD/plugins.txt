@@ -1,0 +1,15 @@
+credentials:1214.v1de940103927
+configuration-as-code:1559.v38a_b_2e3b_6b_b_7
+docker-workflow:528.v7c193a_0b_e67c
+job-dsl:1.81
+git:4.12.1
+github:1.36.0
+authorize-project:1.4.0
+matrix-auth:3.1.5
+job-restrictions:0.8
+view-job-filters:2.3
+nested-view:1.26
+# build-pipeline-plugin: The Jenkins project announced an unresolved security vulnerability affecting the current version of this plugin 
+build-pipeline-plugin:1.5.7.1
+hashicorp-vault-plugin:359.v2da_3b_45f17d5
+

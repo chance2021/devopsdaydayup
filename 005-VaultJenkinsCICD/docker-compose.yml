@@ -1,28 +1,30 @@
 version: '2'
-
 services:
   jenkins:
-    image: docker.io/bitnami/jenkins:2
+    build:
+      context: .
+      dockerfile: jenkinsplugin.Dockerfile
     user: root
+    privileged: true
     ports:
-      - '80:8080'
+      - '8080:8080'
+      - '50000:50000'
     environment:
       # Please update JENKINS_PASSWORD and JENKINS_USERNAME in .env file
-      - JENKINS_PASSWORD=$JENKINS_PASSWORD
-      - JENKINS_USERNAME=$JENKINS_USERNAME
       - JENKINS_USER=root
       - TZ=America/Toronto
+      - JENKINS_ADMIN_ID=$JENKINS_USERNAME
+      - JENKINS_ADMIN_PASSWORD=$JENKINS_PASSWORD
     volumes:
-      - 'jenkins_data:/bitnami/jenkins'
+      - 'jenkins_data:/var/jenkins_home'
       - '/usr/bin/docker:/usr/bin/docker'
       - '/var/run/docker.sock:/var/run/docker.sock'
   vault:
-    image: vault:1.12.1
+    build: 
+      context: .
+      dockerfile: vault.Dockerfile 
     cap_add:
       - IPC_LOCK
-    environment:
-      - 'VAULT_LOCAL_CONFIG={"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h"}'
-    command: ["server"]
     volumes:
       - type: volume
         source: vault_file
