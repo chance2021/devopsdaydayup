@@ -175,14 +175,14 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **Description:** Github token</br>
 
 ## 6. Create a Jenkins Pipeline
-a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline. 
-b. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field
-c. Select **"Git"** in **"SCM"** field
-d. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field
-e. Select your github credential in **"Credentials"**
-f. Type `*/main` in **"Branch Specifier"** field
-g. Type `005-VaultJenkinsCICD/Jenkinsfile` in **"Script Path"**
-h. Unselect **"Lightweight checkout"**
+a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br> 
+b. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
+c. Select **"Git"** in **"SCM"** field</br>
+d. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field</br>
+e. Select your github credential in **"Credentials"**</br>
+f. Type `*/main` in **"Branch Specifier"** field</br>
+g. Type `005-VaultJenkinsCICD/Jenkinsfile` in **"Script Path"**</br>
+h. Unselect **"Lightweight checkout"**</br>
 
 # <a name="post_project">Post Project</a>
 Delete the docker-compose containers, as well as the volumes associated
