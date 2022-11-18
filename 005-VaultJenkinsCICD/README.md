@@ -1,6 +1,7 @@
 # Project Name: Vault Jenkins Pipeline 
 
 # Project Goal
+In this article, you will learn how to integrate Vault into Jenkins pipeline, as well as the basic usage of Hashicorp Vault.
 
 # Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -23,12 +24,12 @@ docker exec -it $(docker ps -f name=vault_1 -q) sh
 export VAULT_ADDR='http://127.0.0.1:8200'
 vault operator init
 ```
-**Make a note of the output**. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
+**Note:** Make a note of the output. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
 
 b. **Unsealing** the vault </br>
-Type `vault operator unseal <unseal key>` and pick **3 unseal keys** from above output to unseal the vault. </br>
+Type `vault operator unseal <unseal key>`. The unseal keys are from previous output. You will need at lease **3 keys** to unseal the vault. </br>
 
-When the value for Sealed changes to **false**, the Vault is unsealed. Then you should see below similar output
+When the value of  `Sealed` changes to **false**, the Vault is unsealed. You should see below similar output once it is unsealed
 
 ```
 Unseal Key (will be hidden): 
@@ -51,7 +52,7 @@ Active Node Address     <none>
 Raft Committed Index    31
 Raft Applied Index      31
 ```
-c. Signin to vault with **root** 
+c. Sign in to vault with **root** user </br>
 Type `vault login` and enter the `Initial Root Token` retrieving from previous output
 ```
 / # vault login
@@ -94,10 +95,7 @@ username    root
 ```
 > Note: Since version 2 kv has prefixed `data/`, your secret path will be `kv-v2/data/devops-secret`, instead of `kv-v2/devops-secret`
 
-
-
 ## 3. Write a Vault Policy and create a token
-
 a. **Write** a policy
 ```
 cat > policy.hcl  <<EOF
@@ -129,14 +127,14 @@ vault write auth/approle/role/first-role \
 export ROLE_ID="$(vault read -field=role_id auth/approle/role/first-role/role-id)"
 echo $ROLE_ID
 ```
-> Note: Please make a note as it will be needed when configuring Jenkins credential
+> **Note:** Please make a note as it will be needed when configuring Jenkins credential
 
 d. Create a **secret id** via the previous role
 ```
 export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/first-role/secret-id)"
 echo $SECRET_ID
 ```
-> Note: Please make a note as it will be needed when configuring Jenkins credential
+> **Note:** Please make a note as it will be needed when configuring Jenkins credential
 
 e. Create a **token** with the role ID and secret ID
 ```
@@ -169,9 +167,9 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 ## 5. Add github credential in Jenkins
 Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:</br>
 **Scope:** Global (Jenkins,nodes,items,all child items,etc) </br>
-**Username:** <your github username></br>
-**Password:** <your github personal access token> (please refer to [here](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)</br>
-**ID:** <the id which will be referred in Jenkinsfile, i.g. github-token></br>
+**Username:** (your github username)</br>
+**Password:** <your github personal access token> (please refer to [here](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token))</br>
+**ID:** (the id which will be referred in Jenkinsfile, i.g. github-token)</br>
 **Description:** Github token</br>
 
 ## 6. Create a Jenkins Pipeline
@@ -198,7 +196,7 @@ vault write -f -field=secret_id auth/approle/role/first-role/secret-id
 ```
 Then, you can update your new secret in corresponding Jenkins credential.
 
-Sometime this may be a general error which indicates something wrong in your Jenkinsfile configuration. One thing worth to mention is that, in the Jenkinsfile, `secrets` should use `engineVersion:2`, while `configuration` should use engineVersion:1`. This is because `engineVersion:2` in `secrets` is referring to kv version, which is version 2 in our lab. However the `engineVersion` in `configuration` is referringto the API version, which should be version 1. You can tell this in below API call:
+Sometime this may be a general error which indicates something wrong in your Jenkinsfile configuration. One thing worth to mention is that, in the Jenkinsfile, `secrets` should use `engineVersion:2`, while `configuration` should use `engineVersion:1`. This is because `engineVersion:2` in `secrets` is referring to kv version, which is version 2 in our lab. However the `engineVersion` in `configuration` is referringto the API version, which should be version 1. You can tell this in below API call:
 ```
 curl  --header "X-Vault-Token: hvs.CAESI..."     http://vault:8200/v1/kv-v2/devops-secret/team-1
 ```
