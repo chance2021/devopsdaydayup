@@ -40,7 +40,7 @@ g. Type `006-NexusSonarsourceJenkinsCICD/Jenkinsfile` in **"Script Path"**</br>
 h. Unselect **"Lightweight checkout"**</br>
 
 
-
+Manage Jenkins -> Gloabl Tool Configuration -> Maven -> Name "m3" , check "Install automatically", version "3.8.6" -> Click "Save"
 
 # <a name="post_project">Post Project</a>
 
