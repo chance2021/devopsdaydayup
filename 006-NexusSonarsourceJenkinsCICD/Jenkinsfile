@@ -1,5 +1,5 @@
 #!groovy
-# ref: https://github.com/ricardozanini/soccer-stats/blob/master/Jenkinsfile
+// ref: https://github.com/ricardozanini/soccer-stats/blob/master/Jenkinsfile
 
 // FULL_BUILD -> true/false build parameter to define if we need to run the entire stack for lab purpose only
 final FULL_BUILD = params.FULL_BUILD
