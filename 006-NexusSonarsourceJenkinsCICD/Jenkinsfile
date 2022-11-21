@@ -23,6 +23,7 @@ stage('Build') {
     }
 }
 
+/**
 if(FULL_BUILD) {
     stage('Unit Tests') {   
         node {
@@ -33,6 +34,7 @@ if(FULL_BUILD) {
         }
     }
 }
+**/
 
 if(FULL_BUILD) {
     stage('Integration Tests') {

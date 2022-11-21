@@ -12,4 +12,4 @@ nested-view:1.26
 # build-pipeline-plugin: The Jenkins project announced an unresolved security vulnerability affecting the current version of this plugin 
 build-pipeline-plugin:1.5.7.1
 hashicorp-vault-plugin:359.v2da_3b_45f17d5
-
+pipeline-utility-steps:2.14.0
