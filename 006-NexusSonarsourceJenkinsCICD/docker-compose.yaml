@@ -1,0 +1,36 @@
+version: "2"
+
+services:
+  nexus:
+    image: sonatype/nexus
+    volumes:
+      - "nexus-data:/sonatype-work"
+    ports:
+      - "8081:8081"
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkinsplugin.Dockerfile
+    user: root
+    privileged: true
+    ports:
+      - '8080:8080'
+      - '50000:50000'
+    environment:
+      # Please update JENKINS_PASSWORD and JENKINS_USERNAME in .env file
+      - JENKINS_USER=root
+      - TZ=America/Toronto
+      - JENKINS_ADMIN_ID=$JENKINS_USERNAME
+      - JENKINS_ADMIN_PASSWORD=$JENKINS_PASSWORD
+    volumes:
+      - 'jenkins_data:/var/jenkins_home'
+      - '/usr/bin/docker:/usr/bin/docker'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+ 
+volumes:
+  nexus-data: 
+    driver: local
+  jenkins_data:
+    driver: local
+
+
