@@ -21,7 +21,7 @@ pipeline {
       stage("Maven Build") {
           steps {
               script {
-                  sh "cd cargotracker"
+                  sh "ls"
                   sh "pwd"
                   sh "mvn package -DskipTests=true"
               }
