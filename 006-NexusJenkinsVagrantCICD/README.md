@@ -18,27 +18,57 @@
 
 # <a name="project_steps">Project Steps</a>
 
-## 1. Step 1
+## 1. Deploy Jenins and Nexus containers
+```
 docker-compose build
 docker-compose up -d
+```
 
-# To test
-curl http://0.0.0.0:8081/nexus/service/local/status
-
+## 2. Configure Nexus
+a. Open a browser and login to Nexus web page (http://0.0.0.0:8081)</br>
+b. Fetch the password for `admin` user</br>
+```
 docker exec $(docker ps --filter name=nexus_1 -q) cat /nexus-data/admin.password
+```
+c. Click "Sign In" in the top right and type username as "admin" and also the password fetched in the previous step</br>
+d. Follow the wizard and reset your password. Select "Enable anonymous access" and click "Next"->"Finish" to complete the guide.</br>
+e. Click "Gear" icon in the top and click "Repositories" in "Repository" section. Click "Create repository" to create a new repo.</br>
+![nexus-create-repo](images/nexus-create-repo.png)
+f. Select "maven2(hosted)" and fill below fields as instructed: </br>
+Name: maven-nexus-repo</br>
+Version policy: Mixed</br>
+Deployment policy: Allow redeploy</br>
+![nexus-create-repo-2](images/nexus-create-repo-2.png)
+Click "Create repository" in the bottom</br>
+g. To create a new user, go to "Security" -> "Users" -> Click "Create local user" and fill below fields as instructed: </br>
+ID: jenkins-user </br>
+First name: Jenkins</br>
+Last name: User</br>
+Email: jenkins.user@gmail.com</br>
+Password: <Type your password></br>
+Confirm password: <Type the same password you entered above></br>
+Status: Active</br>
+Roles: nx-admin</br> 
 
-It can take some time (2-3 minutes) for the service to launch in a new container. You can tail the log to determine once Nexus is ready:
-$ docker logs -f nexus
+## 3. Configure Jenkins
+a. Login to your Jenkins website (http://0.0.0.0:8080) and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page in below selection: </br>
+> Note: The username and password is in `.env` file
+**Kind:** Username with password
+**Scope:** Global(Jenkins, nodes, items, all child items, etc)
+**Username:** jenkins-user
+**Password:** <Type the password you set in previous step>
+**ID:** nexus
+**Description:** nexus credential
 
-## 6. Create a Jenkins Pipeline
-a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
-b. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
-c. Select **"Git"** in **"SCM"** field</br>
-d. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field</br>
-e. Select your github credential in **"Credentials"**</br>
-f. Type `*/main` in **"Branch Specifier"** field</br>
-g. Type `006-NexusSonarsourceJenkinsCICD/Jenkinsfile` in **"Script Path"**</br>
-h. Unselect **"Lightweight checkout"**</br>
+
+b. To create a new pipeline, go back to Dashboard, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
+c. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
+d. Select **"Git"** in **"SCM"** field</br>
+e. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field</br>
+f. Select your github credential in **"Credentials"**</br>
+g. Type `*/main` in **"Branch Specifier"** field</br>
+h. Type `006-NexusJenkinsVagrantCICD/Jenkinsfile` in **"Script Path"**</br>
+i. Unselect **"Lightweight checkout"**</br>
 
 
 Manage Jenkins -> Gloabl Tool Configuration -> Maven -> Name "m3" , check "Install automatically", version "3.8.6" -> Click "Save"
