@@ -2,7 +2,7 @@ credentials:1214.v1de940103927
 configuration-as-code:1559.v38a_b_2e3b_6b_b_7
 docker-workflow:528.v7c193a_0b_e67c
 job-dsl:1.81
-git:4.12.1
+git:4.13.0
 github:1.36.0
 authorize-project:1.4.0
 matrix-auth:3.1.5
@@ -13,3 +13,6 @@ nested-view:1.26
 build-pipeline-plugin:1.5.7.1
 hashicorp-vault-plugin:359.v2da_3b_45f17d5
 pipeline-utility-steps:2.14.0
+pipeline-graph-view:143.v33ca_60725f13
+workflow-aggregator:590.v6a_d052e5a_a_b_5
+nexus-artifact-uploader:2.14

@@ -42,6 +42,8 @@ h. Unselect **"Lightweight checkout"**</br>
 
 Manage Jenkins -> Gloabl Tool Configuration -> Maven -> Name "m3" , check "Install automatically", version "3.8.6" -> Click "Save"
 
+Add nexus in credential (admin/admin123)
+
 # <a name="post_project">Post Project</a>
 
 # <a name="troubleshooting">Troubleshooting</a>

@@ -89,7 +89,7 @@ if(FULL_BUILD) {
                 nexusUrl: NEXUS_URL, 
                 nexusVersion: 'nexus3', 
                 protocol: 'http', 
-                repository: 'ansible-meetup', 
+                repository: 'Snapshots', 
                 version: "${pom.version}"        
         }
     }
