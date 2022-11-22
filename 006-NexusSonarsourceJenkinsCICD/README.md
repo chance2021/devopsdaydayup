@@ -13,6 +13,8 @@
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
 - Docker(see installation guide [here](https://docs.docker.com/get-docker/))
 - Docker Compose(see installation guide [here](https://docs.docker.com/compose/install/))
+- Vagrant(see download page [here](https://developer.hashicorp.com/vagrant/downloads))
+- VBox (see installation guide [here](https://www.virtualbox.org/wiki/Linux_Downloads))
 
 # <a name="project_steps">Project Steps</a>
 
@@ -43,6 +45,8 @@ Manage Jenkins -> Gloabl Tool Configuration -> Maven -> Name "m3" , check "Insta
 
 Add nexus in credential (admin/admin123)
 
+vagrant plugin install vagrant-scp
+
 # <a name="post_project">Post Project</a>
 
 # <a name="troubleshooting">Troubleshooting</a>
@@ -54,8 +58,32 @@ Below error occurs when running `mvn package -DskipTests=true`:
 **Solution:**
 Change Maven version to 3.3.9 in Jenkins
 
+## Issue 2: Failed to execute goal org.apache.maven.plugins:maven-war-plugin:2.2:war (default-war) on project my-app
+
+**Solution:**
+
+ref: https://stackoverflow.com/questions/33390460/maven-error-assembling-war-webxml-attribute-is-required-when-building-the-sprin
+
+## Issue 3: Stderr: VBoxManage: error: VT-x is disabled in the BIOS for all CPU modes (VERR_VMX_MSR_ALL_VMX_DISABLED)
+When running `vagrant up`, see below error:
+```
+here was an error while executing `VBoxManage`, a CLI used by Vagrant
+for controlling VirtualBox. The command and stderr is shown below.
+
+Command: ["startvm", "a37a5fa4-0d58-460e-96f2-e6336c12ad2e", "--type", "headless"]
+
+Stderr: VBoxManage: error: VT-x is disabled in the BIOS for all CPU modes (VERR_VMX_MSR_ALL_VMX_DISABLED)
+VBoxManage: error: Details: code NS_ERROR_FAILURE (0x80004005), component ConsoleWrap, interface IConsole
+
+```
+**Solution:**
+https://www.howtogeek.com/213795/how-to-enable-intel-vt-x-in-your-computers-bios-or-uefi-firmware/
 # <a name="reference">Reference</a>
 [Integrating Ansible Jenkins CICD Process](https://www.redhat.com/en/blog/integrating-ansible-jenkins-cicd-process) </br>
 
 [Maven In Five Minutes](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)</br>
 [Publishing Artifacts to Sonatype Nexus Using Jenkins](https://dzone.com/articles/publishing-artifacts-to-sonatype-nexus-using-jenki)</br>
+[Maven Crash Course](https://www.marcobehler.com/guides/mvn-clean-install-a-short-guide-to-maven#_a_look_at_the_maven_build_lifecycle_phases)</br>
+[How to Upload Artifact to Nexus using Jenkins](https://www.fosstechnix.com/how-to-upload-artifact-to-nexus-using-jenkins/)</br>
+[Vagrant Cheat Sheet](https://gist.github.com/wpscholar/a49594e2e2b918f4d0c4)</br>
+[Install Tomcat](https://linuxhint.com/install_apache_tomcat_server_ubuntu/)
