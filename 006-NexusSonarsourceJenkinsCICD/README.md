@@ -58,3 +58,5 @@ Change Maven version to 3.3.9 in Jenkins
 # <a name="reference">Reference</a>
 [Integrating Ansible Jenkins CICD Process](https://www.redhat.com/en/blog/integrating-ansible-jenkins-cicd-process) </br>
 
+[Maven In Five Minutes](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)</br>
+
