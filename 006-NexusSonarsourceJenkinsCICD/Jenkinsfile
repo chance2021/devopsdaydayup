@@ -4,9 +4,9 @@ pipeline {
       maven "m3"
   }
   environment {
-      NEXUS_VERSION = "nexus"
+      NEXUS_VERSION = "nexus3"
       NEXUS_PROTOCOL = "http"
-      NEXUS_URL = "nexus:8081/nexus"
+      NEXUS_URL = "nexus:8081"
       NEXUS_REPOSITORY = "snapshots"
       NEXUS_CREDENTIAL_ID = "nexus"
   }

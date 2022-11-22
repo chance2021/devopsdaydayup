@@ -23,8 +23,7 @@ docker-compose up -d
 # To test
 curl http://0.0.0.0:8081/nexus/service/local/status
 
-Default credentials are: admin / admin123
-
+docker exec $(docker ps --filter name=nexus_1 -q) cat /nexus-data/admin.password
 
 It can take some time (2-3 minutes) for the service to launch in a new container. You can tail the log to determine once Nexus is ready:
 $ docker logs -f nexus
@@ -59,4 +58,4 @@ Change Maven version to 3.3.9 in Jenkins
 [Integrating Ansible Jenkins CICD Process](https://www.redhat.com/en/blog/integrating-ansible-jenkins-cicd-process) </br>
 
 [Maven In Five Minutes](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)</br>
-
+[Publishing Artifacts to Sonatype Nexus Using Jenkins](https://dzone.com/articles/publishing-artifacts-to-sonatype-nexus-using-jenki)</br>

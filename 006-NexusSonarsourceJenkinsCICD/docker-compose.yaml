@@ -2,9 +2,9 @@ version: "2"
 
 services:
   nexus:
-    image: sonatype/nexus
+    image: sonatype/nexus3
     volumes:
-      - "nexus-data:/sonatype-work"
+      - "nexus-data:/nexus-data"
     ports:
       - "8081:8081"
   jenkins:
