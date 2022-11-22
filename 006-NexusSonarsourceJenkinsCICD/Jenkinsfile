@@ -56,7 +56,7 @@ pipeline {
                               type: pom.packaging],
                               [artifactId: pom.artifactId,
                               classifier: '',
-                              file: "pom.xml",
+                              file: "006-NexusSonarsourceJenkinsCICD/pom.xml",
                               type: "pom"]
                           ]
                       );
