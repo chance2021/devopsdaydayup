@@ -21,6 +21,7 @@ pipeline {
       stage("Maven Build") {
           steps {
               script {
+                  sh "cd 006-NexusSonarsourceJenkinsCICD"
                   sh "ls"
                   sh "pwd"
                   sh "mvn clean package -DskipTests=true"
