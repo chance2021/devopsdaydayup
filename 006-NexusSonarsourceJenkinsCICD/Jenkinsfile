@@ -23,8 +23,9 @@ pipeline {
               script {
                   sh "ls"
                   sh "pwd"
-                  sh "mvn package -DskipTests=true"
-                  sh "cd 006-NexusSonarsourceJenkinsCICD"
+                  sh "mvn clean package -DskipTests=true"
+                  sh "pwd"
+                  sh "ls"
               }
           }
       }
