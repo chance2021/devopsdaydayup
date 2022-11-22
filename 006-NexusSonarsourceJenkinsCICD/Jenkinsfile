@@ -13,9 +13,10 @@ pipeline {
   stages {
       stage("Clone code from VCS") {
           steps {
-              script {
-                  git 'https://github.com/chance2021/devopsdaydayup.git';
-              }
+              git branch: 'main',
+                  url: 'https://github.com/chance2021/devopsdaydayup.git'
+              sh "pwd"
+              sh "ls -lat"
           }
       }
       stage("Maven Build") {
