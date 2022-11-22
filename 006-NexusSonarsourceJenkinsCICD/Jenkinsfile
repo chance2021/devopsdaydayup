@@ -25,7 +25,7 @@ pipeline {
                   sh "cd 006-NexusSonarsourceJenkinsCICD"
                   sh "ls"
                   sh "pwd"
-                  sh "mvn clean package -DskipTests=true"
+                  sh "cd 006-NexusSonarsourceJenkinsCICD && mvn clean package -DskipTests=true"
                   sh "pwd"
                   sh "ls"
               }
