@@ -1,0 +1,146 @@
+# ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values
+controller:
+  componentName: "jenkins-controller"
+  image: "jenkins/jenkins"
+  tag: "2.361.3-jdk11"
+  #tagLabel: jdk11
+  imagePullPolicy: "Always"
+  numExecutors: 2
+  executorMode: "NORMAL"
+  adminSecret: true
+
+  hostNetworking: false
+  adminUser: "admin"
+  # adminPassword: <defaults to random>
+  admin:
+    existingSecret: ""
+    userKey: jenkins-admin-user
+    passwordKey: jenkins-admin-password
+  jenkinsHome: "/var/jenkins_home"
+  jenkinsRef: "/usr/share/jenkins/ref"
+  jenkinsWar: "/usr/share/jenkins/jenkins.war"
+  # Overrides the default arguments passed to the war
+  # overrideArgs:
+  #   - --httpPort=8080
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "256Mi"
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+  # javaOpts: "-Xms512m -Xmx512m"
+  servicePort: 8080
+  targetPort: 8080
+  serviceType: NodePort
+  installPlugins:
+    - kubernetes:3734.v562b_b_a_627ea_c
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:4.13.0
+    - configuration-as-code:1569.vb_72405b_80249
+  cloudName: "kubernetesdevopsdaydayup"
+  JCasC:
+    defaultConfig: true
+    configScripts: 
+      welcome-message: |
+        jenkins:
+          systemMessage: Welcome to our DevOps DayDayUp CI\CD server!  This Jenkins is configured and managed 'as code'.
+          credentials:
+            system:
+              domainCredentials:
+                - credentials:
+                    - basicSSHUserPrivateKey:
+                        scope: SYSTEM
+                        id: ssh_with_passphrase_provided
+                        username: ssh_root
+                        passphrase: ${SSH_KEY_PASSWORD}
+                        description: "SSH passphrase with private key file. Private key provided"
+                        privateKeySource:
+                          directEntry:
+                            privateKey: ${SSH_PRIVATE_KEY}
+                    - usernamePassword:
+                        id: "github-token"
+                        username: "exampleuser"
+                        password: ${github-access-token}
+                        description: "Sample credentials of exampleuser"
+                        scope: GLOBAL
+    securityRealm: |-
+      local:
+        allowsSignup: false
+        enableCaptcha: false
+        users:
+        - id: "${chart-admin-username}"
+          name: "Jenkins Admin"
+          password: "${chart-admin-password}"
+
+  sidecars:
+    configAutoReload:
+      enabled: true
+      image: kiwigrid/k8s-sidecar:1.15.0
+      imagePullPolicy: IfNotPresent
+      resources: 
+           limits:
+             cpu: 100m
+             memory: 100Mi
+           requests:
+             cpu: 50m
+             memory: 50Mi
+
+  ingress:
+    enabled: false
+    paths: []
+    # - backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+    # - backend:
+    #     serviceName: >-
+    #       {{ template "jenkins.fullname" . }}
+    #     # Don't use string here, use only integer value!
+    #     servicePort: 8080
+    # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
+    # For Kubernetes v1.19+, use 'networking.k8s.io/v1'
+    apiVersion: "extensions/v1beta1"
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
+    # path: "/jenkins"
+    # configures the hostname e.g. jenkins.example.com
+    hostName:
+    tls:
+    # - secretName: jenkins.cluster.local
+    #   hosts:
+    #     - jenkins.cluster.local
+
+agent:
+  enabled: true
+  jenkinsUrl:
+  # connect to the specified host and port, instead of connecting directly to the Jenkins controller
+  jenkinsTunnel:
+  kubernetesConnectTimeout: 5
+  kubernetesReadTimeout: 15
+  maxRequestsPerHostStr: "32"
+  namespace:
+  image: "jenkins/inbound-agent"
+  tag: "4.11.2-4"
+  workingDir: "/home/jenkins/agent"
+  nodeUsageMode: "NORMAL"
+  customJenkinsLabels: []
+  # name of the secret to be used for image pulling
+  imagePullSecretName:
+  componentName: "jenkins-agent"
+  websocket: false
+  privileged: false
+  runAsUser:
+  runAsGroup:
+  hostNetworking: false
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+    limits:
+      cpu: "512m"
+      memory: "512Mi"
+
