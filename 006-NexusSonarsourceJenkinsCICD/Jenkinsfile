@@ -14,13 +14,14 @@ pipeline {
       stage("Clone code from VCS") {
           steps {
               script {
-                  git 'https://github.com/javaee-samples/javaee7-simple-sample.git';
+                  git 'https://github.com/chance2021/devopsdaydayup.git';
               }
           }
       }
       stage("Maven Build") {
           steps {
               script {
+                  sh "cd 006-NexusSonarsourceJenkinsCICD"
                   sh "ls"
                   sh "pwd"
                   sh "mvn package -DskipTests=true"
