@@ -22,10 +22,10 @@ pipeline {
       stage("Maven Build") {
           steps {
               script {
-                  sh "cd NexusJenkinsVagrantCICD"
+                  sh "cd 006-NexusSonarsourceJenkinsCICD"
                   sh "ls"
                   sh "pwd"
-                  sh "cd NexusJenkinsVagrantCICD && mvn clean package -DskipTests=true"
+                  sh "cd 006-NexusSonarsourceJenkinsCICD && mvn clean package -DskipTests=true"
                   sh "pwd"
                   sh "ls"
               }
@@ -34,8 +34,8 @@ pipeline {
       stage("Publish to Nexus Repository Manager") {
           steps {
               script {
-                  pom = readMavenPom file: "NexusJenkinsVagrantCICD/pom.xml";
-                  filesByGlob = findFiles(glob: "NexusJenkinsVagrantCICD/target/*.${pom.packaging}");
+                  pom = readMavenPom file: "006-NexusSonarsourceJenkinsCICD/pom.xml";
+                  filesByGlob = findFiles(glob: "006-NexusSonarsourceJenkinsCICD/target/*.${pom.packaging}");
                   echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
                   artifactPath = filesByGlob[0].path;
                   artifactExists = fileExists artifactPath;
@@ -56,7 +56,7 @@ pipeline {
                               type: pom.packaging],
                               [artifactId: pom.artifactId,
                               classifier: '',
-                              file: "NexusJenkinsVagrantCICD/pom.xml",
+                              file: "006-NexusSonarsourceJenkinsCICD/pom.xml",
                               type: "pom"]
                           ]
                       );
