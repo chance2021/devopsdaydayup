@@ -112,7 +112,7 @@ docker-compose down -v
 ```
 Stop/Remove the Vagrant VM
 ```
-Vagrant destroy
+vagrant destroy
 ```
 
 # <a name="troubleshooting">Troubleshooting</a>
