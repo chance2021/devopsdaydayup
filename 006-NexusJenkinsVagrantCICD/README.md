@@ -46,20 +46,21 @@ g. To create a new user, go to **"Security"** -> **"Users"** -> Click **"Create 
 **First name:** Jenkins</br>
 **Last name:** User</br>
 **Email:** jenkins.user@gmail.com</br>
-**Password:** <Type your password></br>
-**Confirm password:** *<Type the same password you entered above>*</br>
+**Password:**  *<Type your password>* </br>
+**Confirm password:**  *<Type the same password you entered above>*  </br>
 **Status:** Active</br>
 **Roles:** nx-admin</br> 
 
 ## 3. Configure Jenkins
 a. Login to your Jenkins website (http://0.0.0.0:8080) and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page in below selection: </br>
-> Note: The **username** and **password** is in `.env` file
-**Kind:** Username with password
-**Scope:** Global(Jenkins, nodes, items, all child items, etc)
-**Username:** jenkins-user
-**Password:** *<Type the password you set in previous step>*
-**ID:** nexus
-**Description:** nexus credential
+> Note: The **username** and **password** is in `.env` file </br>
+
+**Kind:** Username with password</br>
+**Scope:** Global(Jenkins, nodes, items, all child items, etc)</br>
+**Username:** jenkins-user</br>
+**Password:** *<Type the password you set in previous step>*</br>
+**ID:** nexus</br>
+**Description:** nexus credential</br>
 b. To create a new pipeline, go back to Dashboard, click **"New Item"** in the left navigation lane, and type the item name (i.g. `first-project`) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
 c. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
 d. Select **"Git"** in **"SCM"** field</br>
