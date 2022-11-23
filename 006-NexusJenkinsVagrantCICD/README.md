@@ -58,7 +58,7 @@ a. Login to your Jenkins website (http://0.0.0.0:8080) and go to **"Manage Jenki
 **Kind:** Username with password</br>
 **Scope:** Global(Jenkins, nodes, items, all child items, etc)</br>
 **Username:** jenkins-user</br>
-**Password:** *<Type the password you set in previous step>*</br>
+**Password:** *(Type the password you set in previous step)*</br>
 **ID:** nexus</br>
 **Description:** nexus credential</br>
 b. To create a new pipeline, go back to Dashboard, click **"New Item"** in the left navigation lane, and type the item name (i.g. `first-project`) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
