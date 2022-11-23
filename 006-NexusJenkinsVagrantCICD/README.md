@@ -25,43 +25,41 @@ docker-compose up -d
 ```
 
 ## 2. Configure Nexus
-a. Open a browser and login to Nexus web page (http://0.0.0.0:8081)</br>
-b. Fetch the password for `admin` user</br>
+a. Open a browser and **login to** Nexus home page (http://0.0.0.0:8081)</br>
+b. Fetch the **password** for `admin` user</br>
 ```
 docker exec $(docker ps --filter name=nexus_1 -q) cat /nexus-data/admin.password
 ```
-c. Click "Sign In" in the top right and type username as "admin" and also the password fetched in the previous step</br>
-d. Follow the wizard and reset your password. Select "Enable anonymous access" and click "Next"->"Finish" to complete the guide.</br>
-e. Click "Gear" icon in the top and click "Repositories" in "Repository" section. Click "Create repository" to create a new repo.</br>
+c. Click **"Sign In"** in the top right and type username `admin`, as well as the password fetched in the previous step</br>
+d. Follow the **wizard** and reset your password. Select **"Enable anonymous access"** and click **"Next"**->**"Finish"** to complete the guide.</br>
+e. Click **Gear icon** in the top and click **"Repositories"** in **"Repository"** section. Click **"Create repository"** to create a new repo.</br>
 ![nexus-create-repo](images/nexus-create-repo.png)
-f. Select "maven2(hosted)" and fill below fields as instructed: </br>
-Name: maven-nexus-repo</br>
-Version policy: Mixed</br>
-Deployment policy: Allow redeploy</br>
+f. Select **"maven2(hosted)"** and fill below fields as instructed: </br>
+**Name:** `maven-nexus-repo`</br>
+**Version policy:** Mixed</br>
+**Deployment policy:** Allow redeploy</br>
 ![nexus-create-repo-2](images/nexus-create-repo-2.png)
-Click "Create repository" in the bottom</br>
-g. To create a new user, go to "Security" -> "Users" -> Click "Create local user" and fill below fields as instructed: </br>
-ID: jenkins-user </br>
-First name: Jenkins</br>
-Last name: User</br>
-Email: jenkins.user@gmail.com</br>
-Password: <Type your password></br>
-Confirm password: <Type the same password you entered above></br>
-Status: Active</br>
-Roles: nx-admin</br> 
+Click **"Create repository"** in the bottom</br>
+g. To create a new user, go to **"Security"** -> **"Users"** -> Click **"Create local user"** and fill below fields as instructed: </br>
+**ID:** `jenkins-user` </br>
+**First name:** Jenkins</br>
+**Last name:** User</br>
+**Email:** jenkins.user@gmail.com</br>
+**Password:** <Type your password></br>
+**Confirm password:** *<Type the same password you entered above>*</br>
+**Status:** Active</br>
+**Roles:** nx-admin</br> 
 
 ## 3. Configure Jenkins
 a. Login to your Jenkins website (http://0.0.0.0:8080) and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page in below selection: </br>
-> Note: The username and password is in `.env` file
+> Note: The **username** and **password** is in `.env` file
 **Kind:** Username with password
 **Scope:** Global(Jenkins, nodes, items, all child items, etc)
 **Username:** jenkins-user
-**Password:** <Type the password you set in previous step>
+**Password:** *<Type the password you set in previous step>*
 **ID:** nexus
 **Description:** nexus credential
-
-
-b. To create a new pipeline, go back to Dashboard, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
+b. To create a new pipeline, go back to Dashboard, click **"New Item"** in the left navigation lane, and type the item name (i.g. `first-project`) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
 c. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
 d. Select **"Git"** in **"SCM"** field</br>
 e. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field</br>
@@ -69,43 +67,51 @@ f. Select your github credential in **"Credentials"**</br>
 g. Type `*/main` in **"Branch Specifier"** field</br>
 h. Type `006-NexusJenkinsVagrantCICD/Jenkinsfile` in **"Script Path"**</br>
 i. Unselect **"Lightweight checkout"** and click "Apply" to complete the creation</br>
-j. To add maven tool, go back to "Dashboard" -> "Manage Jenkins" -> "Global Tool Configuration" -> Scroll down to "Maven" section and click "Add Maven". Then fill out below fields as instructed:
-**Name:** m3
-**Install automaticall** selected
-**Version:** 3.8.6
-Click "Save"
+j. To add maven tool, go back to **"Dashboard"** -> **"Manage Jenkins"** -> **"Global Tool Configuration"** -> Scroll down to **"Maven"** section and click **"Add Maven"**. Then fill out below fields as instructed:</br>
+**Name:** m3</br>
+**Install automaticall** selected</br>
+**Version:** 3.8.6</br>
+Click **"Save"**</br>
 
 ## 4. Launch the Jenkins pipeline
-Go to "Dashboard" -> "first-project" pipeline -> Click "Build Now", then the Jenkins pipeline will compile the app to a war file and upload to the Nexus repository. </br>
-You can login to the Nexus website (http://0.0.0.0:8081) and go to "Browse" section, and then click "maven-nexus-repo", you should be able to see the artifacts just uploaded.
+Go to **"Dashboard"** -> Click **"first-project"** pipeline -> Click **"Build Now"**, then the Jenkins pipeline will compile the app to a war file and upload to the Nexus repository. </br>
+You can login to the Nexus website (http://0.0.0.0:8081) and go to **"Browse"** section, and then click **"maven-nexus-repo"**, you should be able to see the artifacts just uploaded.
 ![nexus-repo-configuration](images/nexus-repo-configuration.png)
 
 ## 5. Deploy a Tomcat server via Vagrant
-Run below commands to start up a Vagrant VM:
+Run below command to start up a Vagrant VM:
 ```
 vagrant up
 ```
 
 ## 6. Download the war file and deploy to the Tomcat server
-You can login to the Tomcat Vagrant VM and download the war from the Nexus repo. You should be able to see the url link to download the war file in the Nexus web page. Just make sure to replace the IP address `0.0.0.0` to the actual IP of your host (running `ifconfig`).
+Once the deployment is done, you can login to the Tomcat Vagrant VM and download the war from the Nexus repo. You should be able to see the url link to download the war file in the Nexus web page. Just make sure to replace the IP address `0.0.0.0` to the actual IP of your host (running `ifconfig` to check your host IP).
 ![nexus-war-download-url](images/nexus-war-download-url.png)
 ```
 vagrant ssh
 cd /var/lib/tomcat9/webapp/
 sudo wget http://<your_host_IP>:8081/repository/maven-nexus-repo/sparkjava-hello-world/sparkjava-hello-world/1.0/sparkjava-hello-world-1.0.war 
 ```
-Wait for 2 mins and then you can see the war file is unzip
+Wait for **2 mins** and then you can see the war file is unzip
 ```
 vagrant@vagrant:/var/lib/tomcat9/webapps$ ls
 ROOT  sparkjava-hello-world-1.0  sparkjava-hello-world-1.0.war
 ```
-Then `exit` the Vagrant VM and type below URL in yoru browser, you should be able to see the "Hello World" page
+Then type `exit` to exit the Vagrant VM and type below URL in yoru browser, and you should be able to see the "Hello World" page
 ```
 http://0.0.0.0:8088/sparkjava-hello-world-1.0/hello
 ```
 ![helloworld](images/helloworld.png)
 
 # <a name="post_project">Post Project</a>
+Stop/Remove the Jenkins/Nexus containers
+```
+docker-compose down -v
+```
+Stop/Remove the Vagrant VM
+```
+Vagrant destroy
+```
 
 # <a name="troubleshooting">Troubleshooting</a>
 ## Issue 1: Fail to maven build
