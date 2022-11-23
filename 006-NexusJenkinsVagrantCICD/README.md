@@ -1,6 +1,7 @@
-# Project Name: 
+# Project Name: Push War file to Nexus Repository Via Jenkins Pipeline and Deploy to Tomcat in Vagrant VM
 
 # Project Goal
+In this article, you will set up a **Nexus** repository and push a war file from **Jenkins Pipeline**, then you will deploy the war file to a **Tomcat 9** installed in a **Vagrant VM**
 
 # Table of Contents
 1. [Prerequisites](#prerequisites)
