@@ -1,0 +1,74 @@
+version: '3.7'
+services:
+  freeipa:
+    image: freeipa/freeipa-server:centos-8-4.9.6
+    restart: unless-stopped
+    hostname: $HOSTNAME
+    environment:
+      IPA_SERVER_HOSTNAME: $HOSTNAME
+      TZ: "America/Toronto"
+    tty: true
+    stdin_open: true
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - freeipavol:/data
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.lo.disable_ipv6=0
+    security_opt:
+      - "seccomp:unconfined"
+    command:
+      - -U
+      - --domain=$DOMAIN
+      - --realm=$DOMAIN
+      - --http-pin=$PASSWORD
+      - --dirsrv-pin=$PASSWORD
+      - --ds-password=$PASSWORD
+      - --admin-password=$PASSWORD
+      - --no-host-dns
+      - --unattended
+    ports:
+      - "53:53/udp"
+      - "53:53"
+      - "80:80"
+      - "443:443"
+      - "389:389"
+      - "636:636"
+      - "88:88"
+      - "464:464"
+      - "88:88/udp"
+      - "464:464/udp"
+      - "123:123/udp"
+      - "7389:7389"
+      - "9443:9443"
+      - "9444:9444"
+      - "9445:9445"
+  vault:
+    build: 
+      context: .
+      dockerfile: vault.Dockerfile 
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - type: volume
+        source: vault_file
+        target: /vault/file
+      - type: volume
+        source: vault_config
+        target: /vault/config
+    ports:
+      - "8200:8200"
+
+volumes:
+  freeipavol:
+    driver: local
+  vault_file:
+    driver: local
+  vault_config:
+    driver: local
+
+
+
