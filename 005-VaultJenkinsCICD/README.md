@@ -141,6 +141,7 @@ e. Create a **token** with the role ID and secret ID
 apk add jq
 export VAULT_TOKEN=$(vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID" -format=json|jq .auth.client_token)
 echo $VAULT_TOKEN
+VAULT_TOKEN=$(echo $VAULT_TOKEN|tr -d '"')
 vault token lookup | grep policies
 ```
 
@@ -202,6 +203,18 @@ curl  --header "X-Vault-Token: hvs.CAESI..."     http://vault:8200/v1/kv-v2/devo
 ```
 
 You can see `http://vault:8200/v1` which means the API version is `1`. This is referring to the `engineVersion` in `configuration`. Also, my secret actual path is `kv-v2/data/devops-secret/team-1`, `/data` is just prefix for kv 2 secret path, so that is why `engineVersion` is `2` in `secret` as it is reffering to the kv version, not API version. 
+
+## Issue 2: Failed to look up namespace from the token: no namespace
+export VAULT_TOKEN=$(vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID" -format=json|jq .auth.client_token)
+echo $VAULT_TOKEN
+vault token lookup | grep policies
+**Solution:**
+Error might happen if quotes exists in token
+```
+VAULT_TOKEN=$(echo $VAULT_TOKEN|tr -d '"')
+```
+ref: https://github.com/hashicorp/vault/issues/6287#issuecomment-684125899
+
 
 
 # <a name="reference">Reference</a>
