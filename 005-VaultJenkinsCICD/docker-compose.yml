@@ -25,6 +25,8 @@ services:
       dockerfile: vault.Dockerfile 
     cap_add:
       - IPC_LOCK
+    ports:
+      - '8200:8200'
     volumes:
       - type: volume
         source: vault_file

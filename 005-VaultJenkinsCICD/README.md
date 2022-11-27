@@ -20,6 +20,7 @@ In this article, you will learn how to integrate Vault into Jenkins pipeline, as
 ## 1. Initiate Vault
 a. **Initializing** the Vault
 ```bash
+docker-compose up -d
 docker exec -it $(docker ps -f name=vault_1 -q) sh
 export VAULT_ADDR='http://127.0.0.1:8200'
 vault operator init

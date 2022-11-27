@@ -232,11 +232,13 @@ cat > payload.json<<EOF
   "password": "admin123"
 }
 EOF
-curl \
+VAULT_TOKEN=$(curl -s \
     --request POST \
     --data @payload.json \
-    http://vault:8200/v1/auth/ldap/login/devops
+    http://vault:8200/v1/auth/ldap/login/devops |jq .auth.client_token|tr -d '"')
 > Note: You can see the token in `client_token` field
+
+echo $VAULT_TOKEN
 
 
 cat > public-key.json <<EOF
@@ -247,13 +249,17 @@ cat > public-key.json <<EOF
 EOF
 > Note: You can retrieve the public key by running commands: `cat ~/.ssh/admin-key.pub`
 
-curl \
-    --header "X-Vault-Token: hvs.CAESIAYwheVoHo5r2LDd2WXP_k28r2UNNovTY49ObKnxBBRtGh4KHGh2cy5hUXh6bkV5ZU0ydkpnbjVKS1kxanphMVk" \
+SIGNED_KEY=$(curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
     --data @public-key.json \
-    http://vault:8200/v1/ssh-client-signer/sign/admin-role
+    http://vault:8200/v1/ssh-client-signer/sign/admin-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
+echo $SIGNED_KEY
+SIGNED_KEY=${SIGNED_KEY::-2}
 
+ssh -i signed.pub  admin@192.168.33.10
 
+# Wait for 3 mins and try again, you will see `Permission denied` error, as the certificate has expired
 ```
 
 > Note: If you are in Vault container trying to login the Vagrant VM, you can use below `vault` commands as well: 
@@ -300,4 +306,5 @@ ref: https://stackoverflow.com/questions/17846529/could-not-open-a-connection-to
 [(Official)Managing SSH Access At Scale With Hashicorp Vault](https://www.hashicorp.com/blog/managing-ssh-access-at-scale-with-hashicorp-vault)
 [Manaing SSH Access with Harhicorp Vault](https://www.civo.com/learn/managing-ssh-access-with-hashicorp-vault)
 [Signed SSH Certificates](https://developer.hashicorp.com/vault/docs/secrets/ssh/signed-ssh-certificates)
+[SSH API](https://developer.hashicorp.com/vault/api-docs/secret/ssh)
 [FreeIPA Docker Hub](https://hub.docker.com/r/freeipa/freeipa-server/)
