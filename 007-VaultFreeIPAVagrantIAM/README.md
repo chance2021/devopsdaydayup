@@ -124,7 +124,7 @@ EOH
 ```
 
 ## 4. Create Vault **Policies**
-You are going to create policies for cooresponding roles created above.
+You are going to create policies for cooresponding roles created above.</br>
 **admin-policy**
 ```
 vault policy write admin-policy - << EOF
@@ -180,7 +180,7 @@ vault write auth/ldap/users/user  policies=user-policy
 vagrant up
 vagrant ssh 
 echo 'ssh-rsa <TRUSTED CA Key>' |sudo tee /etc/ssh/trusted-CA.pem
-> Note: The trusted CA key was generated in previous step
+> Note: The trusted CA key was generated in previous step 2
 
 cd /etc/ssh
 sudo mkdir auth_principals/
@@ -189,7 +189,7 @@ cd auth_principals/
 sudo echo 'admin' |sudo tee admin
 sudo echo 'user' |sudo tee app-user
 
-sudo cat >> /etc/ssh/ssh_config <<EOF
+sudo tee -a /etc/ssh/ssh_config > /dev/null <<EOF
     AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u
     ChallengeResponseAuthentication no
     PasswordAuthentication no
@@ -227,7 +227,7 @@ ssh-keygen -b 2048 -t rsa -f ~/.ssh/admin-key
 > Note: Just leave it blank and press Enter
 ssh-add ~/.ssh/admin-key
 ```
-b. Login **Vault** via **LDAP** credential 
+b. Login to **Vault** via **LDAP** credential by posting to vault's API
 ```
 cat > payload.json<<EOF
 {
@@ -248,7 +248,7 @@ echo $VAULT_TOKEN
 
 cat > public-key.json <<EOF
 {
-  "public_key": "$(cat ~/.ssh/admin-key)",
+  "public_key": "$(cat ~/.ssh/admin-key.pub)",
   "valid_principals": "admin"
 }
 EOF
@@ -258,7 +258,7 @@ SIGNED_KEY=$(curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
     --data @public-key.json \
-    http://vault:8200/v1/ssh-client-signer/sign/admin-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
+    http://$VAULT_ADDRESS:8200/v1/ssh-client-signer/sign/admin-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
 echo $SIGNED_KEY
 SIGNED_KEY=${SIGNED_KEY::-2}
 echo $SIGNED_KEY > admin-signed-key.pub
