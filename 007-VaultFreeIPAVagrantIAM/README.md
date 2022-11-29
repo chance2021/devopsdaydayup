@@ -1,7 +1,7 @@
 # Project Name: Managing SSH Access with Vault
 
 # Project Goal
-In this article, you will experince how to get a signed SSH certificate from Vault in order to login a Vagrant VM via SSH.
+In this article, you will experince how to get a **signed SSH certificate** from **Vault** for a **LDAP** user in order to login a Vagrant VM via SSH.
 
 # Project Scenario
 You have a running **FreeIPA** system which has two users: `devops` and `bob`. `devops` is a system admin and should have all administrator priviliages (i.g. `sudo` group), while `bob` is just a regular user. In your **Vagrant** VM, there are two accounts. One is `admin`, which is `sudo` user, and another one is `app-user`, which is regular user. The goal is that the `devops` user in FreeIPA should be able to login the Vagrant VM in `admin` account, and `bob` user in FreeIPA should login as `app-user` in Vagrant VM. The SSH certificates should only last for 3 mins.
