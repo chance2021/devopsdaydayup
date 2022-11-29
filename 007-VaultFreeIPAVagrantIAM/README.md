@@ -4,7 +4,7 @@
 In this article, you will experince how to get a signed SSH certificate from Vault in order to login a Vagrant VM via SSH.
 
 # Project Scenario
-You have a running **FreeIPA** system which has two users: `devops` and `bob`. `devops` is a system admin and should have all administrator priviliages (i.g. sudo group), while `bob` is just a regular user. In your Vagrant VM, there are two accounts. One is `admin`, which is sudo user, and another one is `app-user`, which is regular user. The goal is that the `devops` user in FreeIPA should be able to login the Vagrant VM in `admin` account, and `bob` user in FreeIPA should login as `app-user` in Vagrant VM. The SSH certificates should only last for 3 min.
+You have a running **FreeIPA** system which has two users: `devops` and `bob`. `devops` is a system admin and should have all administrator priviliages (i.g. `sudo` group), while `bob` is just a regular user. In your **Vagrant** VM, there are two accounts. One is `admin`, which is `sudo` user, and another one is `app-user`, which is regular user. The goal is that the `devops` user in FreeIPA should be able to login the Vagrant VM in `admin` account, and `bob` user in FreeIPA should login as `app-user` in Vagrant VM. The SSH certificates should only last for 3 mins.
 
 # Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -58,7 +58,7 @@ Active Node Address     <none>
 Raft Committed Index    31
 Raft Applied Index      31
 ```
-c. Sign in to vault with **root** user </br>
+c. Sign in to Vault with **root** user </br>
 Type `vault login` and enter the `<Initial Root Token>` retrieving from previous output
 ```
 / # vault login
@@ -82,9 +82,9 @@ policies             ["root"]
 vault secrets enable -path=ssh-client-signer ssh
 vault write ssh-client-signer/config/ca generate_signing_key=true
 ```
-You should get a SSH CA public key in the output, which will be used later on the Vagrant VM host configurations. **Make a note of the key**.
+You should get **a SSH CA public key** in the output, which will be used later on the Vagrant VM host configurations. **Make a note of the key**.
 
-3. Create Vault roles for signing client SSH keys
+3. Create Vault **roles** for signing client SSH keys
 You are going to create two roles in Vault. One is `admin-role` and another one is `user-role`. </br>
 **admin-role**
 ```
@@ -123,8 +123,8 @@ vault write ssh-client-signer/roles/user-role -<<EOH
 EOH
 ```
 
-4. Create Vault Policies
-You are going to create policies for each role created above.
+4. Create Vault **Policies**
+You are going to create policies for cooresponding roles created above.
 **admin-policy**
 ```
 vault policy write admin-policy - << EOF
@@ -150,8 +150,10 @@ path "ssh-client-signer/sign/user-role" {
  capabilities = ["create","update"]
 }
 EOF
+```
 
-# Enable LDAP Engine and configure the FreeLDAP setting
+5. Enable **LDAP Engine** and configure the FreeLDAP setting in Vault
+```
 vault auth enable ldap
 
 vault write auth/ldap/config \
@@ -168,10 +170,11 @@ vault write auth/ldap/config \
     upndomain="" \
     discoverdn=true
 
+# Attach the policies to the roles
 vault write auth/ldap/users/devops  policies=admin-policy
 vault write auth/ldap/users/user  policies=user-policy
 ```
-6. Configure the SSH Setting in the Vagrant VM Host
+6. Configure the SSH Setting in the **Vagrant VM** Host
 
 ```bash
 vagrant up
@@ -186,56 +189,58 @@ cd auth_principals/
 sudo echo 'admin' |sudo tee admin
 sudo echo 'user' |sudo tee app-user
 
-sudo vi /etc/ssh/ssh_config
-
-AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u
-ChallengeResponseAuthentication no
-PasswordAuthentication no
-TrustedUserCAKeys /etc/ssh/trusted-CA.pem
-
-sudo vi /etc/ssh/sshd_config
+sudo cat >> /etc/ssh/ssh_config <<EOF
+    AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u
+    ChallengeResponseAuthentication no
+    PasswordAuthentication no
+    TrustedUserCAKeys /etc/ssh/trusted-CA.pem
+EOF
 
 sudo service ssh restart
 ```
 
-7. Client Configurations
-Now you are all set in server's end. In order to have a user to login to the Vagrant Host, the user needs to create an SSH key pair and then send the SSH public key to Vault to be signed by its SSH CA. The signed SSH certificate will then be used to connect to the target host.
-
-Let's go through what that may look like for FreeIPA user `devops`, who is a system administrator.
-a. In your local host, update `/etc/hosts` by adding this entry: `0.0.0.0 ipa.devopsdaydayup.org`
-b. Open the browser and go to The FreeIPA portal (https://ipa.devopsdaydayup.org). Type the username as `admin` and the password as `admin123` (Note: they are defined in `.env` file)
-c. Click "Add" in "Users" page and enter below info:
+7. Create LDAP users in **FreeIPA**
+a. In your **local host**, update `/etc/hosts` by adding this entry: `0.0.0.0 ipa.devopsdaydayup.org` </br>
+b. Open the **browser** and go to The **FreeIPA portal** (https://ipa.devopsdaydayup.org). Type the username as `admin` and the password as `admin123` (**Note**: they are defined in `.env` file)</br>
+c. Click **"Add"** in **"Users"** page and enter below info:</br>
 **User login:** devops </br>
 **First Name:** devops</br>
 **Last Name:** devops</br>
-**New Password:** <Type any password you want></br>
-**Verify Password:** <Type any password you want></br>
-d. Click "Add and Add Another" to create another user `user`:
+**New Password:** *(Type any password you want)*</br>
+**Verify Password:** *(Type any password you want)*</br>
+d. Click **"Add and Add Another"** to create another user `user`:
 **User login:** user </br>
 **First Name:** user</br>
 **Last Name:** user</br>
-**New Password:** <Type any password you want></br>
-**Verify Password:** <Type any password you want></br>
-Click "Add" to finish the creation. You should be able to see two users appearing in the "Active users" page.
+**New Password:** *(Type any password you want)*</br>
+**Verify Password:** *(Type any password you want)*</br>
+Click **"Add"** to finish the creation. You should be able to see two users appearing in the **"Active users"** page.
 
-e. Create SSH key pair
+8. Client Configurations
+Now you are all set in server's end. In order to have a user to login to the Vagrant Host, the user needs to **create an SSH key pair** and then send the SSH **public key** to **Vault** to be **signed** by its SSH CA. The **signed SSH certificate** will then be used to connect to the target host.
+
+Let's go through what that may look like for FreeIPA user `devops`, who is a system administrator.
+
+a. In your **local host**, create a SSH key pair
 ```
-
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/admin-key
 > Note: Just leave it blank and press Enter
 ssh-add ~/.ssh/admin-key
 ```
-f. Login Vault via LDAP credential 
+b. Login **Vault** via **LDAP** credential 
 ```
 cat > payload.json<<EOF
 {
   "password": "admin123"
 }
 EOF
+
+sudo apt install jq -y
+VAULT_ADDRESS=0.0.0.0
 VAULT_TOKEN=$(curl -s \
     --request POST \
     --data @payload.json \
-    http://vault:8200/v1/auth/ldap/login/devops |jq .auth.client_token|tr -d '"')
+    http://$VAULT_ADDRESS:8200/v1/auth/ldap/login/devops |jq .auth.client_token|tr -d '"')
 > Note: You can see the token in `client_token` field
 
 echo $VAULT_TOKEN
@@ -243,11 +248,11 @@ echo $VAULT_TOKEN
 
 cat > public-key.json <<EOF
 {
-  "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDVC4d86qJGvHcQJkiqusGPkygmyoCw0vJCbnZGC/9JBHRTHVzmX7TAkQ40gQjb7wQU66ho4z9SRPUpUAvvJCvxJNm6gt/BBEWAfS6yPcFw1o3mYzJ4KqaS90Xzs+YoESyC33D5kCOANPa3Z5js9THL1uNDZ5otL1puQQCS+NvMxGsUtgtZIATvhf1uaAPbH+77uXbxGzAGMedvKMZXpM5+yXAmVLq5bBU9Eb+QVxZF3hiXdlOQb3n3vUe3smVcLNbYhuzKYYNdHS975j4rgmTdj65SMz1AjhgUhK61VBmB2gdck/BiSPZD8M/j14E5Pf0WPjKKn080NVPf/f//RqKH chance@chance-ThinkCentre-M900",
+  "public_key": "$(cat ~/.ssh/admin-key)",
   "valid_principals": "admin"
 }
 EOF
-> Note: You can retrieve the public key by running commands: `cat ~/.ssh/admin-key.pub`
+> Note: You can retrieve the public key by running the following command: `cat ~/.ssh/admin-key.pub`
 
 SIGNED_KEY=$(curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -256,8 +261,9 @@ SIGNED_KEY=$(curl \
     http://vault:8200/v1/ssh-client-signer/sign/admin-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
 echo $SIGNED_KEY
 SIGNED_KEY=${SIGNED_KEY::-2}
+echo $SIGNED_KEY > admin-signed-key.pub
 
-ssh -i signed.pub  admin@192.168.33.10
+ssh -i admin-signed-key.pub  admin@192.168.33.10
 
 # Wait for 3 mins and try again, you will see `Permission denied` error, as the certificate has expired
 ```
@@ -266,7 +272,7 @@ ssh -i signed.pub  admin@192.168.33.10
 ```
 vault login -method=ldap username=devops
 vault write -field=signed_key ssh-client-signer/sign/admin-role \
- public_key=@$HOME/.ssh/admin-key.pub valid_principals=admin > ~/.ssh/admin-signed-key.pub
+    public_key=@$HOME/.ssh/admin-key.pub valid_principals=admin > ~/.ssh/admin-signed-key.pub
 ssh-keygen -Lf admin-signed-key.pub
 ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
 ```
