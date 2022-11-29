@@ -30,7 +30,7 @@ docker exec -it $(docker ps -f name=vault_1 -q) sh
 export VAULT_ADDR='http://127.0.0.1:8200'
 vault operator init
 ```
-**Note:** Make a note of the output. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
+**Note:** Make a note of the output. This is the only time ever you see those **unseal keys** and **root token**. If you lose it, you won't be able to seal vault any more.
 
 b. **Unsealing** the vault </br>
 Type `vault operator unseal <unseal key>`. The unseal keys are from previous output. You will need at lease **3 keys** to unseal the vault. </br>
@@ -77,14 +77,14 @@ token_policies       ["root"]
 identity_policies    []
 policies             ["root"]
 ```
-2. Enable **ssh-client-signer** Engine in Vault
+## 2. Enable **ssh-client-signer** Engine in Vault
 ```bash
 vault secrets enable -path=ssh-client-signer ssh
 vault write ssh-client-signer/config/ca generate_signing_key=true
 ```
 You should get **a SSH CA public key** in the output, which will be used later on the Vagrant VM host configurations. **Make a note of the key**.
 
-3. Create Vault **roles** for signing client SSH keys
+## 3. Create Vault **roles** for signing client SSH keys
 You are going to create two roles in Vault. One is `admin-role` and another one is `user-role`. </br>
 **admin-role**
 ```
@@ -123,7 +123,7 @@ vault write ssh-client-signer/roles/user-role -<<EOH
 EOH
 ```
 
-4. Create Vault **Policies**
+## 4. Create Vault **Policies**
 You are going to create policies for cooresponding roles created above.
 **admin-policy**
 ```
@@ -152,7 +152,7 @@ path "ssh-client-signer/sign/user-role" {
 EOF
 ```
 
-5. Enable **LDAP Engine** and configure the FreeLDAP setting in Vault
+## 5. Enable **LDAP Engine** and configure the FreeLDAP setting in Vault
 ```
 vault auth enable ldap
 
@@ -174,7 +174,7 @@ vault write auth/ldap/config \
 vault write auth/ldap/users/devops  policies=admin-policy
 vault write auth/ldap/users/user  policies=user-policy
 ```
-6. Configure the SSH Setting in the **Vagrant VM** Host
+## 6. Configure the SSH Setting in the **Vagrant VM** Host
 
 ```bash
 vagrant up
@@ -199,7 +199,7 @@ EOF
 sudo service ssh restart
 ```
 
-7. Create LDAP users in **FreeIPA**
+## 7. Create LDAP users in **FreeIPA**
 a. In your **local host**, update `/etc/hosts` by adding this entry: `0.0.0.0 ipa.devopsdaydayup.org` </br>
 b. Open the **browser** and go to The **FreeIPA portal** (https://ipa.devopsdaydayup.org). Type the username as `admin` and the password as `admin123` (**Note**: they are defined in `.env` file)</br>
 c. Click **"Add"** in **"Users"** page and enter below info:</br>
@@ -216,7 +216,7 @@ d. Click **"Add and Add Another"** to create another user `user`:
 **Verify Password:** *(Type any password you want)*</br>
 Click **"Add"** to finish the creation. You should be able to see two users appearing in the **"Active users"** page.
 
-8. Client Configurations
+## 8. Client Configurations
 Now you are all set in server's end. In order to have a user to login to the Vagrant Host, the user needs to **create an SSH key pair** and then send the SSH **public key** to **Vault** to be **signed** by its SSH CA. The **signed SSH certificate** will then be used to connect to the target host.
 
 Let's go through what that may look like for FreeIPA user `devops`, who is a system administrator.
