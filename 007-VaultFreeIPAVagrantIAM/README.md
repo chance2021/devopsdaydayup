@@ -206,17 +206,17 @@ c. Click **"Add"** in **"Users"** page and enter below info:</br>
 **User login:** devops </br>
 **First Name:** devops</br>
 **Last Name:** devops</br>
-**New Password:** *(Type any password you want)*</br>
+**New Password:** *(Type any password you want,i.g. admin123)*</br>
 **Verify Password:** *(Type any password you want)*</br>
 d. Click **"Add and Add Another"** to create another user `user`:
 **User login:** user </br>
 **First Name:** user</br>
 **Last Name:** user</br>
-**New Password:** *(Type any password you want)*</br>
+**New Password:** *(Type any password you want, i.g. user123)*</br>
 **Verify Password:** *(Type any password you want)*</br>
 Click **"Add"** to finish the creation. You should be able to see two users appearing in the **"Active users"** page.
 
-## 8. Client Configurations
+## 8. Client Configurations to login as admin user
 Now you are all set in server's end. In order to have a user to login to the Vagrant Host, the user needs to **create an SSH key pair** and then send the SSH **public key** to **Vault** to be **signed** by its SSH CA. The **signed SSH certificate** will then be used to connect to the target host.
 
 Let's go through what that may look like for FreeIPA user `devops`, who is a system administrator.
@@ -276,6 +276,66 @@ vault write -field=signed_key ssh-client-signer/sign/admin-role \
 ssh-keygen -Lf admin-signed-key.pub
 ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
 ```
+You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.
+
+## 9. Client Configurations to login as non-admin user
+Now we are going to login as non-admin user. In FreeIPA, it is `user`. And in the Vagrant VM, it is `app-user`. We will be authenticated as `user` from FreeIPA in Vault and then create a signed ssh key to login the Vagrant VM as `app-user`.
+a. In your **local host**, create a SSH key pair
+```
+ssh-keygen -b 2048 -t rsa -f ~/.ssh/user-key
+> Note: Just leave it blank and press Enter
+ssh-add ~/.ssh/user-key
+```
+b. Login to **Vault** via **LDAP** credential by posting to vault's API
+```
+cat > payload.json<<EOF
+{
+  "password": "user123"
+}
+EOF
+
+sudo apt install jq -y
+VAULT_ADDRESS=0.0.0.0
+VAULT_TOKEN=$(curl -s \
+    --request POST \
+    --data @payload.json \
+    http://$VAULT_ADDRESS:8200/v1/auth/ldap/login/user |jq .auth.client_token|tr -d '"')
+> Note: You can see the token in `client_token` field
+
+echo $VAULT_TOKEN
+
+
+cat > public-key.json <<EOF
+{
+  "public_key": "$(cat ~/.ssh/user-key.pub)",
+  "valid_principals": "app-user"
+}
+EOF
+> Note: You can retrieve the public key by running the following command: `cat ~/.ssh/user-key.pub`
+
+SIGNED_KEY=$(curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @public-key.json \
+    http://$VAULT_ADDRESS:8200/v1/ssh-client-signer/sign/user-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
+echo $SIGNED_KEY
+SIGNED_KEY=${SIGNED_KEY::-2}
+echo $SIGNED_KEY > user-signed-key.pub
+
+ssh -i user-signed-key.pub  user@192.168.33.10
+
+# Wait for 3 mins and try again, you will see `Permission denied` error, as the certificate has expired
+```
+
+> Note: If you are in Vault container trying to login the Vagrant VM, you can use below `vault` commands as well: 
+```
+vault login -method=ldap username=user
+vault write -field=signed_key ssh-client-signer/sign/admin-role \
+    public_key=@$HOME/.ssh/admin-key.pub valid_principals=admin > ~/.ssh/admin-signed-key.pub
+ssh-keygen -Lf admin-signed-key.pub
+ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
+```
+You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.
 # <a name="post_project">Post Project</a>
 
 # <a name="troubleshooting">Troubleshooting</a>
