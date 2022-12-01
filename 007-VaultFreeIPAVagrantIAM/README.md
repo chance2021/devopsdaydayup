@@ -278,6 +278,11 @@ ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
 ```
 You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.</br>
 `exit` the Vagrant host and wait for 3 mins, and then you can try to login again with the same command above, you will find the permission is denied, as the SSH cert is expired
+```
+$ ssh -i admin-signed-key.pub -o IdentitiesOnly=yes admin@192.168.33.10
+admin@192.168.33.10: Permission denied (publickey).
+
+```
 
 ## 9. Client Configurations to login as non-admin user
 Now we are going to login as non-admin user. In FreeIPA, it is `bob`. And in the Vagrant VM, it is `app-user`. We will be authenticated as `bob` from FreeIPA in Vault and then create a signed ssh key to login the Vagrant VM as `app-user`.
@@ -330,11 +335,11 @@ ssh -i bob-signed-key.pub -i ~/.ssh/bob-key  app-user@192.168.33.10
 
 > Note: If you are in Vault container trying to login the Vagrant VM, you can use below `vault` commands as well: 
 ```
-vault login -method=ldap username=user
-vault write -field=signed_key ssh-client-signer/sign/admin-role \
-    public_key=@$HOME/.ssh/admin-key.pub valid_principals=admin > ~/.ssh/admin-signed-key.pub
-ssh-keygen -Lf admin-signed-key.pub
-ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
+vault login -method=ldap username=bob
+vault write -field=signed_key ssh-client-signer/sign/user-role \
+    public_key=@$HOME/.ssh/user-key.pub valid_principals=user > ~/.ssh/user-signed-key.pub
+ssh-keygen -Lf user-signed-key.pub
+ssh -i ~/.ssh/user-signed-key.pub user@192.168.33.10
 ```
 You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.
 # <a name="post_project">Post Project</a>
