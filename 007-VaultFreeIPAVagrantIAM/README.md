@@ -172,7 +172,7 @@ vault write auth/ldap/config \
 
 # Attach the policies to the roles
 vault write auth/ldap/users/devops  policies=admin-policy
-vault write auth/ldap/users/user  policies=user-policy
+vault write auth/ldap/users/bob  policies=user-policy
 ```
 ## 6. Configure the SSH Setting in the **Vagrant VM** Host
 
@@ -187,7 +187,7 @@ sudo mkdir auth_principals/
 cd auth_principals/
 
 sudo echo 'admin' |sudo tee admin
-sudo echo 'app-user' |sudo tee app-user
+sudo echo 'user' |sudo tee app-user
 
 sudo tee -a /etc/ssh/ssh_config > /dev/null <<EOF
     AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u
@@ -209,9 +209,9 @@ c. Click **"Add"** in **"Users"** page and enter below info:</br>
 **New Password:** *(Type any password you want,i.g. admin123)*</br>
 **Verify Password:** *(Type any password you want)*</br>
 d. Click **"Add and Add Another"** to create another user `user`:
-**User login:** user </br>
-**First Name:** user</br>
-**Last Name:** user</br>
+**User login:** bob </br>
+**First Name:** bob</br>
+**Last Name:** li</br>
 **New Password:** *(Type any password you want, i.g. user123)*</br>
 **Verify Password:** *(Type any password you want)*</br>
 Click **"Add"** to finish the creation. You should be able to see two users appearing in the **"Active users"** page.
@@ -280,12 +280,12 @@ You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` 
 `exit` the Vagrant host and wait for 3 mins, and then you can try to login again with the same command above, you will find the permission is denied, as the SSH cert is expired
 
 ## 9. Client Configurations to login as non-admin user
-Now we are going to login as non-admin user. In FreeIPA, it is `user`. And in the Vagrant VM, it is `app-user`. We will be authenticated as `user` from FreeIPA in Vault and then create a signed ssh key to login the Vagrant VM as `app-user`.
+Now we are going to login as non-admin user. In FreeIPA, it is `bob`. And in the Vagrant VM, it is `app-user`. We will be authenticated as `bob` from FreeIPA in Vault and then create a signed ssh key to login the Vagrant VM as `app-user`.
 a. In your **local host**, create a SSH key pair
 ```
-ssh-keygen -b 2048 -t rsa -f ~/.ssh/user-key
+ssh-keygen -b 2048 -t rsa -f ~/.ssh/bob-key
 > Note: Just leave it blank and press Enter
-ssh-add ~/.ssh/user-key
+ssh-add ~/.ssh/bob-key
 ```
 b. Login to **Vault** via **LDAP** credential by posting to vault's API
 ```
@@ -300,7 +300,7 @@ VAULT_ADDRESS=0.0.0.0
 VAULT_TOKEN=$(curl -s \
     --request POST \
     --data @payload.json \
-    http://$VAULT_ADDRESS:8200/v1/auth/ldap/login/user |jq .auth.client_token|tr -d '"')
+    http://$VAULT_ADDRESS:8200/v1/auth/ldap/login/bob |jq .auth.client_token|tr -d '"')
 > Note: You can see the token in `client_token` field
 
 echo $VAULT_TOKEN
@@ -308,11 +308,11 @@ echo $VAULT_TOKEN
 
 cat > public-key.json <<EOF
 {
-  "public_key": "$(cat ~/.ssh/user-key.pub)",
+  "public_key": "$(cat ~/.ssh/bob-key.pub)",
   "valid_principals": "user"
 }
 EOF
-> Note: You can retrieve the public key by running the following command: `cat ~/.ssh/user-key.pub`
+> Note: You can retrieve the public key by running the following command: `cat ~/.ssh/bob-key.pub`
 
 SIGNED_KEY=$(curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
@@ -321,9 +321,9 @@ SIGNED_KEY=$(curl \
     http://$VAULT_ADDRESS:8200/v1/ssh-client-signer/sign/user-role | jq .data.signed_key|tr -d '"'|tr -d '\n')
 echo $SIGNED_KEY
 SIGNED_KEY=${SIGNED_KEY::-2}
-echo $SIGNED_KEY > user-signed-key.pub
+echo $SIGNED_KEY > bob-signed-key.pub
 
-ssh -i user-signed-key.pub -o IdentitiesOnly=yes  user@192.168.33.10
+ssh -i bob-signed-key.pub -i ~/.ssh/bob-key  app-user@192.168.33.10
 
 # Wait for 3 mins and try again, you will see `Permission denied` error, as the certificate has expired
 ```
