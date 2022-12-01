@@ -187,7 +187,7 @@ sudo mkdir auth_principals/
 cd auth_principals/
 
 sudo echo 'admin' |sudo tee admin
-sudo echo 'user' |sudo tee app-user
+sudo echo 'app-user' |sudo tee app-user
 
 sudo tee -a /etc/ssh/ssh_config > /dev/null <<EOF
     AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u
@@ -276,7 +276,8 @@ vault write -field=signed_key ssh-client-signer/sign/admin-role \
 ssh-keygen -Lf admin-signed-key.pub
 ssh -i ~/.ssh/admin-signed-key.pub admin@192.168.33.10
 ```
-You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.
+You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.</br>
+`exit` the Vagrant host and wait for 3 mins, and then you can try to login again with the same command above, you will find the permission is denied, as the SSH cert is expired
 
 ## 9. Client Configurations to login as non-admin user
 Now we are going to login as non-admin user. In FreeIPA, it is `user`. And in the Vagrant VM, it is `app-user`. We will be authenticated as `user` from FreeIPA in Vault and then create a signed ssh key to login the Vagrant VM as `app-user`.
@@ -308,7 +309,7 @@ echo $VAULT_TOKEN
 cat > public-key.json <<EOF
 {
   "public_key": "$(cat ~/.ssh/user-key.pub)",
-  "valid_principals": "app-user"
+  "valid_principals": "user"
 }
 EOF
 > Note: You can retrieve the public key by running the following command: `cat ~/.ssh/user-key.pub`
@@ -322,7 +323,7 @@ echo $SIGNED_KEY
 SIGNED_KEY=${SIGNED_KEY::-2}
 echo $SIGNED_KEY > user-signed-key.pub
 
-ssh -i user-signed-key.pub  user@192.168.33.10
+ssh -i user-signed-key.pub -o IdentitiesOnly=yes  user@192.168.33.10
 
 # Wait for 3 mins and try again, you will see `Permission denied` error, as the certificate has expired
 ```
@@ -366,6 +367,16 @@ eval `ssh-agent -s`
 ssh-add
 ```
 ref: https://stackoverflow.com/questions/17846529/could-not-open-a-connection-to-your-authentication-agent
+
+## Issue 3: SSH Too Many Authentication Failures
+While trying to connect to remote systems via SSH, encountering the error "Received disconnect from x.x.x.x port 22:2: Too many authentication failures"
+
+**Solution:**
+To fix this issue, you just need to add `IdentitiesOnly` with a value of yes.
+```
+ssh -i user-signed-key.pub  -o IdentitiesOnly=yes user@192.168.33.10
+```
+ref: https://www.tecmint.com/fix-ssh-too-many-authentication-failures-error/
 
 # <a name="reference">Reference</a>
 [LDAP Integrate into Vault](https://developer.hashicorp.com/vault/docs/auth/ldap)
