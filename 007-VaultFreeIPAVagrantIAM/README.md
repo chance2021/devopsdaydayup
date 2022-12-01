@@ -343,6 +343,14 @@ ssh -i ~/.ssh/user-signed-key.pub user@192.168.33.10
 ```
 You can now ssh to the Vagrant VM via the signed ssh key. You can type `whoami` to see which user account you are logging with.
 # <a name="post_project">Post Project</a>
+Stop docker-compose
+```
+docker-compose down -v
+```
+Stop Vagrant
+```
+vagrant destroy
+```
 
 # <a name="troubleshooting">Troubleshooting</a>
 ## Issue 1: Port 53 error
