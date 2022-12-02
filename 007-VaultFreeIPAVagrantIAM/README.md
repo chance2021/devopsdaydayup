@@ -163,7 +163,7 @@ vault write auth/ldap/config \
     groupdn="cn=groups,cn=accounts,dc=devopsdaydayup,dc=org" \
     groupfilter="" \
     binddn="uid=admin,cn=users,cn=accounts,dc=devopsdaydayup,dc=org" \
-    bindpass="admin123" \
+    bindpass="admin123" \ <--- This is the password for FreeIPA admin user
     insecure_tls=true \
     certificate="" \
     starttls=false \
@@ -229,9 +229,10 @@ ssh-add ~/.ssh/admin-key
 ```
 b. Login to **Vault** via **LDAP** credential by posting to vault's API
 ```
+# Note: This is the password for `admin` user in the Vagrant VM
 cat > payload.json<<EOF
 {
-  "password": "admin123"
+  "password": "admin123"  
 }
 EOF
 
@@ -294,6 +295,7 @@ ssh-add ~/.ssh/bob-key
 ```
 b. Login to **Vault** via **LDAP** credential by posting to vault's API
 ```
+# Note: Below is the password for `user` user in the Vagrant VM
 cat > payload.json<<EOF
 {
   "password": "user123"

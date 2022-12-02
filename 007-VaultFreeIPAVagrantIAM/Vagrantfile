@@ -68,7 +68,7 @@ Vagrant.configure("2") do |config|
     useradd -m admin
     useradd -m app-user
     usermod -aG sudo admin
-    echo "admin:testPass123"|chpasswd
-    echo "app-user:testPass123"|chpasswd
+    echo "admin:admin123"|chpasswd
+    echo "app-user:user123"|chpasswd
   SHELL
 end
