@@ -71,6 +71,7 @@ export YOUR_GITLAB_DOMAIN=example20221106.com
 sudo docker cp gitlab:/etc/gitlab/ssl/gitlab.$YOUR_GITLAB_DOMAIN.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 ```
+> Note: If you are using CentOS, you may need to include "-addext basicConfstraints=critical,CA:TRUE" in the ca.crt file and use `update-ca-trust` command instead.
 
 ## 5. Create a new project in your Gitlab server and generate a personal access token
 Login to your Gitlab server website (`https://<Your_Gitlab_Hostname>`) and Click **"New project"** -> **"Create blank project"** -> Type a project name in **"Project name"**, i.g. *first_project*  , select **"Public"** in **Visiblity Level** section -> Click **"Create project"** </br>
