@@ -12,6 +12,8 @@ In this lab, you will learn how to use Ansible to install Jenkins
 # <a name="prerequisites">Prerequisites</a>
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
 - Ansible (see installation guide [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html))
+- Vagrant(see installation guide [here](https://developer.hashicorp.com/vagrant/downloads))
+- Vbox(see installation guide [here](https://www.virtualbox.org/wiki/Linux_Downloads))
 # <a name="project_steps">Project Steps</a>
 
 ## 1. Create a VM to Install Jenkins
