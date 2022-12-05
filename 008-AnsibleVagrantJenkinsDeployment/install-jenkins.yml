@@ -1,0 +1,27 @@
+# ansible-playbook install-jenkins.yml -i inventory.txt --ask-pass --ask-become-pass
+---
+- hosts: jenkins_vm
+  become: yes
+  remote_user: admin
+  become_user: root
+  tasks:
+  - name: Download Jenkins key
+    get_url: 
+      url: https://pkg.jenkins.io/debian-stable/jenkins.io.key
+      dest: /usr/share/keyrings/jenkins-keyring.asc
+  - name: Add Apt source list
+    lineinfile: 
+      path: /etc/apt/sources.list.d/jenkins.list
+      line: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+      create: yes
+  - name: Run apt-get update
+    apt:
+      update_cache: yes
+  - name: Install Java
+    apt:
+      name: openjdk-11-jre
+      state: present
+  - name: Install Jenkins
+    apt:
+      name: jenkins
+      state: present

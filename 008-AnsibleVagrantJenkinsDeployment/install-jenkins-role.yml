@@ -1,0 +1,8 @@
+# ansible-playbook install-jenkins.yml -i inventory.txt --ask-pass --ask-become-pass
+---
+- hosts: jenkins_vm
+  become: yes
+  remote_user: admin
+  become_user: root
+  roles:
+    - role: geerlingguy.jenkins

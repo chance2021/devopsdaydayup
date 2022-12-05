@@ -1,0 +1,15 @@
+# ansible-playbook uninstall-jenkins.yml -i inventory.txt --ask-pass --ask-become-pass
+---
+- hosts: jenkins_vm
+  become: yes
+  remote_user: admin
+  become_user: root
+  tasks:
+  - name: Uninstall Jenkins
+    apt:
+      name: jenkins
+      state: absent
+  - name: Uninstall Java
+    apt:
+      name: openjdk-11-jre
+      state: absent
