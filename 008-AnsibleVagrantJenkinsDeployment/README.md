@@ -17,7 +17,7 @@ In this lab, you will learn how to use Ansible to install Jenkins
 # <a name="project_steps">Project Steps</a>
 
 ## 1. Create a VM to Install Jenkins
-We are using **Vagrant** to create a VM for the Jenkins installation
+We are using **Vagrant** to create a VM to install the Jenkins application
 ```
 vagrant provision
 vagrant up
@@ -25,7 +25,7 @@ vagrant up
 > Note: Select the network card which is being used to connect to Internet
 
 ## 2. Run Ansible Playbook
-> Note: Before you run the Ansible Playbook, you need to SSH into the Vagrant VM created above and accept the finger print. If you don't do this, then you will encounter errors when you try and run the Ansible Playbook
+> Note: Before you run the Ansible Playbook, you need to SSH into the Vagrant VM created above and accept the finger print. If you don't do this, then you may encounter errors when you try and run the Ansible Playbook
 ```
 ssh-copy-id admin@192.168.33.10
 ssh admin@192.168.33.10 
@@ -35,7 +35,8 @@ You can run below **ad-hoc** command to make sure the Ansible is able to talk to
 ```
 ansible -i hosts.ini jenkins_vm -m ping 
 ```
-You should get below response if it is success
+> Note: If you are using other VM instead of Vagrant, you need to update the IP in `hosts.ini`
+You should get below response if it is successful
 ```
 jenkins_vm | SUCCESS => {
     "ansible_facts": {
@@ -49,7 +50,7 @@ Then, in your **local host**, run below Ansible playbook script:
 ```
 ansible-playbook install-jenkins.yml -i hosts.ini --ask-pass --ask-become-pass
 ``` 
-> Note: The password is stored in `Vagrantfile` for `admin` user. The default is `admin123`. You should see below output if the installation is successful.
+> Note: The password is stored in `Vagrantfile` for `admin` user if you are using Vagrant as VM. The default is `admin123`. You should see below output if the installation is successful.
 Below output when the deployment is done:
 ```
 SSH password: 
@@ -61,12 +62,12 @@ PLAY RECAP *********************************************************************
 jenkins_vm                 : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
 ```
 
-3. Unlocking Jenkins
+## 3. Unlocking Jenkins
 When you first access the new Jenkins install, you are asked to unlock it using an automatically-generated password. </br>
-a. Browse to http://192.168.33.10 (or whichever port you configured for Jenkins when installing it) and wait until the Unlock Jenkins page appears. </br>
-b. Run `sudo cat /var/lib/jenkins/secrets/initialAdminPassword` in the Vagrant VM and enter the password showed and click "Next". </br>
-c. Click "Install suggested plugins" and wait for all plugins are installed.</br>
-d. Fill out the info for your First Amdin User. </br>
+a. **Browse** to http://192.168.33.10 (or whichever port you configured for Jenkins when installing it) and wait until the Unlock Jenkins page appears. </br>
+b. Run `sudo cat /var/lib/jenkins/secrets/initialAdminPassword` in the Vagrant VM or any other VM you installed the Jenkins and enter the password showed and click "Next". </br>
+c. Click **"Install suggested plugins"** and wait for all plugins are installed.</br>
+d. Fill out the info for your First **Amdin User**. </br>
 - **Username:** admin </br>
 - **Password:** test123</br>  
 - **Confirm password:** test123</br>
@@ -75,8 +76,9 @@ d. Fill out the info for your First Amdin User. </br>
 Click **"Save and Continue"**</br>
 e. Click **"Save and Finish"** and click **"Start using Jenkins"**. Then you should login as the admin user you just created previously
 
-4. Using Ansibel Role 
-You are done with the Jenkins via Ansible. Now, we are going to use **Ansible Role** to install the Jenkins instead. Ansible Role are consists of many playbooks and it is a way to group multiple tasks together into one container to do automation in very effective manner with clean directory structures. It can be easily reuse the codes by anyone if it it is suitable. </br>
+## 4. Using Ansibel Role 
+You are **done** with the Jenkins via Ansible. </br>
+Now, we are going to use **Ansible Role** to install the Jenkins instead. **Ansible Role** are consists of many playbooks and it is a way to group multiple tasks together into one container to do automation in very effective manner with clean directory structures. It can be easily reuse the codes by anyone if it it is suitable. </br>
 Before that, you can uninstall the Jenkins/Java package in the Vagrant VM, if you are going to use the same VM. </br>
 We are going to apply the Ansible Playbook `uninstall-jenkins.yaml` to remove the related packages before we start the new deployment:
 ```
@@ -133,6 +135,6 @@ ref: https://stackoverflow.com/questions/70704093/the-ip-address-configured-for-
 
 # <a name="reference">Reference</a>
 [Install Jenkins in Linux](https://www.jenkins.io/doc/book/installing/linux/)</br>
-[Install Jenkins Using Ansible On Ubuntu](https://blog.knoldus.com/how-to-install-jenkins-using-ansible-on-ubuntu/)
-[Installing Jenkins using an Ansible Playbook](https://medium.com/nerd-for-tech/installing-jenkins-using-an-ansible-playbook-2d99303a235f)
-[Jenkins Role](https://galaxy.ansible.com/geerlingguy/jenkins)
+[Install Jenkins Using Ansible On Ubuntu](https://blog.knoldus.com/how-to-install-jenkins-using-ansible-on-ubuntu/)</br>
+[Installing Jenkins using an Ansible Playbook](https://medium.com/nerd-for-tech/installing-jenkins-using-an-ansible-playbook-2d99303a235f)</br>
+[Jenkins Role](https://galaxy.ansible.com/geerlingguy/jenkins)</br>
