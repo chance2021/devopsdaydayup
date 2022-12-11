@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  test-service:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-12-10T19:25:21.067420246-05:00"
+    description: A Helm chart for Kubernetes
+    digest: 9fe1bd89c274fd1f8026477392bc888013c2a4d30a842523cb718dfadb3ded08
+    name: test-service
+    type: application
+    urls:
+    - https://chance2021.github.io/devopsdaydayup/test-service-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-12-10T19:25:21.066875514-05:00"
