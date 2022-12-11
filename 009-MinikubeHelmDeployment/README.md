@@ -25,7 +25,7 @@ You can install the **Minikube** by following the instruction in the [Minikube o
 minikube start
 minikube status
 ```
-Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/))
+Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/)
 ```
 minikube kubectl
 alias k="kubectl"
@@ -59,7 +59,7 @@ helm repo update
 ```
 
 ## 5. Install Jenkins Helm Chart
-Helm uses a packaging format called **charts**. A **chart** is a collection of files that describe a related set of Kubernetes resources, such as deployment, statefulset, secret, configmap, etc.. We are going to download/install the chart from above **jenkins** repo:
+Helm uses a packaging format called **charts**. A **chart** is a collection of files that describe a related set of Kubernetes resources, such as deployment, statefulset, secret, configmap, etc.. We are going to download/install the chart from the **jenkins** repo:
 
 ```
 helm install jenkins jenkins/jenkins 
@@ -74,7 +74,7 @@ Now, you have deployed a Jenkins service in the Minikube. You can check if the J
 ```
 k get pod
 ```
-If so, forward the port to your local and then you can access the Jenkins website
+If so, **forward** the port to your local and then you can access the Jenkins website
 ```
 kubectl --namespace default port-forward svc/jenkins 8080:8080
 ```
@@ -85,10 +85,10 @@ kubectl exec --namespace default -it svc/jenkins -c jenkins -- /bin/cat /run/sec
 ```
 ---
 # Create Your Own Helm Chart
-In above lab, we went through the steps to deploy an app via Helm Chart in K8s. In practical, you may need to create your own helm chart to deploy your own developed code.In the following article, we will create a **customized helm chart** and store in the **GitHub page**.
-1. Create your own Github repo.
+In above lab, we went through the steps to deploy an app via Helm Chart in K8s. In practical, you may need to create your own helm chart to deploy your own developed code.In the following article, we will create a **customized helm chart** and store it in the **GitHub page**.
+## 1. Create your own Github repo.
 You can refer to [here](https://docs.github.com/en/get-started/quickstart/create-a-repo) for how to create a repo in the Github.
-2. Create a Helm Chart
+## 2. Create a Helm Chart
 In your repo created above, run below commands to create a Helm Chart
 ```
 mkdir helm-charts
