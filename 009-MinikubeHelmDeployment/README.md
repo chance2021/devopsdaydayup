@@ -87,9 +87,9 @@ kubectl exec --namespace default -it svc/jenkins -c jenkins -- /bin/cat /run/sec
 # Create Your Own Helm Chart
 In above lab, we went through the steps to deploy an app via Helm Chart in K8s. In practical, you may need to create your own helm chart to deploy your own developed code.In the following article, we will create a **customized helm chart** and store it in the **GitHub page**.
 ## 1. Create your own Github repo.
-You can refer to [here](https://docs.github.com/en/get-started/quickstart/create-a-repo) for how to create a repo in the Github.
+You can refer to [here](https://docs.github.com/en/get-started/quickstart/create-a-repo) for how to **create a repo** in the Github.
 ## 2. Create a Helm Chart
-In your repo created above, run below commands to create a Helm Chart
+In your repo created above, run below commands to **create a Helm Chart**
 ```
 mkdir helm-charts
 cd helm-charts
@@ -114,7 +114,7 @@ test-service/
 └── values.yaml
 
 ```
-**charts:** Charts that this chart depends on. You can define the dependencies in `Chart.yaml`</br>
+**charts:** Charts that this chart depends on. You can define the **dependencies** in `Chart.yaml`</br>
 **Chart.yaml:** Information about your chart</br>
 **templates:** All template manifest files</br>
 **values.yaml:** The default values for your templates</br>
@@ -144,7 +144,7 @@ cd ..
 mkdir docs
 mv helm-charts/{index.yaml,test-service-0.1.0.tgz} docs
 ```
-Push the changes to your Github repo
+**Commit** the changes to your Github repo
 ```
 git add .
 git commit -m "Helm Chart"
@@ -152,8 +152,8 @@ git push
 ```
 ## 4. Create Github Pages
 In order to make your `tgz` downloadable from your Github site, you need to enable your Github Pages. </br>
-a. Go to your Github site and head into your repo which is planning to be used to hold your Helm Chart.</br>
-b. Go to "Settings" and click "Pages" in the left lane. </br>
+a. Go to your Github site and head into **your repo** which is planning to be used to hold your Helm Chart.</br>
+b. Go to **"Settings"** and click "Pages" in the left lane. </br>
 c. In the **Branch** section, select "main" and "/docs". </br>
 d. Click "Save" to apply the change. </br>
 Once the Github Page is setup, you should be able to download the `tgz` file from the site. The URL should be like `https://<your_github_username>.github.io/<your_repo_name>`
@@ -161,7 +161,7 @@ Once the Github Page is setup, you should be able to download the `tgz` file fro
 
 ## 5. Deploy your own Helm Chart
 Now you are ready to deploy your own created Helm Chart! </br>
-Add the Helm repository locally
+**Add the Helm repository** locally
 ```
 helm repo add myrepo https://<your_github_username>.github.io/<your_repo_name>
 
@@ -169,11 +169,11 @@ helm repo add myrepo https://<your_github_username>.github.io/<your_repo_name>
 $ helm repo add myrepo https://chance2021.github.io/devopsdaydayup
 "myrepo" has been added to your repositories
 ```
-Install this Helm Chart into your Minikube
+**Install** this Helm Chart into your Minikube
 ```
 helm install test-service myrepo/test-service
 ```
-You should see below output once the deployment is successful
+You should see below **output** once the deployment is successful
 ```
 NAME: test-service
 LAST DEPLOYED: Sat Dec 10 19:52:20 2022
