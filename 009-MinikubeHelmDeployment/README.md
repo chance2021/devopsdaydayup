@@ -25,20 +25,15 @@ You can install the **Minikube** by following the instruction in the [Minikube o
 minikube start
 minikube status
 ```
-Once the Minikube starts, you can download the **kubectl** used by Minikube:
+Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/))
 ```
 minikube kubectl
-alias k="minikube kubectl --"
+alias k="kubectl"
 ```
 Then, when you run the command `kubectl get node` or `k get node`, you should see below output:
 ```
 NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   4m37s   v1.25.3
-```
-Or if you already have **kubectl** installed (can be downloaded from [k8s official website](https://kubernetes.io/docs/tasks/tools/)), you can use **kubectl** directly, as the Minikube installation will modify the `~/.kube/config` file and you will have the access to the Miniokube cluster, as well as other existing clusters if you have any.
-```
-alias k="kubectl"
-k get node
 ```
 ## 2. Enable Minikube Dashboard
 You can also enable your **Minikube dashboard** by running below command:
