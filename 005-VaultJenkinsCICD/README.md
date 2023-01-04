@@ -1,30 +1,36 @@
-# Project Name: Vault Jenkins Pipeline 
+# Project Name: Vault Jenkins Pipeline
 
-# Project Goal
+## Project Goal
+
 In this article, you will learn how to integrate Vault into Jenkins pipeline, as well as the basic usage of Hashicorp Vault.
 
-# Table of Contents
+## Table of Contents
+
 1. [Prerequisites](#prerequisites)
 2. [Project Steps](#project_steps)
 3. [Post Project](#post_project)
 4. [Troubleshooting](#troubleshooting)
 5. [Reference](#reference)
 
-# <a name="prerequisites">Prerequisites</a>
+## <a name="prerequisites">Prerequisites</a>
+
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
 - Docker(see installation guide [here](https://docs.docker.com/get-docker/))
 - Docker Compose(see installation guide [here](https://docs.docker.com/compose/install/))
 
-# <a name="project_steps">Project Steps</a>
+## <a name="project_steps">Project Steps</a>
 
-## 1. Initiate Vault
+### 1. Initiate Vault
+
 a. **Initializing** the Vault
+
 ```bash
 docker-compose up -d
 docker exec -it $(docker ps -f name=vault_1 -q) sh
 export VAULT_ADDR='http://127.0.0.1:8200'
 vault operator init
 ```
+
 **Note:** Make a note of the output. This is the only time ever you see those unseal keys and root token. If you lose it, you won't be able to seal vault any more.
 
 b. **Unsealing** the vault </br>
@@ -53,8 +59,10 @@ Active Node Address     <none>
 Raft Committed Index    31
 Raft Applied Index      31
 ```
+
 c. Sign in to vault with **root** user </br>
 Type `vault login` and enter the `Initial Root Token` retrieving from previous output
+
 ```
 / # vault login
 Token (will be hidden): 
@@ -73,19 +81,25 @@ identity_policies    []
 policies             ["root"]
 ```
 
-## 2. Enable Vault KV Secrets Engine Version 2
-> Refer to https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2
+### 2. Enable Vault KV Secrets Engine Version 2
+
+> Refer to <https://developer.hashicorp.com/vault/docs/secrets/kv/kv-v2>
+
 ```
 vault secrets enable -version=2 kv-v2
 
 vault kv put -mount=kv-v2 devops-secret username=root password=changeme
 
 ```
+
 You can **read** the data by running this:
+
 ```
 vault kv get -mount=kv-v2 devops-secret
 ```
+
 Then you should be able to see below output
+
 ```
 ====== Data ======
 Key         Value
@@ -94,10 +108,13 @@ password    changeme
 username    root
 
 ```
+
 > Note: Since version 2 kv has prefixed `data/`, your secret path will be `kv-v2/data/devops-secret`, instead of `kv-v2/devops-secret`
 
-## 3. Write a Vault Policy and create a token
+### 3. Write a Vault Policy and create a token
+
 a. **Write** a policy
+
 ```
 cat > policy.hcl  <<EOF
 path "kv-v2/data/devops-secret/*" {
@@ -110,11 +127,13 @@ vault policy read first-policy
 ```
 
 b. **Enable approle**
+
 ```
 vault auth enable approle
 ```
 
 c. Create an **role**
+
 ```
 vault write auth/approle/role/first-role \
     secret_id_ttl=10000m \
@@ -128,16 +147,20 @@ vault write auth/approle/role/first-role \
 export ROLE_ID="$(vault read -field=role_id auth/approle/role/first-role/role-id)"
 echo $ROLE_ID
 ```
+
 > **Note:** Please make a note as it will be needed when configuring Jenkins credential
 
 d. Create a **secret id** via the previous role
+
 ```
 export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/first-role/secret-id)"
 echo $SECRET_ID
 ```
+
 > **Note:** Please make a note as it will be needed when configuring Jenkins credential
 
 e. Create a **token** with the role ID and secret ID
+
 ```
 apk add jq
 export VAULT_TOKEN=$(vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID" -format=json|jq .auth.client_token)
@@ -147,14 +170,16 @@ vault token lookup | grep policies
 ```
 
 f. Write a **secret** via the new token
+
 ```
 vault kv put -mount=kv-v2 devops-secret/team-1 username2=root2 password2=changemeagain
 vault kv get -mount=kv-v2 devops-secret/team-1
 
 ```
 
-## 4. Add the role id/secret id in Jenkins
-> Refer to https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential
+### 4. Add the role id/secret id in Jenkins
+
+> Refer to <https://plugins.jenkins.io/hashicorp-vault-plugin/#plugin-content-vault-app-role-credential>
 
 Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page in below selection: </br>
 **Kind:** Vault App Role Credential</br>
@@ -166,7 +191,8 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **ID:** (the credential id you will refer within Jenkins Pipeline. i.g. vault-app-role)</br>
 **Description:** Vault: AppRole Authentication</br>
 
-## 5. Add github credential in Jenkins
+### 5. Add github credential in Jenkins
+
 Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Credentials"** ->  **"System"** -> **"Global credentials (unrestricted)"** -> Click **"Add Credentials"** and you should fill out the page below below selection:</br>
 **Scope:** Global (Jenkins,nodes,items,all child items,etc) </br>
 **Username:** (your github username)</br>
@@ -174,8 +200,9 @@ Login to your Jenkins website and go to **"Manage Jenkins"** -> **"Manage Creden
 **ID:** (the id which will be referred in Jenkinsfile, i.g. github-token)</br>
 **Description:** Github token</br>
 
-## 6. Create a Jenkins Pipeline
-a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br> 
+### 6. Create a Jenkins Pipeline
+
+a. In the Jenkins portal, click **"New Item"** in the left navigation lane, and type the item name (i.g. first-project) and select **"Pipeline"**. Click **"OK"** to configure the pipeline.</br>
 b. Go to **"Pipeline"** section and select **"Pipeline script from SCM"** in the **"Definition"** field</br>
 c. Select **"Git"** in **"SCM"** field</br>
 d. Add `https://github.com/chance2021/devopsdaydayup.git` in **"Repository URL"** field</br>
@@ -184,41 +211,79 @@ f. Type `*/main` in **"Branch Specifier"** field</br>
 g. Type `005-VaultJenkinsCICD/Jenkinsfile` in **"Script Path"**</br>
 h. Unselect **"Lightweight checkout"**</br>
 
-# <a name="post_project">Post Project</a>
+## <a name="post_project">Post Project</a>
+
 Delete the docker-compose containers, as well as the volumes associated
+
 ```
 docker-compose down -v
 ```
-# <a name="troubleshooting">Troubleshooting</a>
-## Issue 1: Access denied to Vault Secrets at 'kv-v2/devops-secret/team-1'
+
+## <a name="troubleshooting">Troubleshooting</a>
+
+### Issue 1: Access denied to Vault Secrets at 'kv-v2/devops-secret/team-1'
+
 **Solution:**
 If you see an information in the log like `[INFO]  expiration: revoked lease`, that means your secret is expired and you may need to renew it by running below command:
+
 ```
 vault write -f -field=secret_id auth/approle/role/first-role/secret-id
 ```
+
 Then, you can update your new secret in corresponding Jenkins credential.
 
 Sometime this may be a general error which indicates something wrong in your Jenkinsfile configuration. One thing worth to mention is that, in the Jenkinsfile, `secrets` should use `engineVersion:2`, while `configuration` should use `engineVersion:1`. This is because `engineVersion:2` in `secrets` is referring to kv version, which is version 2 in our lab. However the `engineVersion` in `configuration` is referringto the API version, which should be version 1. You can tell this in below API call:
+
 ```
 curl  --header "X-Vault-Token: hvs.CAESI..."     http://vault:8200/v1/kv-v2/devops-secret/team-1
 ```
 
-You can see `http://vault:8200/v1` which means the API version is `1`. This is referring to the `engineVersion` in `configuration`. Also, my secret actual path is `kv-v2/data/devops-secret/team-1`, `/data` is just prefix for kv 2 secret path, so that is why `engineVersion` is `2` in `secret` as it is reffering to the kv version, not API version. 
+You can see `http://vault:8200/v1` which means the API version is `1`. This is referring to the `engineVersion` in `configuration`. Also, my secret actual path is `kv-v2/data/devops-secret/team-1`, `/data` is just prefix for kv 2 secret path, so that is why `engineVersion` is `2` in `secret` as it is reffering to the kv version, not API version.
 
-## Issue 2: Failed to look up namespace from the token: no namespace
+### Issue 2: Failed to look up namespace from the token: no namespace
+
 export VAULT_TOKEN=$(vault write auth/approle/login role_id="$ROLE_ID" secret_id="$SECRET_ID" -format=json|jq .auth.client_token)
 echo $VAULT_TOKEN
 vault token lookup | grep policies
 **Solution:**
 Error might happen if quotes exists in token
+
 ```
 VAULT_TOKEN=$(echo $VAULT_TOKEN|tr -d '"')
 ```
-ref: https://github.com/hashicorp/vault/issues/6287#issuecomment-684125899
 
+ref: <https://github.com/hashicorp/vault/issues/6287#issuecomment-684125899>
 
+### Issue 3: How to fix the docker-compose issues
 
-# <a name="reference">Reference</a>
+We use this file `plugins.txt` to manage install plug-ins. Unfortunately, it always forces us to use the latest versions. Hence the 1st step `docker-compose up -d` is likely to fail out.
+
+e.g.
+
+```dos
+ => => naming to docker.io/library/005-vaultjenkinscicd-vault                                                                                                                               0.0s 
+ => [005-vaultjenkinscicd-jenkins 2/4] COPY plugins.txt /usr/share/jenkins/ref/plugins.txt                                                                                                  0.3s 
+ => ERROR [005-vaultjenkinscicd-jenkins 3/4] RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt                                                                        5.1s 
+------
+ > [005-vaultjenkinscicd-jenkins 3/4] RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt:
+#0 5.036 Multiple plugin prerequisites not met:
+#0 5.036 Plugin docker-workflow:528.v7c193a_0b_e67c (via pipeline-model-definition:2.2118.v31fd5b_9944b_5->git-client:4.0.0) depends on configuration-as-code:1569.vb_72405b_80249, but there is an older version defined on the t
+an older version defined on the top level - configuration-as-code:1559.v38a_b_2e3b_6b_b_7,
+#0 5.036 Plugin git:4.12.1 (via git-client:4.0.0) depends on configuration-as-code:1569.vb_72405b_80249, but there is an older version defined on the top level - configuration-as-code:1559.v38a_b_2e3b_6b_b_7_b_2e3b_6b_b_7
+------
+failed to solve: executor failed running [/bin/sh -c jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt]: exit code: 1
+```
+
+The solution is to update the plugin file `plugins.txt` manually based on the error messages and then re-run `docker-compose up -d` until it can go through.
+
+e.g.
+
+![1672798209848](image/README/1672798209848.png)
+
+![1672798247625](image/README/1672798247625.png)
+
+## <a name="reference">Reference</a>
+
 [Vault Getting Started Deploy](https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-deploy)</br>
 [Vault Store The Google API Key](https://developer.hashicorp.com/vault/tutorials/secrets-management/static-secrets#store-the-google-api-key)</br>
 [Vault Signed SSH Certificates](https://developer.hashicorp.com/vault/docs/secrets/ssh/signed-ssh-certificates)</br>
