@@ -168,6 +168,7 @@ Click **Apply** to save the change</br>
 - **Custom all value**: .\*
 
 Click **Apply** to save the change</br>
+
 **interval**
 ---
 - **Select variable type**: Interval
