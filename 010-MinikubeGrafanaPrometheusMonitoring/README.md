@@ -114,8 +114,9 @@ Go to the **Dashboards** section in the left navigation lane, and click **+New d
 a. Click **Dashboard settings**(the gear icon) in the top right </br>
 b. Go to **Variables** section </br>
 c. Click **Add variable** and add below variables </br>
----
+
 **Node** </br>
+---
 - **Select variable type**: Query
 - **Name**: Node
 - Label: <leave it blank>
@@ -131,8 +132,9 @@ c. Click **Add variable** and add below variables </br>
 - **Custom all value**: .\*
 
 Click **Apply** to save the change</br>
----
+
 **Container**
+---
 - **Select variable type**: Query
 - **Name**: Container
 - Label: <leave it blank>
@@ -148,8 +150,9 @@ Click **Apply** to save the change</br>
 - **Custom all value**: .\*
 
 Click **Apply** to save the change</br>
----
+
 **Namespace**
+---
 - **Select variable type**: Query
 - **Name**: Namespace
 - Label: <leave it blank>
