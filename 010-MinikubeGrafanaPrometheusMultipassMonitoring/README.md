@@ -1,7 +1,7 @@
-# Project Name: Deploy Prometheus/Grafana on Minikube and Monitor Containers' Health
+# Project Name: Deploy Prometheus/Grafana on Minikube and Monitor The Health of Containers and VMs
 
 ## Project Goal
-In this lab, we will deploy the **Prometheus-Grafana** **Helm** chart on **Minikube**, and then set up a **dashboard** to monitor the health of the containers in the Minikube cluster.
+In this lab, we will deploy the **Prometheus-Grafana** **Helm** chart on **Minikube**, and then set up a **dashboard** to monitor the health of the containers in the Minikube cluster, as well as a VM created by **Multipass**.
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -19,11 +19,12 @@ In this lab, we will deploy the **Prometheus-Grafana** **Helm** chart on **Minik
 - Docker Compose(see installation guide [here](https://docs.docker.com/compose/install/))
 - Minikube (see installation guide [here](https://minikube.sigs.k8s.io/docs/start/))
 - Helm (see installation guide [here](https://helm.sh/docs/intro/install/)
+- Multipass (see installation guide [here](https://multipass.run/install))
 
 ## <a name="project_steps">Project Steps</a>
-## <a name="k8s">Monitor Kuberentes Nodes and Containers</a>
-### 1. Start Minikube
-You can install the **Minikube** by following the instruction in the [Minikube official website](https://minikube.sigs.k8s.io/docs/start/). Once it is installed, start the Minikube by running below command:
+### <a name="k8s">Monitor Kuberentes Nodes and Containers</a>
+#### 1. Start Minikube
+You can install the **Minikube** by following the instruction in the [Minikube official website](https://minikube.sigs.k8s.io/docs/start/). Once it is installed, **start** the Minikube by running below command:
 ```
 minikube start
 minikube status
@@ -31,21 +32,20 @@ minikube status
 Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/)
 ```
 minikube kubectl
-alias k="kubectl"
 ```
-Then, when you run the command `kubectl get node` or `k get node`, you should see below output:
+Then, when you run the command `kubectl get node`, you should see below output:
 ```
 NAME       STATUS   ROLES           AGE     VERSION
 minikube   Ready    control-plane   4m37s   v1.25.3
 ```
-### 2. Enable Minikube Dashboard
+#### 2. Enable Minikube Dashboard
 You can also enable your **Minikube dashboard** by running below command:
 ```
 minikube dashboard
 ```
-You should see a Kuberentes Dashboard page pop out in your browser immediately. You can explore all Minikube resources in this UI website.
+A Kuberentes Dashboard will pop out in your browser immediately. You can explore all Minikube resources in this UI website.
 
-### 3. Install Helm v3.x
+#### 3. Install Helm v3.x
 Run the following commands to install **Helm v3.x**:
 > ref: https://helm.sh/docs/intro/install/
 ```
@@ -54,12 +54,12 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 ```
 
-### 4. Deploy Metrics Server
+#### 4. Deploy Metrics Server
 In order to collect more metrics from the cluster, you should install **metrics server** on the cluster first. You can download the manifest file as follows:
 ```
 wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
-Then you need to **update the yaml file** by **adding** below section to **turn off the TLS verification** (more detail please see the [**Issue 1**](#issue1) in the troubleshooting section below)
+Then you need to **update the yaml file** by **adding** below section to **turn off the TLS verification** (more detail please see the [**Issue 1**](#issue1) in the **troubleshooting section** below)
 ```
 apiVersion: apps/v1
 kind: Deployment
@@ -91,20 +91,20 @@ $ kubectl top nodes
 NAME       CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%   
 minikube   622m         7%     2411Mi          15%  
 ```
-### 5. Add Helm Repo
+#### 5. Add Helm Repo
 Once Helm is set up properly, **add** the **repo** as follows:
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm search repo prometheus-community
 ```
-### 6. Deploy Prometheus Helm Chart
+#### 6. Deploy Prometheus Helm Chart
 **Install** Prometheus Helm Chart by running below command:
 ```
 helm install prometheus-grafana prometheus-community/kube-prometheus-stack -f values.yaml
 ```
 
-### 7. Configure Grafana Dashboard Manually
+#### 7. Configure Grafana Dashboard Manually
 Once the deployment is settle, you can **port-forward** to the Grafana service to access the portal from your local:
 ```
 kubectl -n default port-forward svc/prometheus-grafana 8888:80
@@ -187,41 +187,47 @@ Click **Apply** to save the change</br>
 Click **Apply** to save the change</br>
 Click **Save** to save the dashboard. Name it as **Container Health Status** </br>
 Once you go back to the Dashboard, you will see the **Node**/**Container**/**Namespace**/**Interval** sections are available in the top left with dropdown menu for choosing. </br>
+</br>
+</br>
 Now we are going to add a new **Panel**. Click **Add Panel** in the top right and click **Add a new panel** area. In the section **A**, type below query in the **Enter a PromQL query** field:
 ```
 sum(kube_pod_status_phase{pod=~"^$Container.*",namespace=~"default"}) by (phase)
 ```
 and click **Run queries** to execute the query. Make sure to choose **All** in top **Container** dropdown menu. You should see a line chart in above display area. </br>
+</br>
 In order to make the graph more readable, we can change the type of charts. Just expanding the **Time series** section in the top right and search for **bar gauge** to apply. </br>
+</br>
 Before saving the change, go to **Panel options** section in the right lane and type the name in **Title** field, for example, **Pod Status in Default Namespace**. And click **Apply** to save the change.</br>
-Next, we will create a **panel** to monitor the **top 5 memory intense Pods**. Again, click **Add panel** and then choose "Add a new panel". Copy and paste below query in the query field:
+</br>
+</br>
+Next, we will create a **panel** to monitor the **top 5 memory intense Pods**. Again, click **Add panel** and then choose **Add a new panel**. Copy and paste below query in the query field:
 ```
 topk(5,avg(container_memory_usage_bytes{}) by (pod) /1024/1024/1024)
 ```
 and click **Run queries** to execute the query.Expanding the **Time series** section in the top right and search for **Bar gauge** to apply. You can also change the layout orientation in **Bar gauge** -> **Orientation** section.
 ![Top 5 Memory Intense Pods](images/top-5-memory-intense-pod.png)
 
-### 8. Configure Dashboard by Importing Json file
+#### 8. Configure Dashboard by Importing Json file
 Instead of manually configuring the dashboard, you can also **import the pre-defined dashboard from a json file**. </br>
 In the Grafana Home page, go to **Dashboards** and click **Import**. Click **Upload JSON file** and choose **pod-health-status.json** under `devopsdaydayup/010-MinikubeGrafanaPrometheusMonitoring` folder. Then you should see the dashboard imported. You can adjust some queries/graph/setting as your needs.
 
-### 9. Download Dashboard Template
+#### 9. Download Dashboard Template
 A variety of dashboard templates are available to meet different needs in [**Grafana Labs**](https://grafana.com/grafana/dashboards/). you can go to the [website](https://grafana.com/grafana/dashboards/) and search for any dashboard you like, and just need to copy the **ID** and paste to **Grafana website** -> **Dashboard** -> **Import** -> **Import via grafana.com** and click **Load** to load the template from the website.
 ![Template ID](images/template-id.png)
 ![Template Import](images/template-import.png)
-## 10. Find Help from Your AI Friend
+#### 10. Find Help from Your AI Friend!
 You can also take advanage of your AI friend (e.g. [ChatGPT](https://chat.openai.com/chat)) to generate a query as needed.
 ![chatgpg](images/chatgpg.png)
 
-## <a name="vm">Monitor VMs</a>
-Besides containers, you can also use Prometheus to monitor the VMs outside of the Kubernetes cluster. Belows are the steps you can follows
-### 1. [Option] Deploy a test VM
-If you don't want to install node exporter in your local machine, you can just spin up a brand new VM by `multipass`. If you are using Ubunut, you can run below commands to create a new VM via `multipass`:
+### <a name="vm">Monitor VMs</a>
+You can use Prometheus to monitor VMs outside of the Kubernetes cluster in addition to containers. Below are the steps to do so.
+#### 1. [Option] Deploy a test VM
+If you don't want to install **node exporter** in your local machine directly, you can just spin up a fresh new VM by [multipass](https://multipass.run/install). If you are using Ubunut, you can run below commands to create a new VM via `multipass`:
 ```
 snap install multipass
 multipass launch
 ```
-Once the VM is deployed, you can access it and get its IP address, which you will configure for the Prometheus server later so that it can know where to scrap the metrics.
+After deploying the VM, access it to obtain its IP address. This IP address will later be configured on the Prometheus server, allowing it to collect metrics from the VM.
 ```
 multipass list
 multipass shell <VM Name>
@@ -230,23 +236,23 @@ sudo apt install net-tools -y
 ifconfig
 exit
 ```
-You can update the IP address into `values.prometheus-only.yaml` file under below section:
+You can update the **IP address** into `values.prometheus-only.yaml` file under below section:
 ```
       - job_name: multipass-vm
         static_configs:
           - targets:
             - 10.53.115.53:9100       <------Update this IP address
 ```
-### 2. Install Node Exporter
-You need to install the node exporter in whatever VMs you would like to be monitored by the Prometheus. You can follow the steps in [this website](https://prometheus.io/docs/guides/node-exporter/)
+#### 2. Install Node Exporter
+To monitor VMs with Prometheus, you must install the [node exporter](https://github.com/prometheus/node_exporter/releases) on each VM you want to monitor.
 ```
 wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
 tar xvfz node_exporter-1.5.0.linux-amd64.tar.g
 cd node_exporter-*.*-amd64
 ./node_exporter
 ```
-### 3. Deploy Prometheus Helm Chart
-Based on previous Minikube cluster, you can deploy [another Prometheus Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus) to monitor the VM we just created, which is not in the K8s cluster. But before that, you may need to uninstall the previous deployment, otherwise there will be a port conflict issue, if the default port doesn't change.
+#### 3. Deploy Prometheus Helm Chart
+To monitor the VM, which is not part of the K8s cluster, you can deploy [another Prometheus Helm Chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus) in the existing Minikube cluster. However, you may need to uninstall the previous deployment to avoid port conflict issues, if the default port has not been changed.
 ```
 helm -n default uninstall prometheus-grafana
 ```
@@ -254,7 +260,7 @@ Then you can deploy the new Helm Chart:
 ```
 helm install prometheus prometheus-community/prometheus -f values.prometheus-only.yaml
 ```
-Once the Pod is up and running, you can port forward the prometheus-server to your local port to be access
+Once the Pod is up and running, you can **port forward** the **prometheus-server** to your local port to be access
 ```
 kubectl -n default port-forward prometheus-server 9080:80
 ```
@@ -262,11 +268,11 @@ Open your browser and go to [http://localhost:9080](http://localhost:9080). Type
 ```
 (1 - (node_memory_MemAvailable_bytes{job="multipass-vm"} / (node_memory_MemTotal_bytes{job="multipass-vm"})))* 100
 ```
-Click **Graph** tab and then you can see a graph show the multipass vm memory usage history. </br>
+To view the memory usage history of the multipass VM, click the **Graph** tab and a graph will appear.
 ![prometheus-expression](images/prometheus-expression.png)
 
-### 4. Deploy Grafana Helm Chart
-To enhance the visual appeal of our metrics, we will implement the use of Grafana for displaying them.
+#### 4. Deploy Grafana Helm Chart
+To enhance the visual appeal of our metrics, we will implement a Grafana for displaying them.
 ```
 helm repo add grafana https://grafana.github.io/helm-charts
 helm install grafana grafana/grafana 
@@ -275,26 +281,26 @@ Get your `admin` user password by running:
 ```
 kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 ```
-The Grafana server can be accessed via port 80 on the following DNS name from within your cluster:
+The Grafana server can be **accessed via port 80** on the following DNS name from within your cluster:
 ```
 export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
 kubectl --namespace monitoring port-forward $POD_NAME 3000
 ```
-Login with the password from above and the username: `admin` in [http://localhost:3000](http://localhost:3000) via your browser. Go to **Configuration** (gear icon in the left lane) -> **Data sources** -> Click **Add data source** -> Choose **Prometheus**. In the URL, enter `http://prometheus-server` and then **Save & test** the change. </br>
+**Login** with the password from above and the username: `admin` in [http://localhost:3000](http://localhost:3000) via your browser. Go to **Configuration** (gear icon in the left lane) -> **Data sources** -> Click **Add data source** -> Choose **Prometheus**. In the URL, enter `http://prometheus-server` and then **Save & test** the change. </br>
 Go to **Explorer** and type below query in the PromQL query field
 
 ```
 (1 - (node_memory_MemAvailable_bytes{job="multipass-vm"} / (node_memory_MemTotal_bytes{job="multipass-vm"})))* 100
 
 ```
-You will see the graph as below
+The graph will appear as shown below.
 ![grafana-query](images/grafana-query.png)
-One useful node expertor dashboard template is available in [this website](https://grafana.com/grafana/dashboards/15172-node-exporter-for-prometheus-dashboard-based-on-11074/) or in `vm-health-status.json` file under the same folder of this README 
+One useful node expertor dashboard template is available in [this website](https://grafana.com/grafana/dashboards/15172-node-exporter-for-prometheus-dashboard-based-on-11074/) or in `vm-health-status.json` file under the same folder as this README.
 
-## <a name="alert">Alert Manager</a>
-The next crucial step in setting up the monitoring system is to properly configure alerts. The alert configuration will be handled by the Alert Manager service, which will then forward the alerts to various messaging platforms, including but not limited to Slack, Telegram, Discord, and Microsoft Teams. In our laboratory, we will utilize Slack as the messaging platform. Participants can either create their own Slack channel (see [here](https://api.slack.com/messaging/webhooks) how to create a Slack webhook) or contact me at **chance.chen21@gmail.com** to join the existing one. </br>
+### <a name="alert">Alert Manager</a>
+The next crucial step in setting up the monitoring system is to properly configure **alerts**. The alert configuration will be handled by the **Alert Manager service**, which will then forward the alerts to various messaging platforms, including but not limited to Slack, Telegram, Discord, and Microsoft Teams. In our laboratory, we will utilize **Slack** as the messaging platform. Participants can either create their own Slack channel (see [here](https://api.slack.com/messaging/webhooks) how to create a Slack webhook) or contact me at **chance.chen21@gmail.com** to join the existing one. </br>
 ### 1. Update Configuration
-We need to update Prometheus/Alert Manager with Slack info, as well as Alert rules. Here is the example that we have added in `values.prometheus-only.yaml` file:
+We need to update Prometheus/Alert Manager with **Slack info**, as well as **Alert rules**. Here is the example that we have added in `values.prometheus-only.yaml` file:
 ```
 serverFiles:
 ...
@@ -341,31 +347,28 @@ alertmanager:
       receiver: '#slack-notification'
       repeat_interval: 1h
 ``` 
-### 2. Re-deploy Prometheus
+#### 2. Re-deploy Prometheus
 Then, you can update the Prometheus Helm Deployment by running following command:
 ```
 helm upgrade prometheus prometheus-community/prometheus -f values.prometheus-only.yaml
 
 ```
 
-### 3. Test
-Once the deployment is completed, check if the alert rule is in place via Prometheus UI. Port forward the Prometheus service
+#### 3. Test
+After completing the deployment, use the **Prometheus UI** to verify that the alert rule is in place. To access the UI, **port forward** the Prometheus service.
 ```
 kubectl port-forward svc/prometheus-server 8888:80
 ```
-Go to "Alerts" tab in the top and you should see 2 **Inactive** alerts there
+Go to **Alerts** tab in the top and you should see 2 **Inactive** alerts there
 ![alert-rules-1](images/alert-rules-1.png)
-Now go to your VM which is being monitored and run below command to increase the RAM usage to 95% to trigger the alert
+To trigger the alert, navigate to the VM being monitored and run the command below to increase the RAM usage to 95%.
 ```
 sudo apt update
 sudo apt install stress-ng -y
 stress-ng --vm 1 --vm-bytes 95% --vm-method all --verify -t 10m -v
 ```
-Wait for couple minutes and you will see the alert message being sent to the Slack channel
+Please wait a few minutes and you will receive a notification in the designated Slack channel.
 ![slack](images/slack.png)
-
-
-
 
 ## <a name="post_project">Post Project</a>
 Stop Multipass VM if using
