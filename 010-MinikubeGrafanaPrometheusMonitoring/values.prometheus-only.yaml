@@ -41,7 +41,7 @@ alertmanager:
   config:
     global: 
       resolve_timeout: 1m
-      slack_api_url: 'https://hooks.slack.com/services/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'
+      slack_api_url: '<Add Your Slack URL Here>'
   
     templates:
     - '/etc/alertmanager/*.tmpl'
