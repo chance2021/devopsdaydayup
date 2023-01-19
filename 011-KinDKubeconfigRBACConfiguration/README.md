@@ -214,4 +214,4 @@ Error from server (Forbidden): pods "test-75d6d47c7f-5dshd" is forbidden: User "
 
 ## <a name="reference">Reference</a>
 - [Read Only Kubeconfig](https://docs.hava.io/importing/kubernetes/getting-started-with-kubernetes/read-only-kubeconfig)
-- [
+- [Limited Kubeconfig](https://codeforphilly.github.io/chime/operations/limited-kubeconfigs/limited-kubeconfigs.html)
