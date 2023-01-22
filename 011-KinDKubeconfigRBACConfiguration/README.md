@@ -210,6 +210,11 @@ Error from server (Forbidden): pods "test-75d6d47c7f-5dshd" is forbidden: User "
 
 
 ## <a name="post_project">Post Project</a>
+You can delete the cluster as following command:
+```
+kind delete cluster
+```
+
 
 ## <a name="troubleshooting">Troubleshooting</a>
 
