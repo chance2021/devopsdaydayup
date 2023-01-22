@@ -1,6 +1,7 @@
-# Project Name: 
+# Project Name: Create Read Only Kubeconfig File
 
 ## Project Goal
+In this lab, you will learn how to generate a kubeconfig file with read-only access.
 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
@@ -18,7 +19,7 @@
 ## <a name="project_steps">Project Steps</a>
 
 ### 1. Install Kind from Release Binaries
-If you are using Linux, you can install Kind as below steps (see installation guide [here](https://kind.sigs.k8s.io/docs/user/quick-start/))
+To install Kind on Linux, follow these steps: (see installation guide [here](https://kind.sigs.k8s.io/docs/user/quick-start/))
 ```
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.17.0/kind-linux-amd64
 chmod +x ./kind
@@ -30,13 +31,13 @@ Use below command to create a Kubernetes cluster:
 kind create cluster
 ```
 Once it is ready, you can run below command to test it out:
-> Note: Make sure to install [**kubectl**](https://www.google.com/search?channel=fs&client=ubuntu&q=install+kubectl+) first 
+> Note: Ensure to install [**kubectl**](https://www.google.com/search?channel=fs&client=ubuntu&q=install+kubectl+) before proceeding, if it hasn't been installed
 ```
 kubectl get node
 kubectl -n default create deploy test --image=nginx
 ```
 ### 3. Create a Role ans Service Account
-We are going to use manifest to crete the role and service account in your current context using kubectl, so make sure you have the correct context. You can run below command to confirm your current context:
+We will use a manifest to create a role and service account in your current context using kubectl. Please ensure you have the correct context before proceeding. You can check your current context using the following command:
 ```
 kubectl config current-context
 ```
@@ -112,11 +113,11 @@ Apply the manifest file:
 ```
 kubectl apply -f readonly-manifest.yaml 
 ```
-> Note: As mentioned in this [ticket](https://stackoverflow.com/questions/72256006/service-account-secret-is-not-listed-how-to-fix-it), Since 1.24, ServiceAccount token secrets are no longer automatically generated. (See [this note](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.24.md#urgent-upgrade-notes))
+> Note: As mentioned in this [ticket](https://stackoverflow.com/questions/72256006/service-account-secret-is-not-listed-how-to-fix-it), since 1.24, ServiceAccount token secrets are no longer automatically generated. (See [this note](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG/CHANGELOG-1.24.md#urgent-upgrade-notes))
 Also, the Secret is no longer used to mount credentials into Pods and you also need to manually create it. (ref: https://kubernetes.io/docs/concepts/configuration/secret/#service-account-token-secrets)
 
 ### 4. Create ReadOnly Kubeconfig
-You can now run the below script to create the new readonly kubeconfig
+You can now run the below script to generate a new readonly kubeconfig
 ```
 
 server=$(kubectl config view --minify --output jsonpath='{.clusters[*].cluster.server}')
@@ -186,23 +187,23 @@ mv /tmp/merged-config ~/.kube/config
 ```
 
 ### 5. Test
-Run below command to switch to the new context:
+Run below command to switch to the new readonly context:
 ```
 kubectl config use-context readonly
 kubectl config current-context
 ```
-With the new readonly kubeconfig, you can only list/watch/exec the Pod, but cannot create/delete any Pod. Let's test it out
+With the new readonly kubeconfig, you can only **list**/**watch**/**exec** the Pod, but cannot **create**/**delete** any Pod. Let's test it out
 ```
 kubectl get node
 kubectl -n default get pod
 kubectl exec -it $(kubectl get pod --no-headers|awk '{print $1}') -- bash
 ```
-Try creating or deleting...
+Try creating or deleting an object:
 ```
 kubectl delete pod $(kubectl get pod --no-headers|awk '{print $1}')
 kubectl create deploy test2 --image=nginx
 ```
-The error below indicates a permission issue.
+The error below indicates a permission issue, which means the kubeconfig works as expected
 ```
 Error from server (Forbidden): pods "test-75d6d47c7f-5dshd" is forbidden: User "system:serviceaccount:default:readonly" cannot delete resource "pods" in API group "" in the namespace "default"
 ```
