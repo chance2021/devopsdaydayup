@@ -21,6 +21,7 @@ We **encourage everyone to contribute to this repository**. Whether you are a se
 - **Lab 8**: [Deploy Jenkins via Ansible (Ansible Role)](https://github.com/chance2021/devopsdaydayup/tree/main/008-AnsibleVagrantJenkinsDeployment)
 - **Lab 9**: [Deploy Helm Chart in Minikube](https://github.com/chance2021/devopsdaydayup/tree/main/009-MinikubeHelmDeployment)
 - **Lab 10**: [Deploy Prometheus/Grafana on Minikube and Monitor The Health of Containers and VMs](https://github.com/chance2021/devopsdaydayup/tree/main/010-MinikubeGrafanaPrometheusMultipassMonitoring)
+- **Lab 11** [Create Read Only Kubeconfig File](https://github.com/chance2021/devopsdaydayup/tree/main/011-KinDKubeconfigRBACConfiguration)
 ## Reference
 - [Compose File Version 2](https://docs.docker.com/compose/compose-file/compose-file-v2/#cap_add-cap_drop) </br>
 - [Composerize](https://www.composerize.com/) </br>
