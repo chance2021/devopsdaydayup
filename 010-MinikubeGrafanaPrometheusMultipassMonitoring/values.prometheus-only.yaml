@@ -1,0 +1,59 @@
+serverFiles:
+  prometheus.yml:
+    rule_files:
+      - /etc/config/recording_rules.yml
+      - /etc/config/alerting_rules.yml
+    ## Below two files are DEPRECATED will be removed from this default values file
+      - /etc/config/rules
+      - /etc/config/alerts
+
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets:
+            - localhost:9090
+
+      - job_name: multipass-vm
+        static_configs:
+          - targets:
+            - 10.53.115.53:9100
+  alerting_rules.yml:
+    groups:
+    - name: Test Instances
+      rules:
+      - alert: VM_High_Memory_Usage
+        expr: 100 * (node_memory_MemTotal_bytes{job="multipass-vm"} - node_memory_MemAvailable_bytes{job="multipass-vm"}) / node_memory_MemTotal_bytes{job="multipass-vm"} > 60
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage on VM {{ $labels.instance }}"
+          description: "Memory usage on VM {{ $labels.instance }} is at {{ $value }}%, which exceeds the threshold of 60%."
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
+          summary: 'Instance {{ $labels.instance }} down'
+alertmanager:
+  config:
+    global: 
+      resolve_timeout: 1m
+      slack_api_url: '<Add Your Slack URL Here>'
+  
+    templates:
+    - '/etc/alertmanager/*.tmpl'
+  
+    receivers:
+    - name: '#slack-notification'
+      slack_configs:
+      - channel: 'alertmanager-testing'
+        send_resolved: true
+  
+    route:
+      group_wait: 10s
+      group_interval: 1m
+      receiver: '#slack-notification'
+      repeat_interval: 1h

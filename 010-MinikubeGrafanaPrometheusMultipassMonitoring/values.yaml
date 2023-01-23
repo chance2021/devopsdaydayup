@@ -1,0 +1,3 @@
+grafana:
+  enabled: true
+  adminPassword: changeme
