@@ -150,7 +150,7 @@ cp ~/.kube/config ~/.kube/config.$(date +%Y%m%d).bak
 KUBECONFIG=~/.kube/config:readonly-kubeconfig.yml kubectl config view --flatten > /tmp/merged-config
 mv /tmp/merged-config ~/.kube/config
 ```
-Note: If you are using AKS, you should have a service account `readonly-sa` already, which has been associated with an existing readonly cluster role. You can just run below script:
+Note: If you are using **AKS**, you should have a **service account** `readonly-sa` already, which has been associated with an existing readonly cluster role. You can just run below script instead:
 ```
 api_server=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}')
 cluster_name=$(kubectl config view -o jsonpath='{.clusters[0].name}')
@@ -195,7 +195,7 @@ kubectl config current-context
 With the new readonly kubeconfig, you can only **list**/**watch**/**exec** the Pod, but cannot **create**/**delete** any Pod. Let's test it out
 ```
 kubectl get node
-kubectl -n default get pod
+kubectl -n default get pod --watch
 kubectl exec -it $(kubectl get pod --no-headers|awk '{print $1}') -- bash
 ```
 Try creating or deleting an object:
