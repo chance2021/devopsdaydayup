@@ -29,3 +29,6 @@ We **encourage everyone to contribute to this repository**. Whether you are a se
 - [DevOps Resource from bregman-arie](https://github.com/bregman-arie/devops-resources)</br>
 - [DevOps Exercises from bregman-arie](https://github.com/bregman-arie/devops-exercises)</br>
 - [Grafana Awesome Alert](https://awesome-prometheus-alerts.grep.to/)</br>
+
+## Useful Resources
+[Cron AI](https://cron-ai.vercel.app)

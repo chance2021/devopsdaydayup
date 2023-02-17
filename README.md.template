@@ -13,6 +13,9 @@
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
 - Docker(see installation guide [here](https://docs.docker.com/get-docker/))
 - Docker Compose(see installation guide [here](https://docs.docker.com/compose/install/))
+- Minikube (see installation guide [here](https://minikube.sigs.k8s.io/docs/start/))
+- Helm (see installation guide [here](https://helm.sh/docs/intro/install/)
+
 
 ## <a name="project_steps">Project Steps</a>
 
