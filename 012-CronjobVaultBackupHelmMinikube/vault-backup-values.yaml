@@ -9,11 +9,11 @@ env:
     VAULT_CACERT: '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
     CONSUL_HTTP_ADDR: 'http://consul-server.vault:8500'
     CONSUL_CACERT: '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-    VAULT_APPROLE_ROLE_ID: '<changeme>'
-    VAULT_APPROLE_SECRET_ID: '<changeme>'
+    VAULT_APPROLE_ROLE_ID: '<ROLE_ID>'
+    VAULT_APPROLE_SECRET_ID: '<SECRET_ID>'
     MOUNT_POINT: 'example'
     SECRET_PATH: 'config'
     CONTAINER_NAME: 'vault-backup'
-    MINIO_USERNAME:  "<changeme>"
-    MINIO_PASSWORD: "<changeme>"
+    MINIO_USERNAME: '<MINIO_USERNAME>'
+    MINIO_PASSWORD: '<MINIO_PASSWORD>'
 
