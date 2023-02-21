@@ -106,7 +106,12 @@ Now when you go to **Users** section in the Keycloak, you will see all users fro
 
 
 ## <a name="post_project">Post Project</a>
+Stop the docker compose container and remove the volumes
+```
+docker-compose down -v
+```
 
 ## <a name="troubleshooting">Troubleshooting</a>
 
 ## <a name="reference">Reference</a>
+- [FreeIPA Data Migration](https://www.freeipa.org/page/Howto/Migration)
