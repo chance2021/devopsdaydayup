@@ -63,6 +63,10 @@ services:
       - KEYCLOAK_ADMIN_PASSWORD=Test2023!
       - KEYCLOAK_MANAGEMENT_USER=test-manager
       - KEYCLOAK_MANAGEMENT_PASSWORD=Test2023!
+      - KEYCLOAK_LOGLEVEL=TRACE
+      - KEYCLOAK_LOG_LEVEL=TRACE
+      - WILDFLY_LOGLEVEL=TRACE
+      - ROOT_LOGLEVEL=TRACE
     depends_on:
       - postgresql
     ports:

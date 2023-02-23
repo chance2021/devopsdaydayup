@@ -112,6 +112,50 @@ docker-compose down -v
 ```
 
 ## <a name="troubleshooting">Troubleshooting</a>
+### Issue 1: ipa: ERROR: did not receive Kerberos credentials
+When running freeipa migration, fails with error message `ipa: ERROR: did not receive Kerberos credentials`
+**Solution:**
+Make sure to run `kinit` to login with an admin user.
+
+ref: https://computingforgeeks.com/run-freeipa-server-in-docker-podman-containers/
+
+
+### Issue 2: Error starting userland proxy: listen tcp4 0.0.0.0:53: bind: address already in use
+An error occurs when deploying docker-compose
+```
+ ⠿ Container template-freeipa-1  Star...                                              1.1s
+Error response from daemon: driver failed programming external connectivity on endpoint freeipa-azure-template-freeipa-1 (da970ca164c00ceb0): Error starting userland proxy: listen tcp4 0.0.0.0:53: bind: address already in use
+```
+
+**Solution:**
+
+```
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+
+# In `/etc/resolv.conf`, replace the line `nameserver 127.0.0.53` to `nameserver 8.8.8.8`
+```
+
+## Issue 3: Auth service cannot login to FreeIPA
+Cannot login FreeIPA via Auth service via below command
+
+```
+kubectl exec -ti <authPodID> -- bash
+python3
+from python_freeipa import ClientMeta
+from app.config import ConfigSettings
+client = ClientMeta(ConfigSettings.FREEIPA_URL, verify_ssl=False)
+client.login(ConfigSettings.FREEIPA_USERNAME, ConfigSettings.FREEIPA_PASSWORD)
+```
+Below error showing:
+```
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='x.x.x.x', port=443): Max retries exceeded with url: /ipa/session/login_password (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7fe09c38c670>: Failed to establish a new connection: [Errno 110] Connection timed out'))
+
+```
+**Solution:**
+Python code has to talk to FreeIPA via both port `443` and `389`. You have to open them up in corresponding Firewall for FreeIPA.
+
+
 
 ## <a name="reference">Reference</a>
 - [FreeIPA Data Migration](https://www.freeipa.org/page/Howto/Migration)
