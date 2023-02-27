@@ -5,15 +5,16 @@ cronjob:
     imageVault: hashicorp/vault:1.9.2
     imageConsul: hashicorp/consul:1.12.0
 env:
-    VAULT_ADDR: 'https://vault.vault:8200'
+    VAULT_ADDR: 'http://vault.vault-test:8200'
     VAULT_CACERT: '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-    CONSUL_HTTP_ADDR: 'http://consul-server.vault:8500'
-    CONSUL_CACERT: '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
-    VAULT_APPROLE_ROLE_ID: '<changeme>'
-    VAULT_APPROLE_SECRET_ID: '<changeme>'
-    MOUNT_POINT: 'example'
-    SECRET_PATH: 'config'
-    CONTAINER_NAME: 'vault-backup'
-    MINIO_USERNAME:  "<changeme>"
-    MINIO_PASSWORD: "<changeme>"
+    #CONSUL_HTTP_ADDR: 'http://consul-server.vault-test:8500'
+    #CONSUL_CACERT: '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+    VAULT_APPROLE_ROLE_ID: '<ROLE_ID>'
+    VAULT_APPROLE_SECRET_ID: '<SECRET_ID>'
+    MOUNT_POINT: 'kv-v2'
+    SECRET_PATH: 'devops-secret'
+    BUCKET_NAME: 'test'
+    MINIO_USERNAME: 'rootuser'
+    MINIO_PASSWORD: 'Test1234!'
+    MINIO_ADDR: '<MINIO SERVICE NAME>.minio'
 

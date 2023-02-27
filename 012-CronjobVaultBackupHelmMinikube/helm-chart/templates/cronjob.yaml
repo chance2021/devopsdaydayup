@@ -30,37 +30,27 @@ spec:
             volumeMounts:
             - mountPath: /backup
               name: backup-dir
-          - name: consul-snapshot
-            image: {{ .Values.cronjob.imageConsul }}
-            command:
-              - /bin/sh
-              - -ec
-              - |
-                consul snapshot save /backup/consul-backup-`date +%Y%m%d%H%M`.snap
-            env:
-              {{- range $key, $val := .Values.env }}
-              - name: "{{ $key }}"
-                value: "{{ $val }}"
-              {{- end }}
-            volumeMounts:
-            - mountPath: /backup
-              name: backup-dir
+#          - name: consul-snapshot
+#            image: {{ .Values.cronjob.imageConsul }}
+#            command:
+#              - /bin/sh
+#              - -ec
+#              - |
+#                consul snapshot save /backup/consul-backup-`date +%Y%m%d%H%M`.snap
+#            env:
+#              {{- range $key, $val := .Values.env }}
+#              - name: "{{ $key }}"
+#                value: "{{ $val }}"
+#              {{- end }}
+#            volumeMounts:
+#            - mountPath: /backup
+#              name: backup-dir
           containers:
           - name: upload
             image: {{ .Values.cronjob.imageUpload }}
             command:
               - /bin/sh
-              - -ec
-              - |
-                ls -trl /backup 
-                # Check if the backup files exist or empty
-                VAULT_BACKUP_FILE=/backup/$(ls /backup|grep vault)
-                CONSUL_BACKUP_FILE=/backup/$(ls /backup|grep consul)
-                
-                if [ -f "$VAULT_BACKUP_FILE" ] && [ -f "$CONSUL_BACKUP_FILE" ] && [ ! -s "$VAULT_BACKUP_FILE" ] && [ ! -s "$CONSUL_BACKUP_FILE" ]; then echo "Files $VAULT_BACKUP_FILE and $CONSUL_BACKUP_FILE exist but have size 0" && exit 1; elif [ -f "$VAULT_BACKUP_FILE" ] && [ -f "$CONSUL_BACKUP_FILE" ]; then echo "Files $VAULT_BACKUP_FILE and $CONSUL_BACKUP_FILE exist and have size greater than 0"; else echo "One or both of the files $VAULT_BACKUP_FILE and $CONSUL_BACKUP_FILE do not exist" && exit 2; fi
-                mc alias set local-minio http://minio.minio:9000 $MINIO-USERNAME $MINIO-PASSWORD
-                mc cp --recursive /backup/* local-minio/test
-
+              - /upload/upload.sh
             env:
               {{- range $key, $val := .Values.env }}
               - name: "{{ $key }}"
@@ -70,9 +60,14 @@ spec:
             volumeMounts:
             - mountPath: /backup
               name: backup-dir
+            - mountPath: /upload
+              name: upload
           restartPolicy: OnFailure
           volumes:
           - name: backup-dir
             emptyDir: {}
+          - name: upload
+            configMap:
+              name: upload
+              defaultMode: 0777
       backoffLimit: 3
-

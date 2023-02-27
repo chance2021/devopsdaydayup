@@ -1,0 +1,79 @@
+version: '3.7'
+services:
+  freeipa:
+    image: freeipa/freeipa-server:centos-8-4.9.6
+    restart: unless-stopped
+    hostname: $HOSTNAME
+    environment:
+      IPA_SERVER_HOSTNAME: $HOSTNAME
+      TZ: "America/Toronto"
+    tty: true
+    stdin_open: true
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - freeipavol:/data
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.lo.disable_ipv6=0
+    security_opt:
+      - "seccomp:unconfined"
+    command:
+      - -U
+      - --domain=$DOMAIN
+      - --realm=$DOMAIN
+      - --http-pin=$PASSWORD
+      - --dirsrv-pin=$PASSWORD
+      - --ds-password=$PASSWORD
+      - --admin-password=$PASSWORD
+      - --no-host-dns
+      - --unattended
+    ports:
+#      - "53:53/udp"
+#      - "53:53"
+      - "80:80"
+      - "443:443"
+      - "389:389"
+      - "636:636"
+      - "88:88"
+      - "464:464"
+      - "88:88/udp"
+      - "464:464/udp"
+      - "123:123/udp"
+      - "7389:7389"
+      - "9443:9443"
+      - "9444:9444"
+      - "9445:9445"
+  postgresql:
+    image: docker.io/bitnami/postgresql:11
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_keycloak
+      - POSTGRESQL_DATABASE=bitnami_keycloak
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+
+  keycloak:
+    image: docker.io/bitnami/keycloak:16.1.0-debian-10-r0
+    environment:
+      - KEYCLOAK_ADMIN_USER=test
+      - KEYCLOAK_ADMIN_PASSWORD=Test2023!
+      - KEYCLOAK_MANAGEMENT_USER=test-manager
+      - KEYCLOAK_MANAGEMENT_PASSWORD=Test2023!
+      - KEYCLOAK_LOGLEVEL=TRACE
+      - KEYCLOAK_LOG_LEVEL=TRACE
+      - WILDFLY_LOGLEVEL=TRACE
+      - ROOT_LOGLEVEL=TRACE
+    depends_on:
+      - postgresql
+    ports:
+      - "8080:8080"
+volumes:
+  freeipavol:
+    driver: local
+  postgresql_data:
+    driver: local
+
