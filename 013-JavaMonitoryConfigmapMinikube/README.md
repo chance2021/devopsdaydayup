@@ -2,9 +2,9 @@
 
 
 ## Project Goal: 
-In this lab, you will learn how to develop a Java application that interacts with the Kubernetes API to monitor changes to a file that is mounted by a ConfigMap. 
+In this lab, you will learn how to develop a **Java application** that interacts with the Kubernetes API to **monitor changes** to a file that is mounted by a **ConfigMap**. 
 
-It is important to note that the file mounted by the ConfigMap is mounted as a symbolic link, so your Java code should read the link instead of the file directly.
+It is important to note that **the file mounted by the ConfigMap is mounted as a symbolic link** (e.g. `/config/game.properties` -> `/config/..data/game.properties`` -> `/config/..2023_03_02_15_51_59.1603915861/game.properties`), so your Java code should read the **symlink** instead of the file directly.
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Project Steps](#project_steps)
@@ -20,9 +20,35 @@ It is important to note that the file mounted by the ConfigMap is mounted as a s
 
 ## <a name="project_steps">Project Steps</a>
 
-### 1. Build Image
-Run below command to build the image:
+### 1. Start Minikube
+You can install the **Minikube** by following the instruction in the [Minikube official website](https://minikube.sigs.k8s.io/docs/start/). Once it is installed, start the minikube by running below command:
 ```
+minikube start
+minikube status
+```
+Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/)
+```
+minikube kubectl
+alias k="kubectl"
+```
+Then, when you run the command `kubectl get node` or `k get node`, you should see below output:
+```
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   4m37s   v1.25.3
+```
+Update the minio username and password in `vault-backup-values.yaml`
+```
+MINIO_USERNAME=$(kubectl get secret -l app=minio -o=jsonpath="{.items[0].data.rootUser}"|base64 -d)
+echo "MINIO_USERNAME is $MINIO_USERNAME"
+MINIO_PASSWORD=$(kubectl get secret -l app=minio -o=jsonpath="{.items[0].data.rootPassword}"|base64 -d)
+echo "MINIO_PASSWORD is $MINIO_PASSWORD"
+```
+
+### 2. Build Image
+Run below command to **build** the image:
+```
+git clone https://github.com/chance2021/devopsdaydayup.git
+cd 013-JavaMonitoryConfigmapMinikube
 eval $(minikube docker-env)
 docker build -t java-monitor-file:v2.0 .
 ```
@@ -37,21 +63,29 @@ kubectl apply -f pod.yaml
 ```
 
 ### 4. Verification
-Now you can modify the configmap to see if the activity will be captured in the log:
+You can modify the contents of the ConfigMap and verify if the activity is captured in the log. First **stream the log**:
 ```
 kubectl logs -f configmap-demo-pod
-
-# Open Another Terminal to modify the ConfigMap
-kubectl edit cm game-demo
-
-# Update anything within below section
-data:
-  game.properties: "enemy.types=aliens123456789876543,monsters\nplayer.maximum-lives=5
-    \   \n"
 ```
+Then open another terminal to **modify the ConfigMap**
+```
+kubectl edit cm game-demo
+```
+**Update** anything within below **data** section
+```
+# From
+data:
+  game.properties: "enemy.types=aliens,monsters\nplayer.maximum-lives=5\\n"
 
+# To
+data:
+  game.properties: "enemy.types=alienstest,monsters\nplayer.maximum-lives=5\\n"
+```
 Then wait for about 1 min and you should see below message in the log
 ```
+$ kubectl logs -f configmap-demo-pod
+
+Content has changed!
 ```
 
 ## <a name="post_project">Post Project</a>
