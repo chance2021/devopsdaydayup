@@ -185,6 +185,10 @@ You should see output like this:
 ```
 The package will appear in the Github page after the upload successfully.
 ![github-package.png](images/github-package.png)
+You can download the artifact by below commands:
+```
+wget --header "Authorization: token <GITHUB_TOKEN>" https://maven.pkg.github.com/chance2021/devopsdaydayup/com/example/file-monitor/1.0.0/file-monitor-1.0.0.jar
+```
 
 ref: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-maven
 
