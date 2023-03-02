@@ -87,6 +87,7 @@ $ kubectl logs -f configmap-demo-pod
 
 Content has changed!
 ```
+> Note: You can also update `spec.containers.args` in `pod.yaml` if you would like to monitor another file path.
 
 ## <a name="post_project">Post Project</a>
 Stop Minikube

@@ -7,7 +7,7 @@ spec:
     - name: demo
       image: java-monitor-file:v2.0
       imagePullPolicy: Never
-      #command: ["/config/game.properties"]
+      args: ["/config/game.properties", "3"]
       volumeMounts:
       - name: config
         mountPath: "/config"

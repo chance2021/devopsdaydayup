@@ -11,4 +11,4 @@ From maven:3.6.3-openjdk-17
 COPY --from=builder target/file-monitor-1.0.0.jar file-monitor-1.0.0.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "file-monitor-1.0.0.jar"]
-CMD ["/config/game.properties", "3"]
+#CMD ["/config/game.properties", "3"]
