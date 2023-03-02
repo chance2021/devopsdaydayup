@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-demo-pod2
+spec:
+  containers:
+    - name: demo
+      image: java-monitor-file:v1.1
+      imagePullPolicy: Never
+      volumeMounts:
+      - name: config
+        mountPath: "/tmp"
+        readOnly: true
+  volumes:
+  # You set volumes at the Pod level, then mount them into containers inside that Pod
+  - name: config
+    configMap:
+      # Provide the name of the ConfigMap you want to mount.
+      name: test-demo
