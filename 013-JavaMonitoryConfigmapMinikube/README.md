@@ -133,6 +133,61 @@ docker cp ubuntu-java-build:/target/file-monitor-1.0.0.jar .
 ```
 ref: https://www.digitalocean.com/community/tutorials/install-maven-linux-ubuntu
 
+### Issue 2: Install app in mvn container
+**Solution**:
+Please use below command to install any app you want
+```
+microdnf install <app_name>
+```
+
+### Issue 3: Upload the jar into Github Package repo
+Add below section in `pom.xml` (Note: make sure to replace `YOUR_GITHUB_USERNAME` and `YOUR_GITHUB_REPO` accordingly):
+```
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/[YOUR_GITHUB_USERNAME]/[YOUR_GITHUB_REPO]</url>
+        </repository>
+    </distributionManagement>
+```
+Then create `.m2` folder under your home folder, if it doesn't exist
+```
+mkdir ~/.m2/
+```
+Create `settings.xml` with below content (Note: make sure to replace `YOUR_GITHUB_USERNAME` and `YOUR_GITHUB_TOKEN` accordingly):
+```
+<settings>
+    <servers>
+        <server>
+        <id>github</id>
+            <username>[YOUR_GITHUB_USERNAME]</username>
+            <password>[YOUR_GITHUB_TOKEN]</password>
+        </server>
+    </servers>
+</settings>
+```
+Then run below command to upload the artifacts to Github Package repo:
+```
+mvn --batch-mode deploy
+```
+You should see output like this:
+```
+[INFO] Downloading from github: https://maven.pkg.github.com/chance2021/devopsdaydayup/com/example/file-monitor/maven-metadata.xml
+[INFO] Downloaded from github: https://maven.pkg.github.com/chance2021/devopsdaydayup/com/example/file-monitor/maven-metadata.xml (221 B at 505 B/s)
+[INFO] Uploading to github: https://maven.pkg.github.com/chance2021/devopsdaydayup/com/example/file-monitor/maven-metadata.xml
+[INFO] Uploaded to github: https://maven.pkg.github.com/chance2021/devopsdaydayup/com/example/file-monitor/maven-metadata.xml (330 B at 990 B/s)
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  15.020 s
+[INFO] Finished at: 2023-03-02T20:56:50Z
+```
+The package will appear in the Github page after the upload successfully.
+![github-package.png](images/github-package.png)
+
+ref: https://docs.github.com/en/actions/publishing-packages/publishing-java-packages-with-maven
+
 ## <a name="reference">Reference</a>
 - [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/)
 - [AliCloud Build an Image for a Java app via Dockerfile](https://static-aliyun-doc.oss-cn-hangzhou.aliyuncs.com/download%2Fpdf%2F60719%2FBest_Practices_reseller_en-US.pdf)
