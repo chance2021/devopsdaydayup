@@ -42,6 +42,7 @@ export ARM_TENANT_ID=
 Based on the Terraform script which created the AKS, update the corresponding variable (e.g. `k8s_version` in your **terraform.tfvars**)
 
 ### 3. Apply Changes
+> Note: Before the update, you'd better scale down some applications' replicas (e.g. `vault`) to 0. Otherwise, it may prevent the worker nodes to be removed/restarted.
 ```
 terraform init -backend-config=config/test/config.tf 
 terraform plan -var-file=config/test/test.tfvars -out deploy.tfplan
