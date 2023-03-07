@@ -113,6 +113,13 @@ If for any case you would like to roll back to previous Keycloak, you can just s
 helm -n test-keycloak upgrade -f values-keycloak-16.yaml keycloak old-bitnami/keycloak --version v6.1.0
 ```
 
+### 7. Verification
+Port forward the Keycloak service and verify if the website is up and running with the previous configuration:
+```
+kubectl -n test-keycloak port-forward svc/keycloak 8888:80
+```
+Open your local broswer and go to the [Keycloak website](http://localhost:8888). Check if all changes you made before the upgrading still exist.
+
 
 ## <a name="troubleshooting">Troubleshooting</a>
 
