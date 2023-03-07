@@ -19,8 +19,32 @@ In this lab, we will guide you through the process of upgrading the Keycloak Bit
 
 
 ## <a name="project_steps">Project Steps</a>
+### 1. Start Minikube
+You can install the **Minikube** by following the instruction in the [Minikube official website](https://minikube.sigs.k8s.io/docs/start/). Once it is installed, start the minikube by running below command:
+```
+minikube start
+minikube status
+```
+Once the Minikube starts, you can download the **kubectl** from [k8s official website](https://kubernetes.io/docs/tasks/tools/)
+```
+minikube kubectl
+alias k="kubectl"
+```
+Then, when you run the command `kubectl get node` or `k get node`, you should see below output:
+```
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   4m37s   v1.25.3
+```
+Update the minio username and password in `vault-backup-values.yaml`
+```
+MINIO_USERNAME=$(kubectl get secret -l app=minio -o=jsonpath="{.items[0].data.rootUser}"|base64 -d)
+echo "MINIO_USERNAME is $MINIO_USERNAME"
+MINIO_PASSWORD=$(kubectl get secret -l app=minio -o=jsonpath="{.items[0].data.rootPassword}"|base64 -d)
+echo "MINIO_PASSWORD is $MINIO_PASSWORD"
+```
 
-### 1. Setup Keycloak v16
+
+### 2. Setup Keycloak v16
 Run below commands to **deploy Keycloak v16**:
 ```
 k create ns test-keycloak
@@ -29,7 +53,7 @@ helm -n test-keycloak upgrade --install -f values-keycloak-16.yaml keycloak old-
 ```
 You can just **make some changes** in the Keycloak configuration (e.g. adding users/groups/clients) so that we can verify that later after upgrading.
 
-### 2. Backup Keycloak
+### 3. Backup Keycloak
 You can either backup the data from the postgres database as following steps:
 ```
 PGPASSWORD=$(kubectl -n test-keycloak get secret --namespace "keycloak" keycloak-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
@@ -55,13 +79,13 @@ Or you can use Velero to backup entire keycloak namespace (ref: [Velero Installa
 velero backup create keycloak-ns --include-namespaces test-keycloak
 ```
 
-### 3. Deploy Postgresql V15
+### 4. Deploy Postgresql V15
 Since Keycloak v20 helm chart is combined with Postgresql v15, we will deploy the postgres helm chart separately:
 ```
 helm -n test-keycloak install keycloak20-postgresql15 bitnami/postgresql  --version 12.2.2 -f values-postgres-15-for-keycloak-20.yaml
 ```
 
-### 4. Restore Backup to Postgresql V15
+### 5. Restore Backup to Postgresql V15
 We are going to restore the keycloak backup completed in previous step into the new Postgresql V15 instance:
 ```
 export POSTGRES_PASSWORD=$(kubectl get secret --namespace keycloak keycloak20-postgresql15 -o jsonpath="{.data.password}" | base64 -d)
@@ -77,7 +101,7 @@ gzip -d <BACKUP_NAME>.gz
 psql -U postgres -f /tmp/<BACKUP_NAME> -d keycloak16
 ```
 
-### 5. Re-Deploy Keycloak Helm Chart to V20
+### 6. Re-Deploy Keycloak Helm Chart to V20
 Upgrade Keycloak Helm chart to the newer version, which will connect to the postgres v15 as **external database**
 ```
 helm -n keycloak upgrade -f values-keycloak-20.yaml keycloak bitnami/keycloak --version 13.2.0 
