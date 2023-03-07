@@ -24,6 +24,7 @@ sudo mv velero-v1.10.2-rc.2-linux-amd64/velero /usr/bin
 
 ### 2. Deploy Velero into AKS
 ```
+az login
 AZURE_BACKUP_RESOURCE_GROUP=test-velero-backups
 az group create -n $AZURE_BACKUP_RESOURCE_GROUP --location canadacentral
 AZURE_STORAGE_ACCOUNT_ID="testvelero$(uuidgen | cut -d '-' -f5 | tr '[A-Z]' '[a-z]')"
