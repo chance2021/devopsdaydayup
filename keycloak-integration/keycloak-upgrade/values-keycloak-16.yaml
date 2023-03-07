@@ -1,0 +1,16 @@
+image:
+  tag: 16.1.0-debian-10-r0
+auth:
+   adminUser: user
+   adminPassword: "test1234!"
+service:
+  type: ClusterIP
+extraEnvVars:
+  - name: KEYCLOAK_LOGLEVEL
+    value: DEBUG
+  - name: WILDFLY_LOGLEVEL
+    value: DEBUG
+  - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+    value: "true"
+  - name: KEYCLOAK_DATABASE_NAME
+    value: "new_keycloak"
