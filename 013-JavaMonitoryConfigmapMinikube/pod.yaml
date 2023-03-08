@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: configmap-demo-pod
+spec:
+  containers:
+    - name: demo
+      image: java-monitor-file:v2.0
+      imagePullPolicy: Never
+      args: ["/config/game.properties", "3"]
+      volumeMounts:
+      - name: config
+        mountPath: "/config"
+        readOnly: false
+  volumes:
+  # You set volumes at the Pod level, then mount them into containers inside that Pod
+  - name: config
+    configMap:
+      # Provide the name of the ConfigMap you want to mount.
+      name: game-demo
+      # An array of keys from the ConfigMap to create as files
+      defaultMode: 0777
+      items:
+      - key: "game.properties"
+        path: "game.properties"

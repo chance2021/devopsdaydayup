@@ -1,0 +1,30 @@
+# helm -n test-keycloak upgrade --install keycloak bitnami/keycloak --version 13.2.0 -f values-keycloak-20.yaml
+image:
+  registry: docker.io
+  repository: bitnami/keycloak
+  tag: 20.0.5-debian-11-r4
+
+auth:
+   adminUser: user
+   adminPassword: "test1234!"
+service:
+  type: ClusterIP
+extraEnvVars:
+  - name: KEYCLOAK_LOGLEVEL
+    value: DEBUG
+  - name: WILDFLY_LOGLEVEL
+    value: DEBUG
+  - name: KEYCLOAK_PROXY_ADDRESS_FORWARDING
+    value: "true"
+  - name: KEYCLOAK_DATABASE_NAME
+    value: "keycloak16"
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  host: "postgresql-for-keycloak20.test-keycloak"
+  port: 5432
+  user: bn_keycloak
+  database: keycloak16
+  password: "test1234!"

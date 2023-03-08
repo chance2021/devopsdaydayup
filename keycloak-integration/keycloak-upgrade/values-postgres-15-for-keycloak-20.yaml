@@ -1,0 +1,13 @@
+# helm -n test-keycloak upgrade --install postgresql-for-keycloak20 bitnami/postgresql  --version 12.2.2 -f values-postgres-12.yaml
+global:
+  postgresql:
+    auth:
+      postgresPassword: "test1234!"
+      username: "bn_keycloak"
+      password: "test1234!"
+      database: "keycloak20"
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: 15.2.0-debian-11-r5
+
