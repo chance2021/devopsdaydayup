@@ -22,6 +22,14 @@ We **encourage everyone to contribute to this repository**. Whether you are a se
 - **Lab 9**: [Deploy Helm Chart in Minikube](https://github.com/chance2021/devopsdaydayup/tree/main/009-MinikubeHelmDeployment)
 - **Lab 10**: [Deploy Prometheus/Grafana on Minikube and Monitor The Health of Containers and VMs](https://github.com/chance2021/devopsdaydayup/tree/main/010-MinikubeGrafanaPrometheusMultipassMonitoring)
 - **Lab 11**: [Create Read Only Kubeconfig File](https://github.com/chance2021/devopsdaydayup/tree/main/011-KinDKubeconfigRBACConfiguration)
+- **Lab 12**: [Deploy A Cronjob to Backup Vault Data](https://github.com/chance2021/devopsdaydayup/tree/main/012-CronjobVaultBackupHelmMinikube)
+- **Lab 13**: [Deploy A Java Application In K8s, Monitoring ConfigMap File Change](https://github.com/chance2021/devopsdaydayup/tree/main/013-JavaMonitoryConfigmapMinikube)
+
+- **AKS Related Lab**: [AKS Upgrade](https://github.com/chance2021/devopsdaydayup/tree/main/aks/aks-upgrade)
+- **AKS Related Lab**: [AKS Backup Solution - Velero](https://github.com/chance2021/devopsdaydayup/tree/main/aks/backup-solution-velero)
+
+- **Keycloak Related Lab**: [Integrate FreeIPA into Keycloak](https://github.com/chance2021/devopsdaydayup/tree/main/keycloak-integration)
+- **Keyclaok Related Lab**: [Upgrade Keycloak v16 to v20](https://github.com/chance2021/devopsdaydayup/tree/main/keycloak-integration)
 ## Reference
 - [Kubernetes API Extension](https://kubebuilder.io)
 - [Compose File Version 2](https://docs.docker.com/compose/compose-file/compose-file-v2/#cap_add-cap_drop) </br>
