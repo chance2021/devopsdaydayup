@@ -31,14 +31,14 @@ This lab will guide you through the process of **deploying a Vault Helm chart** 
 ## <a name="project_steps">Project Steps</a>
 
 ### 1. Add Helm Repo
-To use the Helm chart, add the Hashicorp helm repository and check that you have access to the chart:
+To use the Helm chart, **add the Hashicorp helm repository** and check that you have access to the chart:
 ```
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 helm search repo hashicorp/vault
 ```
 ### 2. Deploy Vault Helm Chart
-Install the latest release of the Vault Helm chart with below command:
+**Install** the latest release of the Vault Helm chart with below command:
 ```
 helm install vault hashicorp/vault -f values.yaml
 ```
@@ -115,11 +115,11 @@ username    root
 ```
 ### 5. Configure Kubernetes authentication
 Stay on the Vault pod and configure the kuberentes authentication </br>
-a. Enable the Kuberetes atuh in the Vault
+a. **Enable** the Kuberetes atuh in the Vault
 ```
 vault auth enable kubernetes
 ```
-b. Create a role for the service account which is used by the deployment
+b. Create a **role** for the service account which is used by the deployment
 ```
 vault write auth/kubernetes/config \
     kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"
@@ -131,7 +131,7 @@ path "internal-app/data/database/config" {
 EOF
 ```
 > Note: Since version 2 kv has prefixed `data/`, your secret path will be `internal-app/data/database/config`, instead of `internal-app/database/config`
-c. Associate the role created above to the service account
+c. Associate the role created above to the **service account**
 ```
  vault write auth/kubernetes/role/internal-app \
     bound_service_account_names=app-sa \
@@ -144,20 +144,20 @@ Apply the `app-deployment.yaml` to deploy a deployment:
 ```
 kubectl apply -f app-deployment.yaml
 ```
-Wait for the pods are ready
+Wait for the pods are **ready**
 ```
 kubectl wait pods -n default -l app=nginx --for condition=Ready --timeout=1000s
 ```
 
 ### 7. Update the deployment to Enable the Vault Injection
-To enable the vault to inject secrets into a deployment's pods, you need to patch the  code in `patch-app-deployment.yaml` into the annotation section of the deployment file:
+To enable the vault to inject secrets into a deployment's pods, you need to patch the  code in `patch-app-deployment.yaml` into the **annotation** section of the deployment file:
 ```
 kubectl patch deployment app-deployment --patch "$(cat patch-app-deployment.yaml)"
 ```
 Once the vault sidecar is successfully injected into the app deployment's pod, you should be able to verify its presence by inspecting the pod's configuration. 
 
 ## <a name="post_project">Post Project</a>
-Delete Minikube
+**Delete** Minikube
 ```
 minikube stop
 ```
