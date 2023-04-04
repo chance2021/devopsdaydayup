@@ -2,7 +2,7 @@ Project Name: Deploy and Use Vault As Agent Sidecar Injector
 ---
 
 ## Project Goal
-This lab will guide you through the process of **deploying a Vault Helm chart** in a Kubernetes cluster running on **Minikube**. Once you have the Vault instance up and running, you will create a **deployment** that utilizes **Vault as a sidecar** to **inject secrets** into the pod's environment variables. This approach ensures that the application running in the pod has access to the necessary secrets without compromising their security by storing them in plain text within the container.
+This lab will guide you through the process of **deploying a Vault Helm chart** in a Kubernetes cluster running on **Minikube**. Once you have the Vault instance up and running, you will create a **deployment** that utilizes **Vault as a sidecar** to **inject secrets** into the pod as a file. This approach ensures that the application running in the pod has access to the necessary secrets without compromising their security by storing them in plain text within the container.
 
 ## Table of Contents
 - [Project Name: Deploy and Use Vault As Agent Sidecar Injector](#project-name-deploy-and-use-vault-as-agent-sidecar-injector)
@@ -155,6 +155,10 @@ To enable the vault to inject secrets into a deployment's pods, you need to patc
 kubectl patch deployment app-deployment --patch "$(cat patch-app-deployment.yaml)"
 ```
 Once the vault sidecar is successfully injected into the app deployment's pod, you should be able to verify its presence by inspecting the pod's configuration. 
+
+```
+kubectl exec $(kubectl get pod|grep app-deployment|awk '{print $1}') -- cat /vault/secrets/database-config.txt
+```
 
 ## <a name="post_project">Post Project</a>
 **Delete** Minikube
