@@ -131,10 +131,12 @@ Containers:
 9. `man grep` for **more** information
 ### kubectx
 > ref: https://github.com/ahmetb/kubectx
+
 **kubectx** is a tool to switch between contexts (clusters) on kubectl faster. \n
 **kubens** (`alias ns=kubens`) is a tool to switch between Kubernetes namespaces (and configure them for kubectl) easily.
 ### kube-ps1
 > ref: https://github.com/jonmosco/kube-ps1
+
 A script that lets you add the current Kubernetes context and namespace configured on kubectl to your Bash/Zsh **prompt strings** (i.e. the $PS1).
 ### krew
 > Installation ref: https://krew.sigs.k8s.io/docs/user-guide/setup/install/
@@ -153,6 +155,12 @@ Krew itself is a kubectl plugin that is installed and updated via Krew (yes, Kre
 - status
 - pod-dive
 - janitor
+
+### minikube
+> ref: https://minikube.sigs.k8s.io/docs/start/
+
+minikube is local Kubernetes, focusing on making it easy to learn and develop for Kubernetes.
+
 ### tmux
 ref: https://tmuxcheatsheet.com/
 - tmux new -s <session_name>
