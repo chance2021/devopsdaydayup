@@ -1,0 +1,35 @@
+injector:
+  replicas: 1
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "1.1.0"
+  agentImage:
+    repository: "hashicorp/vault"
+    tag: "1.12.1"
+server:
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.13.1"
+  ha:
+    raft:
+      config: |
+        storage "raft" {
+          path    = "/vault/data"
+          node_id = "node1"
+        }
+        
+        listener "tcp" {
+          address     = "0.0.0.0:8200"
+          tls_disable = "true"
+          #tls_cert_file = "/vault/vault.crt"
+          #tls_key_file  = "/vault/vault.key"
+          #tls_client_ca_file = "/vault/vault.ca"
+        }
+        
+        api_addr = "http://0.0.0.0:8200"
+        cluster_addr = "https://0.0.0.0:8201"
+        ui = true
+        disable_mlock = true
+        max_lease_ttl = "8784h"
+        default_lease_ttl = "8784h"
+

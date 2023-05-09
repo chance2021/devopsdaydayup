@@ -1,0 +1,1 @@
+seq 1 100 | xargs -n1 -P100  curl --connect-timeout 5 -d 'client_id=test' -d 'client_secret=<client-secret>' -d 'username=<username>' -d 'password=<password>' -d 'grant_type=password' 'http://localhost:18080/realms/master/protocol/openid-connect/token'
