@@ -24,6 +24,9 @@ We **encourage everyone to contribute to this repository**. Whether you are a se
 - **Lab 11**: [Create Read Only Kubeconfig File](https://github.com/chance2021/devopsdaydayup/tree/main/011-KinDKubeconfigRBACConfiguration)
 - **Lab 12**: [Deploy A Cronjob to Backup Vault Data](https://github.com/chance2021/devopsdaydayup/tree/main/012-CronjobVaultBackupHelmMinikube)
 - **Lab 13**: [Deploy A Java Application In K8s, Monitoring ConfigMap File Change](https://github.com/chance2021/devopsdaydayup/tree/main/013-JavaMonitoryConfigmapMinikube)
+- **Lab 14**: [Deploy Vault as SideCar](https://github.com/chance2021/devopsdaydayup/tree/main/014-VaultInjectorMinikube)
+- **Lab 15**: [Remove Large Files from Git Commit History](https://github.com/chance2021/devopsdaydayup/tree/main/015-GitRemoveLargeFile)
+
 
 - **AKS Related Lab**: [AKS Upgrade](https://github.com/chance2021/devopsdaydayup/tree/main/aks/aks-upgrade)
 - **AKS Related Lab**: [AKS Backup Solution - Velero](https://github.com/chance2021/devopsdaydayup/tree/main/aks/backup-solution-velero)
