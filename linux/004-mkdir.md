@@ -21,7 +21,8 @@ mkdir: cannot create directory ‘devops/lesson1/lab1/img’: No such file or di
 /tmp$ mkdir -p devops/lesson1/lab1/img;cd $_
 osboxes@osboxes:/tmp/devops/lesson1/lab1/img$
 ``` 
-复习一下， `cd $_` 意思是把前一个命令里的路径（mkdir 后的 路径）作为下一个命令（cd）的输入。
+复习一下， `cd $_` 意思是把前一个命令里的路径（mkdir 后的 路径）作为下一个命令（cd）的输入。<br>
+
 2. 如果你想要让新建的文件**强制设定属性**，你可以使用`-m`参数，比如
 ```
 $ mkdir -m777 newfolder
