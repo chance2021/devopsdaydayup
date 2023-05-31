@@ -16,7 +16,7 @@ This lab specifically focuses on the process of removing large file objects from
     - [5. **Remove** the File from History](#5-remove-the-file-from-history)
   - [Post Project](#post-project)
   - [Troubleshooting](#troubleshooting)
-  - [Reference](#reference)
+  - [Reference](#reference) 
 
 ## <a name="prerequisites">Prerequisites</a>
 - Ubuntu 20.04 OS (Minimum 2 core CPU/8GB RAM/30GB Disk)
