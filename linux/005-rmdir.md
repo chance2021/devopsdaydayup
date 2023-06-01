@@ -17,6 +17,6 @@ APP_PATH=xxxxxx
 FILE=xxxxxx
 rm -r ${APP_PATH}/${FILE}
 ```
-因为一旦两个变量都为空的时候，这个`rm`/`rmdir` 就变成了`rm -r /` or `rmdir -r /`。
-4. 为了防止误删，你可以在`profile`里给`rm`或`rmdir`一个别名，比如：`alias rm='rm -i'`
+因为一旦两个变量都为空的时候，这个`rm`/`rmdir` 就变成了`rm -r /` or `rmdir -r /`。<br>
+4. 为了防止误删，你可以在`profile`里给`rm`或`rmdir`一个别名，比如：`alias rm='rm -i'` <br>
 5. 可以试试`safe-rm`来替代`rm`，用来防止误删。具体请参考[这里](https://manpages.ubuntu.com/manpages/focal/man1/safe-rm.1.html)
