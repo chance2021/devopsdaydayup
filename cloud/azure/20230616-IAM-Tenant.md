@@ -1,5 +1,5 @@
 # IAM-Tenant（租户)
-1. 今天第一篇文章，本来是打算和大家一起学习Resource Management (e.g. Management Groups, Subscription, Resource Groups, Resources)。因为我觉得，登入Azure Portal后第一个会遇到的应该就是这些吧。但是我发现，其实还有一个东西会在你遇到它们之前就会遇到的，甚至很多人都不太知道它的存在。这就是**Azure Tenant**。<br>
+1. 今天第一篇文章，本来是打算和大家一起学习**Resource Management (e.g. Management Groups, Subscription, Resource Groups, Resources)**。因为我觉得，登入**Azure Portal**后第一个会遇到的应该就是这些吧。但是我发现，其实还有一个东西会在你遇到它们之前就会遇到的，甚至很多人都不太知道它的存在。这就是**Azure Tenant**。<br>
 2. 我第一次接触**Azure Tenan**，是在我使用**Terraform部署AKS**的时候，被要求输入`tenant_id`这个选项([参考这里](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster#tenant_id))。当时我在Azure Portal找了半天才找到对应的**Tenant ID**。
 3. 这两天重新再学习**Tenant ID**,又把它和其他名词混了起来，比如**Microsoft Account**, **Orgnization**, **Subscription**。真是傻傻分不清楚。接下来我们来介绍一下到底什么是**Tenant**。
 4. 官方解释：一个租户(Tenant)代表一个组织(Organization)。它是组织或应用开发人员在与Microsoft建立关系之初获得的Azure AD的专用实例。([A tenant represents an organization. It's a dedicated instance of Azure AD that an organization or app developer receives at the beginning of a relationship with Microsoft.](https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant))
