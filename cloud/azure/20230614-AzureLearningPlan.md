@@ -10,11 +10,11 @@
 第一阶段主要是带着大家把Azure上常见的服务都过一遍。这个顺序我打算按照从一个新手的角度，从登入[Azure Portal](https://portal.azure.com/)开始如何一步一步搭建自己想要的服务的这样一个顺序，把其中会涉及到服务都一一列出来，解释一遍，混个脸熟。这样无论你是公司工作需要使用Azure，还是自己个人做实验想要学习Azure，都能有一个比较好的抓手来进入这个庞杂的体系里。
 
 目前我计划的学习内容顺序如下：
-- 1. **Resource Management**
-- 2. **Location**
-- 3. **Resources**
-- 4. **ARM**
-- 5. **IAM**
+- 1. **IAM**
+- 2. **Resource Management**
+- 3. **Location**
+- 4. **Resources**
+- 5. **ARM**
 - 6. **Cost Management**
 - 7. **Security**
 - 8. **DevOps**
