@@ -1,0 +1,7 @@
+# 开始日拱一卒啦
+今天开始尝试着每天写点自己当天学习到的新知识，以督促自己每日学习。<br/>
+
+1. 开始尝试知识星球，感觉这个相比于微信群，更适合群组讨论，这样讨论的知识才能沉淀。
+2. Akamai是一家美国上市公司，主要经营CDN, 网络安全，和云服务。这两天被要求从我们的CRM软件里导出数据，然后注入到Akamai的数据库里，其中需要用到Azure的Data Factory, Storage Account, Function, Key Vault, Role Assignment等服务。这是一个很好的了解Terraform部署的机会，之后打算写一个类似的项目放入我们实验里。
+3. ADF的部署挺有意思，基础的Instance可以使用IaC工具部署，比如Terraform或Azure ARM，但是之后的具体设置，你可以通过Azure portal UI来配置，配置完以后可以把相关配置Publish到Git的Branch里。UI和Source Control完美结合。
+4. 看了一部很有意思的电视剧，Netflix《人选之人-造浪者》。一共8集，讲的是台湾大选期间各党派内部竞选活动，感觉挺真实，也挺温馨。一群人为了一个共同的目标一起在一段时间共同奋斗，是一段很美好的回忆。推荐
