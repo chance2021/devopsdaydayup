@@ -1,0 +1,9 @@
+/**
+locals {
+    datafacotry = {
+      adf01 = {
+        
+      }
+    }
+}
+**/
