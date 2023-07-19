@@ -7,4 +7,5 @@ module "main" {
   environment     = var.environment
 
   storage-accounts = local.storage-accounts
+  function-apps    = local.function-apps
 }

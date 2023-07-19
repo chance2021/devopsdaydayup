@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "main" {
-  name                     = var.storageaccount_name
+  name                     = var.storage_account_name
   resource_group_name      = var.rg_name
   location                 = var.location
   account_tier             = var.account_tier
