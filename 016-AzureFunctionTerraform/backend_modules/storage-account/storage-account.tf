@@ -1,18 +1,8 @@
-resource "random_string" "primary" {
-  length  = 3
-  special = false
-  upper   = false
-}
-
 resource "azurerm_storage_account" "main" {
-  name                              = var.name_override == null ? lower(format("%sst", replace(local.primary_name, "/[[:^alnum:]]/", ""))) : lower(replace(var.name_override, "/[[:^alnum:]]/", ""))
-  name                     = "storageaccountname"
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "GRS"
+  name                     = "storage2023071988"
+  resource_group_name      = var.rg_name
+  location                 = var.location
+  account_tier             = var.account_tier
+  account_replication_type = var.account_replication_type
 
-  tags = {
-    environment = "staging"
-  }
 }

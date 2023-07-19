@@ -1,1 +1,0 @@
-primary_name = format("%s%s%s", var.project_name, var.environment, rondom_string.primary.result)
