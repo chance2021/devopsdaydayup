@@ -10,7 +10,10 @@ module "storage-account" {
 
   for_each = var.storage-accounts
   ##name_override            = replace(local.standard_storageaccount_name, "instance", each.value.storage_instance)
+  storageaccount_name      = lookup(each.value, "storageaccount_name", null)
   account_tier             = lookup(each.value, "account_tier", "Standard")
   account_replication_type = lookup(each.value, "account_replication_type", "LRS")
+
+  depends_on = [module.resource-group]
 }
 
