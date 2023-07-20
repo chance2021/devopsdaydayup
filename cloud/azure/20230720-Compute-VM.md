@@ -33,7 +33,7 @@
 
 
 
-关于**Azure Virtual Machine**，你需要了解的就这些。如果还有什么你觉的很重要的就留言告诉我，我会在补充进去和大家分享！
+关于**Azure Virtual Machine**，你需要了解的就这些。如果还有什么你觉的很重要的就留言告诉我，我会再补充进去和大家分享！
 
 # Reference
 [VM Naming Convention](https://learn.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions)
