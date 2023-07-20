@@ -5,6 +5,7 @@ module "main" {
   rg_name         = var.rg_name
   location        = var.location
   environment     = var.environment
+  brand           = var.brand
 
   storage-accounts = local.storage-accounts
   function-apps    = local.function-apps
