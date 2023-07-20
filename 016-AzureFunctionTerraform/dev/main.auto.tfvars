@@ -1,5 +1,5 @@
 environment     = "dev"
-rg_name         = "devopsdaydayup"
+rg_name         = "devopsdaydayup2"
 location        = "canadacentral"
 subscription_id = "c3e30486-02ef-4afb-9bc6-d4419197656e"
 tenant_id       = "fc3bd05b-8c1f-41dd-9916-8b35dd923f7a"
