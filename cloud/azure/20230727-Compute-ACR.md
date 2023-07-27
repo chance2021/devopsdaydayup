@@ -1,0 +1,9 @@
+# ACR (Azure Container Registries)
+昨天我们介绍了**ACI(Azure Container Instance)**，知道了如何在Azure上直接创建容器(Container)。我们在第一期Docker班会上讲过，Docker容器有四大支柱，它们分别是:**Docker Container (Daemon/Client/CLI), Docker Network, Docker Volume and Docker Image**. 其中**Docker Image**是Docker的精华所在，Docker利用它的Image能无缝的把一个应用容器从一个系统部署到另一个系统。这个**Docker Image**(容器镜像)本质上就是一个**压缩包**，这个压缩包里存储着运行应用的所有文件，包括应用程序本身，以及这个程序需要依赖的系统文件和函数库。Docker容器其实就是在系统上执行了这个Docker Image的一个**进程**。所以运行容器的前提就是要先把所需的Docker Image （压缩包文件）先下载到你要运行的服务器上，然后再在服务器上执行这个压缩包文件即可。最简单的方式就是把这个Docker Image都存储到某台服务器上，然后其他需要使用这个Docker Image的服务通过网络访问这台服务器，从而下载想要的Docker Image到其本地运行。这个过程就好像我们在Github上存了代码，然后下载到本地一样（Github也提供相应的Docker Image存储仓库）。那这台服务器提供的服务我们就叫它**Image Registry** （镜像仓库）。**ACR**(Azure Container Registries）就是**安装在Azure上的Docker Image Registry**。其实它就是基于开源的Docker Registry 2.0改良而成的。至于它和我们安装在本地的Docker Image Registry有什么区别，我们可以一起来看看以下这些不同之处：
+1. **ACR**分为三个等级：**Basic**, **Standard**, **Premium**。
+2. **Basic**只有一些基础功能，其中包括AAD集成，镜像存储，镜像删除，Webhooks。缺点是容量小，只有10GB免费提供。当然，这里说的免费也是要交钱的，Basic需要每天交0.167美元，然后超过10GB的部分还要额外收费。上限是200TiB，最大Image Layer size是200GiB，最大manifest size是4Mib。注意这几个上限其他几个等级也一样。然后它的读写速度，Webhooks个数都是最少的，具体多少，请查阅官方文档。
+3. **Standard**包含**Basic**所有的功能，然后它免费提供100GB存储容量。之后就是读写速度快，Webhooks个数比Basic多而已。
+4. **Premium**包含前两个等级的所有功能，除了免费提供500GB存储容量，读写速度最高，Webhooks个数最多之外，它还提供了一些特殊功能，比如Geo-repolication(支持异地拷贝)，支持Availability zones， 还有content trust, Private link with private endpoints, Public IP network rules, Service endpoint VNet access, Virtual network rules, Customer-managed keys, 等等功能。反正你能用到的功能基本都提供了。当然，缺点就是:贵，价格是Basic的10倍：1.667美元每天。一年也就是608.5美元，人民币将近5000元，这还不包括使用其他服务...
+5. **访问安全**，都是通过HTTPS+TLS连接传送数据。
+6. **支持Windows和Linux镜像**。
+7. 最后是一个王炸功能，就是你可以让ACR帮你Build Image（构建镜像)!其实原理也很简单，就是把构建镜像需要的所有文件连同Dockerfile一起传到ACR上，让ACR让你`docker build`。如果本地电脑的性能很一般，那这服务能帮你节省很多时间。
