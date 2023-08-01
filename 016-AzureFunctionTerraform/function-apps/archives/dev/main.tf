@@ -6,8 +6,8 @@ module "main" {
   location             = var.location
   environment          = var.environment
   brand                = var.brand
-  purpose              = var.purpose
-  environment_instance = var.environment_instance
+  purpose              = "devops"
+  environment_instance = "01"
   storage-accounts     = local.storage-accounts
   function-apps        = local.function-apps
 }

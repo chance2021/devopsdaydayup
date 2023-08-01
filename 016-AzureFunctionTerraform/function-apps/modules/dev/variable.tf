@@ -1,1 +1,1 @@
-../../variables.tf
+../../variable.tf
