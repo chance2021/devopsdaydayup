@@ -1,9 +1,9 @@
-# Project Name: Deploy Data Factory via Terraform
+# Project Name: Deploy Function via Terraform
 
 ## Project Goal
 
 ## Table of Contents
-- [Project Name: Deploy Data Factory via Terraform](#project-name-deploy-data-factory-via-terraform)
+- [Project Name: Deploy Function via Terraform](#project-name-deploy-function-via-terraform)
   - [Project Goal](#project-goal)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
