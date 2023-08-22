@@ -12,3 +12,9 @@ variable "storage_account_access_key" {}
 variable "function_app_os_type" {}
 variable "function_app_version" {}
 variable "app_service_plan_id" {}
+variable "linux_fx_versio" {
+  default = "Python|3.11"
+}
+variable "ftps_state" {
+  default = "Disabled"
+}
