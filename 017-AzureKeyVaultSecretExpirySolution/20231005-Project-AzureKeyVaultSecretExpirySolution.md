@@ -23,6 +23,12 @@ Resource Group简单说就是Azure里存放一组资源(Resources)的容器，�
 ## Event Grid
 Azure Event Grid是用来对某些指定的事件进行监控然后再触发一些特定的操作。我们的案例里是使用Event Grid来监控Key Vault产生的SecretExpire这个事件，一旦有事件产生，就可以发送Message到Storage Queue里，供消息订阅者消费。
 
+## Storage Account
+Storage Account是Azure的一种存储服务，它可以存储半结构性数据，比如table，也可以存储非结构性数据，比如视频，图片，文件等等。在我们的实验中，主要是用来存储消息队列queue的。也就是接收来自于Event Grid的Message，然后被Logic App消费。
+
+## App Service Plan
+App Service Plan是为Web App (e.g. App Service, Function App, Logic App)定义了计算资源，其中包括什么操作系统（e.g. Windows, Linux), Region（e.g. Canada Central, Canada East), VM数量，VM大小(e.g. Small, Medium, Large), 价格等级(e.g. Free, Shared, Basic, Standard, Premium, etc..). 更多信息请参考我们之前的文章[App Service Plan](https://github.com/chance2021/devopsdaydayup/blob/main/cloud/azure/20230729-Compute-AppServicePlan.md)。
+
 ## Logic App Standard
 Logic App你可以简单的理解为通过UI来构建代码的服务。在Logic App里集成了很多服务，比如我们这个案例用到的监控Storage Queue服务。这个服务会定时查看Storage Queue里是否有Message，一旦发现Message，立马发送Email给相关人员。这个功能你可以用代码来完成(比如Function App)，但是如果你不熟悉代码，你就可以通过Logic App里拖拖拽拽来完成一个应用的构建。这个到时候我们班会上现场演示一下大家就会很容易明白了。其他关于Logic App的信息可以参考我们的另一篇文章[Logic App](https://github.com/chance2021/devopsdaydayup/blob/main/cloud/azure/20230821-Compute-AzureLogicApp.md)
 
