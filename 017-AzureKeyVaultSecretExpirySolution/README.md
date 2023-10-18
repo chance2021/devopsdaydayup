@@ -36,6 +36,8 @@ az account list
 ### 2. Run the Terraform init
 Run below command
 ```
+git clone https://github.com/chance2021/devopsdaydayup.git
+cd devopsdaydayup/017-AzureKeyVaultSecretExpirySolution/terraform/dev
 terraform init
 ```
 
