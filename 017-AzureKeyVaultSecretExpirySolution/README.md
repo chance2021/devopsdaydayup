@@ -1,6 +1,7 @@
 # Project Name: Azure Key Vault Solution
 
 ## Project Goal
+In this guide, you will learn how to respond to Azure Key Vault events that are received via Azure Event Grid by using Azure Logic Apps via Terraform.
 
 ## Table of Contents
 - [Project Name: Azure Key Vault Solution](#project-name-azure-key-vault-solution)
@@ -8,11 +9,11 @@
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
   - [Project Steps](#project-steps)
-    - [1. **Initiate** the test environment](#1-initiate-the-test-environment)
-    - [2. **Remove** the Large File](#2-remove-the-large-file)
-    - [3. Clean the Database](#3-clean-the-database)
-    - [4. **Find** Out the Location of The Large File in packfiles](#4-find-out-the-location-of-the-large-file-in-packfiles)
-    - [5. **Remove** the File from History](#5-remove-the-file-from-history)
+    - [1. Login Azure](#1-login-azure)
+    - [2. Run the Terraform init](#2-run-the-terraform-init)
+    - [3. Run the Terraform plan](#3-run-the-terraform-plan)
+    - [4. Apply the changes](#4-apply-the-changes)
+    - [5. Test](#5-test)
   - [Post Project](#post-project)
   - [Troubleshooting](#troubleshooting)
   - [Reference](#reference)
@@ -20,90 +21,45 @@
 ## <a name="prerequisites">Prerequisites</a>
 - An Azure subscription
 - Azure CLI
-- Azure DevOps account
 - Terraform
 - Github Repository
 
 ## <a name="project_steps">Project Steps</a>
 
-### 1. **Initiate** the test environment
-Run below command to initiate a git repo
+### 1. Login Azure
+Login to your Azure account
 ```
-mkdir git-test
-cd git-test
-git init
-echo "Init setup" > file1
-git add file1
-git commit -m "Version 1"
-du -sh ./
-
-curl -L https://www.kernel.org/pub/software/scm/git/git-2.1.0.tar.gz > git.tgz
-du -sh ./
-
-git add git.tgz
-git commit -m 'Add git tarball'
-du -sh ./
+az login
+az account list
 ```
 
-### 2. **Remove** the Large File
+### 2. Run the Terraform init
+Run below command
 ```
-git rm git.tgz
-git commit -m "Remove large tarball"
-du -sh ./
-```
-
-### 3. Clean the Database
-```
-git gc
-du -sh
-git count-objects -v
+terraform init
 ```
 
-### 4. **Find** Out the Location of The Large File in packfiles
-You can find the SHA for the largest file in packfile
+### 3. Run the Terraform plan
+Run the plan to make sure all required resources will be created
 ```
-git verify-pack -v .git/objects/pack/<index name>.idx | sort -k 3 -n | tail -3
+terraform plan
 ```
-Note: Please replace **<index name>** with actual index name under `.git/objects/pack` folder. <br/>
 
-Run below command to find out what the file name of the blob:
+### 4. Apply the changes
+Apply the changes to Azure
 ```
-git rev-list --objects --all|grep 82c99a3
+terraform apply
 ```
-Note: `82c99a3` is the SHA you found in previous command. It may be different in your scenario.
 
-### 5. **Remove** the File from History
-We are going to use `git-filter-repo` command to rewrite the git history. This doesn't come with the original setup and you have to install it seperately. You can follow [this document](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md) to download the tool. <br/>
-
-Since the tool has to be used in a repo which has clean clone, you may need to below step to clone it to another repo in order to use it:
-```
-cd ..
-git clone git-test git-test-new
-```
-Then run below command to remove the file from the git history
-```
-cd git-test-new
-git filter-repo --invert-paths --path git.tgz
-git gc
-```
-Then you should be able to see the size is reduced
-```
-du -sh
-git count-objects -v
-```
-Last, you can push the change to the remote repo to finish this lab
-```
-git push origin --force --all
-```
+### 5. Test
+Go to [Azure Portal](https://portal.azure.com) and check if all resources have been created under `devopsdaydayup` resource group
 
 ## <a name="post_project">Post Project</a>
-Just remove the repo folders
+Destroy all resources
 ```
-rm -rf git-test git-test-new
+terraform destroy
 ```
 
 ## <a name="troubleshooting">Troubleshooting</a>
 
 ## <a name="reference">Reference</a>
-- [Git Pro - Git 内部原理之维护与数据恢复](https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E7%BB%B4%E6%8A%A4%E4%B8%8E%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D)
-- [Removing sensitive data from a repository](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
