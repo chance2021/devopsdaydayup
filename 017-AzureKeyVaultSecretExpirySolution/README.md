@@ -65,3 +65,4 @@ terraform destroy
 ## <a name="troubleshooting">Troubleshooting</a>
 
 ## <a name="reference">Reference</a>
+[Use Logic Apps to receive email about status changes of key vault secrets](https://learn.microsoft.com/en-us/azure/key-vault/general/event-grid-logicapps)
