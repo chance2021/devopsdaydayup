@@ -13,6 +13,17 @@
 ## 班会历史回顾
 - [第1期班会-活动介绍](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/001-introduction/README.md)
 - [第2期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/002-reference/README.md)
+- [第3期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/003-history/README.md)
+- [第4期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/004-installation/README.md)
+- [第5期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/005-inputoutput/README.md)
+- [第6期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/006-variables/README.md)
+- [第7期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/007-basic/README.md)
+- [第8期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/008-number1/README.md)
+- [第9期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/009-number2/README.md)
+- [第10期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/010-number3/README.md)
+- [第11期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/011-string1/README.md)
+- [第12期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/012-string2/README.md)
+- [第13期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/013-string3/README.md)
 
 ## 相关资源
 1. 免费编程书籍：https://github.com/CIT-PROJECTS-2021/free-programming-books/blob/main/books/free-programming-books-zh.md
