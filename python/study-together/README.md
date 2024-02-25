@@ -11,8 +11,8 @@
 第3圈: 项目实战。我们的目的并不是做一个产品，而是希望能还原企业最真实的开发环境，比如Dev本地开发，QA的CICD工作流，以及Prod环境下需要考虑到的大规模运维已经大流量访问问题，让刚入行的同学能最低成本的获得最有用的工作经验。这个圈我目前还没有能力给大家提供，但是这是我我未来的一个目标，我会向着这个方向努力。
 
 ## 班会历史回顾
-- [第1期班会-活动介绍]()
-- [第2期班会-参考资料]()
+- [第1期班会-活动介绍](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/001-introduction/README.md)
+- [第2期班会-参考资料](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/002-reference/README.md)
 
 ## 相关资源
 1. 免费编程书籍：https://github.com/CIT-PROJECTS-2021/free-programming-books/blob/main/books/free-programming-books-zh.md
