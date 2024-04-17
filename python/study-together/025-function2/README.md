@@ -1,110 +1,168 @@
-（20240326）组团学Python第24期-函数（function）基本概念
+# 组团学Python第25期-函数（function）调用
 
-同学们好！欢迎大家参加我们的第24期每周一三五班会，一起来系统的学习Python。
+同学们好！欢迎大家参加我们的第25期每周一三五班会，一起来系统的学习Python。
 
-本期学习内容： 函数（function）基本概念
+本期学习内容： 函数（function）调用
 
-本期班会我们来看看Python里的函数（function）这个概念。所谓的函数，就是封装一个可以多次执行的代码片段。当然，如果你只有一句代码，而且整个程序只执行一次，那这时候就没必要使用函数了。
+上期我们开始介绍函数，知道了函数就是一个可以重复调用的代码块，还了解什么是函数的参数，以及什么是形参（parameter）和实参（argument）。今天的班会我们会继续再看一下函数的调用，也就是如何使用函数。
 
-其实我们在介绍数据类型时候就使用过很多函数，比如int（），str（），sum()这些都是Python内置的函数。函数通常用于组织代码，提高代码的可读性、可维护性和复用性。
+开始之前，先让同学们看看以下这个函数，你能理解什么意思吗？
 
-函数通常由以下几个部分组成：
+def print_values(*args, **kwargs):
+    print("Positional arguments:")
+    for arg in args:
+        print(arg)
+    
+    print("\nKeyword arguments:")
+    for key, value in kwargs.items():
+        print(f"{key}: {value}")
 
-1. 函数名：函数的名称用于标识和调用函数。
-2. 参数（可选）：*函数可以接受零个或多个参数作为输入，这些参数是函数执行所需的数据。
-3. 函数体：函数体包含了函数的实际代码逻辑，用于完成特定的任务。
-4. 返回值（可选）：函数可以返回一个或多个值作为结果输出，这些值可以被调用函数的代码使用。
+# 调用函数
+print_values(1, 2, 3, name="Alice", age=25)
 
-Python中定义函数的基本语法如下：
+这是函数其中一种很常见的调用方式，我以前经常见，但是却经常忘了是啥意思。和我一样不理解的同学就跟我一起来学吧！
 
-def function_name(参数):
-    # 函数体
-    # 执行特定的任务
-    return value  # 可选，返回值
+在Python中，函数可以以不同的方式进行调用。以下是几种常见的函数调用方式：
 
-注意上面的缩进哦。
+1. 位置参数调用。位置参数是按照函数定义中参数的顺序进行传递的，参数的位置决定了它们的值。当我们调用函数时，按照函数定义中参数的位置从左到右的顺序传递参数值。比如
 
-以下是一个简单的Python函数示例：
+   def greet(name, age):
+       print("Hello, " + name + "! You are " + str(age) + " years old.")
+   
+   greet("Alice", 25)  # Output: Hello, Alice! You are 25 years old.
 
-def greet(name):
-    return "Hello, " + name + "!"
 
-message = greet("Alice")
-print(message)  # Output: Hello, Alice!
+2. 关键字参数调用。关键字参数是通过参数名来指定的，可以不按照函数定义中参数的顺序传递参数值。在调用函数时，通过参数名来传递参数值，可以提高代码的可读性和可维护性。比如还是上面定义的函数，我们这样调用:
+  
+   greet(age=25, name="Alice")  # Output: Hello, Alice! You are 25 years old.
+ 
+在Pythin里使用open函数打开文件的时候，就是用到关键字参数调用来指定文件的打开模式、编码方式等。以下是一个打开文件的例子：
+# 打开文件并写入内容
+with open("example.txt", mode="w", encoding="utf-8") as file:
+    file.write("Hello, world!")
 
-在这个例子中，greet是一个函数，接受一个参数 name，并返回一个拼接了问候语的字符串。调用 greet("Alice")将会返回 "Hello, Alice!"。
+# 打开文件并读取内容
+with open("example.txt", mode="r", encoding="utf-8") as file:
+    content = file.read()
+    print(content)  # 输出：Hello, world!
 
-看到没，调用函数的时候要记得在函数名后面加上小括号，至于里面有没有参数，这是可选的，看你的函数需不需要了。如没有加小括号，那只会返回函数的对象，而不会去调用这个函数，也就不会有返回值了。顺便说一下，我们所说的调用函数，也就是执行函数里面的程序的意思。
 
-在Python里还有一个特殊的函数，叫做匿名函数（Anonymous functions），也称为lambda函数，是一种在Python中用于创建简单函数的特殊方式。
+在这个例子中，open()函数使用了两个关键字参数：
 
-与正常的函数不同，匿名函数通常只包含一个表达式，它的语法更加简洁。匿名函数的基本语法如下：
-lambda arguments: expression
+- `mode`：指定文件的打开模式，这里使用了写入模式 `"w"` 和读取模式 `"r"`。
+- `encoding`：指定文件的编码方式，这里使用了 UTF-8 编码。
 
-其中：
-- `lambda` 是关键字，用于声明一个匿名函数。
-- `arguments` 是函数的参数，可以是零个或多个。
-- `expression` 是函数的返回值，是一个单行表达式。
+使用关键字参数可以更清晰地指定函数的参数值，提高了代码的可读性。
 
-与普通函数不同，匿名函数没有函数名，也没有使用 `def` 关键字来定义，因此称为“匿名”。需要注意的是，lambda体部分不能是一个代码块，也就是不能包含多条语句，只能有一条语句，语句会计算一个结果并返回给lambda函数，它的返回值不需要用到return。总的来说匿名函数通常用于需要简单功能的场合，可以在一行代码中快速定义和使用。
+3. 默认参数调用。默认参数是在函数定义中指定的具有默认值的参数，如果调用函数时不提供对应参数的值，则使用默认值。默认参数可以简化函数调用，但需要注意避免使用可变对象作为默认值。还有记得要把有默认值的参数放在最后，否则如果有其他实参也传入的话就会被按顺序先读取了。再看看下面这个例子：
+   
+   def greet(name, age=30):
+       print("Hello, " + name + "! You are " + str(age) + " years old.")
+   
+   greet("Alice")  # Output: Hello, Alice! You are 30 years old.
+   greet("Bob", 35)  # Output: Hello, Bob! You are 35 years old.
+  
+学过C语言的同学可能会了解一个叫函数重载的概念，即可以定义多个同名函数，但是参数列表不同，这样在调用函数时能传递不同实参。而在Python里却没有这个概念，因默认参数调用就能实现这个目的了。
 
-以下是一个使用匿名函数的简单示例：
+4. 基于元组的可变参数调用(*arg)。可变参数允许传递任意数量的位置参数，这些参数会被封装成一个元组（tuple）传递给函数。在函数定义中，可变参数使用 `*args` 来表示，可以接受任意数量的位置参数。
+   
+   def sum_numbers(*args):
+       total = 0
+       for num in args:
+           total += num
+       return total
+   
+   print(sum_numbers(1, 2, 3))  # Output: 6
 
-double = lambda x: x * 2
-print(double(5))  # Output: 10
+5. 基于字典的可变参数调用（**kwarg
+），它也叫做关键字可变参数调用。关键字可变参数允许传递任意数量的关键字参数，这些参数会被封装成一个字典（dictionary）传递给函数。在函数定义中，关键字可变参数使用 `**kwargs` 来表示，可以接受任意数量的关键字参数。例如:
+   
+   def print_info(**kwargs):
+       for key, value in kwargs.items():
+           print(f"{key}: {value}")
+   
+   print_info(name="Alice", age=25)  # Output: name: Alice, age: 25
 
-在这个例子中，我们使用lambda创建了一个匿名函数，用于将传入的参数x加倍，然后我们传入参数5调用这个匿名函数，输出结果为10。lambda函数里，分号左边的x表示参数，分号右边x*2是表达式，表达式计算后的值就是这个匿名函数的返回值。
+以上就是常见的函数调用方式。这些不同的调用方式可以根据具体的需求来选择，可以根据情况组合使用，以满足函数的不同功能和灵活性。
 
-你可以将匿名函数转换为等效的普通函数，像这样:
+到这里，同学们再回头看看一开头的那个函数，就能理解什么意思了吧！
 
-def double(x):
-    return x * 2
+运行该代码将输出以下内容：Positional arguments:
+1
+2
+3
 
-print(double(5))  # Output: 10
+Keyword arguments:
+name: Alice
+age: 25
 
-这里，我们使用 `def` 关键字来定义了一个名为 `double` 的函数，接受一个参数 `x`，并返回 `x * 2` 的结果。这与之前的匿名函数的功能是相同的，但是使用了标准的函数定义语法。对比一下，匿名函数代码量减少了一半。
+这是因为在函数调用print_values(1, 2, 3, name="Alice", age=25)时，传入了三个位置参数（1、2、3）和两个关键字参数（name="Alice"、age=25），函数内部首先打印了所有的位置参数，然后打印了所有的关键字参数及其对应的值。
 
-lambda函数虽然语法简单，但是增加了学习难度，刚刚开始学的同学第一眼看到一定都会懵。不过没关系，我们之后有很多练习的机会，到时候再慢慢吸收消化。
+在Python中，作用域（Scope）指的是变量可以被访问的范围。Python中有以下几种作用域：
 
-接下来我们再讲一下参数。在函数里，参数分为形参和实参。形参就是形式参数，它是在定义函数时使用的参数。实参是实际参数，它是在调用函数时传递给形参的实际参数值。它们的具体区分如下:
+1. 全局作用域（Global scope）。全局作用域中定义的变量可以在程序的任何地方被访问。在模块级别定义的变量属于全局作用域，在整个模块中都可以被访问。比如:
+   
+   x = 10  # 全局作用域
+   
+   def func():
+       print(x)  # 可以访问全局变量 x
+   
+   func()  # Output: 10
 
-1.形参（Parameters）：形参是函数定义中的变量名，用于接收函数调用时传递的数据。形参在函数定义时被指定，用于定义函数的输入。还有形参相当于函数内部的局部变量，在函数体内可以被使用。
+2. 局部作用域（Local scope）。局部作用域中定义的变量只能在其所在的函数内部被访问。在函数内部定义的变量属于局部作用域，在函数外部无法访问。
 
-在Python中，函数的形参写在函数定义的括号内，例如：
+   def func():
+       y = 20  # 局部作用域
+       print(y)  # 可以访问局部变量 y
+   
+   func()  # Output: 20
+   print(y)  # Error: NameError: name 'y' is not defined
 
-def greet(name):
-    print("Hello, " + name + "!")
+3. 嵌套作用域（Enclosing scope）。嵌套作用域是指函数内部的函数可以访问外部函数中的变量。内部函数可以访问外部函数的局部变量，但外部函数无法访问内部函数的局部变量。
 
-在这个例子中，`name` 就是函数 `greet` 的形参。
+   def outer():
+       z = 30  # 外部函数的局部变量
+       def inner():
+           print(z)  # 可以访问外部函数的局部变量 z
+       inner()
+   
+   outer()  # Output: 30
+  
 
-2. 实参（Arguments）：实参是函数调用时传递给函数的具体数据，用于给函数的形参赋值。实参可以是常量、变量、表达式等。
+4. 内置作用域（Built-in scope）。内置作用域是指Python中内置函数和模块的作用域。
+Python中的内置函数和内置模块中定义的变量可以在程序的任何地方被访问。
 
-在Python中，函数调用时传递的数据称为实参，例如：
-greet("Alice")
+   print(abs(-5))  # 内置函数 abs() 在内置作用域中定义
 
-在这个例子中，"Alice" 就是传递给函数 `greet` 的实参。
 
-总之，形参是函数定义中用来接收数据的变量，实参是在函数调用时传递给函数的具体数据。形参用于定义函数的输入，而实参用于提供函数所需的具体数据。这下以后听到其他程序员口中形参（parameter）和实参（argument）千万不要混淆哦。
+在Python中，变量的作用域由其定义的位置决定。当在函数内部访问变量时，Python会按照以下顺序搜索变量的值：局部作用域 -> 嵌套作用域 -> 全局作用域 -> 内置作用域。如果变量在局部作用域中未定义，则会向外层作用域搜索，直到找到为止。
 
-关于函数，我们还有很多要说的，时间有限，今天班会就到这里，我们下期再见！
+
+关于函数还有很多没讲，我们留到下期班会再继续吧。我们下期再见！
 
 
 今日练习:
 
-What will be the output of the following code? 
+What will be the output of the following snippet? 
 
-def myfunc():
-    print(num + 1, end=")
-num = 2
-myfunc()
-print(num)
-A. 33
-B. 31
-C. 32
-D. 22
+def show_truth():
+    global mysterious_var
+    mysterious_var = 'New Surprise!'
+    print(mysterious_var)
+mysterious_var = 'Surprise!'
+print(mysterious_var)
+pront mysterious var)
+A. Surprise!Surprise!Surprise!
+B. Surprise!New Surprise!New Surprise!
+C. Surprise!New Surprise!Surprise!
+D. New Surprise!New Surprise!New Surprise!
 
 
-Answer: C
+Answer: B
 Explanation/Reference:
-Inside the function, we'll print the value of num increased by 1 (2 + 1 = 3). However, we don't change the value stored in
-the variable num, so when we exit the function, it's still equal to 2. As a result, we can see 3 and then 2 printed.
+First, we print the old value of Surprise. Then, inside the function, we modify the global variable (note the use of the keyword global). From this moment on, mysterious_var will have the new value of New Surprise, and this value will be printed twice: once from the function, once from the main code.
+
+
+
+
+
