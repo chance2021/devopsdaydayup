@@ -28,7 +28,7 @@
 - [第15期班会-序列（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/015-sequence2/README.md)
 - [第16期班会-列表（上）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/016-list1/README.md)
 - [第17期班会-列表（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/017-list2/README.md)
-- [第18期班会-元组）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/018-tuple/README.md)
+- [第18期班会-元组](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/018-tuple/README.md)
 - [第19期班会-集合](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/019-set/README.md)
 - [第20期班会-字典](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/020-dict/README.md)
 - [第21期班会-条件判断if](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/021-if/README.md)
