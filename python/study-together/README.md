@@ -24,6 +24,23 @@
 - [第11期班会-字符串类型（上）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/011-string1/README.md)
 - [第12期班会-字符串类型（中）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/012-string2/README.md)
 - [第13期班会-字符串类型（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/013-string3/README.md)
+- [第14期班会-序列（上）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/014-sequence1/README.md)
+- [第15期班会-序列（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/015-sequence2/README.md)
+- [第16期班会-列表（上）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/016-list1/README.md)
+- [第17期班会-列表（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/017-liste2/README.md)
+- [第18期班会-元组）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/018-tuple/README.md)
+- [第19期班会-集合](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/019-set/README.md)
+- [第20期班会-字典](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/020-dict/README.md)
+- [第21期班会-条件判断if](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/021-if/README.md)
+- [第22期班会-循环语句for](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/022-for/README.md)
+- [第23期班会-循环语句while](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/023-while/README.md)
+- [第24期班会-函数基础](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/024-function1/README.md)
+- [第25期班会-函数调用](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/025-function2/README.md)
+- [第26期班会-函数（上）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/026-function3/README.md)
+- [第27期班会-函数（下）](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/026-function4/README.md)
+- [第28期班会-文件读写处理](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/028-fileOperation/README.md)
+- [第29期班会-异常](https://github.com/chance2021/devopsdaydayup/blob/main/python/study-together/029-exception/README.md)
+
 
 ## 相关资源
 1. 免费编程书籍：https://github.com/CIT-PROJECTS-2021/free-programming-books/blob/main/books/free-programming-books-zh.md
