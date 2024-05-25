@@ -1,0 +1,80 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Docker
+  dockerRegistryServiceConnection: 'DockerHub'
+  imageRepository: 'your-repo'
+  containerRegistry: 'your-registry.docker.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: '$(Build.BuildId)'
+
+  ## SonarQube
+  #sonarQubeServiceConnection: 'SonarQube'
+  #sonarProjectKey: 'your-project-key'
+  #sonarProjectName: 'your-project-name'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    workspace:
+      clean: all
+    displayName: "Build Application"
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'clean install'
+
+    #- task: SonarQubePrepare@4
+    #  inputs:
+    #    SonarQube: $(sonarQubeServiceConnection)
+    #    scannerMode: 'Maven'
+    #    projectKey: $(sonarProjectKey)
+    #    projectName: $(sonarProjectName)
+
+    #- task: SonarQubeAnalyze@4
+
+    #- task: SonarQubePublish@4
+    #  inputs:
+    #    pollingTimeoutSec: '300'
+
+    - script: |
+        echo "Publish Code Coverage"
+      displayName: "Publish Code Coverage"
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(imageRepository)
+        command: 'buildAndPush'
+        Dockerfile: $(dockerfilePath)
+        tags: $(tag)
+
+#- stage: Deploy
+#  jobs:
+#  - deployment: Deploy
+#    environment: 'production'
+#    strategy:
+#      runOnce:
+#        deploy:
+#          steps:
+#          - task: Kubernetes@1
+#            inputs:
+#              connectionType: 'Azure Resource Manager'
+#              azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+#              azureResourceGroup: $(azureResourceGroup)
+#              kubernetesCluster: $(kubernetesCluster)
+#              command: 'apply'
+#              useConfigurationFile: true
+#              configuration: '$(pipeline.workspace)/manifests/deployment.yaml'

@@ -1,0 +1,131 @@
+name: ${{ parameters.stages }}-$(ref_name)-${{ parameters.appName }}-${{ parameters.version }}-$(rev:r)
+
+trigger: none
+
+parameters:
+  - name: appName 
+    displayName: "Select an application"
+    type: string
+    default: app-a
+    values:
+    - app-a
+    - app-b
+  
+  - name: ref 
+    displayName: "Specify which branch to build the app"
+    type: string
+    default: develop
+
+  - name: version 
+    displayName: "Specify version for the artifact"
+    type: string
+    default: changeme
+
+  - name: runSonarqube
+    displayName: "Run Sonarqube"
+    type: boolean
+    default: true
+
+  - name: stages
+    displayName: "Pipeline Stages"
+    default: build-deploy
+    values:
+    - build
+    - deploy
+    - build-deploy
+
+  - name: environment
+    displayName: "Environment"
+    default: dev
+    type: string
+    values:
+    - dev
+    - qa
+    - stage
+    - performance
+    - production
+
+resources:
+  repositories:
+    - repository: self
+      type: git
+      name: 
+
+variables:
+  - name: ref_name
+    value: $[ replace('${{ parameters.ref }}', '/', '-')]
+
+  - ${{ if or( eq(parameters.ref, 'develop'), startsWith(parameters.ref, 'releases')) }}:
+        name: tagName
+        value: "$(TZ=\"America/New_York\" date +'%Y%m%d.%H00')-$(echo ${{ parameters.ref }} | cut -d '/' -f1)"
+    ${{ else }}:
+        name: tagName
+        value: "$(TZ=\"America/New_York\" date +'+%Y%m%d.%H%M')"
+
+  #- group: PAT
+
+  #- template: 
+
+stages:
+- stage: preprocessing_stage
+  displayName: "Pre-build Processing"
+  pool:
+    vmImage: ubuntu-22.04
+  jobs:
+  - job: tag_build_job
+    steps:
+    - script: |
+        echo "Tagging build with application name: ${{ parameters.appName }}"
+        echo "##vso[build.addbuildtag]${{ parameters.appName }}"
+      displayName: "Tagging Build Job"
+
+- stage: build_stage
+  displayName: "Build Java"
+  pool:
+    vmImage: ubuntu-22.04
+  jobs:
+  - job: build_java
+    workspace:
+      clean: all
+    displayName: "Build Application"
+    timeoutInMinutes: 5
+    steps:
+    - checkout: self 
+    - script: |
+        echo "Download JDK Package"
+      displayName: "Download JDK Package"
+    - script: |
+        echo "Fetch Major Version"
+      displayName: "Fetch Major Version"    
+    - script: |
+        echo "Fetch Major Version"
+      displayName: "Install JDK"    
+    - script: |
+        echo "Build Maven"
+      displayName: "Build Maven"    
+    - script: |
+        echo "Publish Code Coverage"
+      displayName: "Publish Code Coverage"    
+    - script: |
+        echo "Run Sonarqube Scan"
+      displayName: "Run Sonarqube Scan"    
+    - script: |
+        echo "Run Veracode Scan"
+      displayName: "Run Veracode Scan"    
+- stage: deploy_stage
+  displayName: "Deploy Java"
+  pool:
+    vmImage: ubuntu-22.04
+  jobs:
+  - deployment: deploy_java
+    environment: ${{ parameters.environment }}
+    workspace:
+      clean: all
+    displayName: "Deploy ${{ parameters.appName }}"
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - script: |
+              echo "Deploy Application"
+            displayName: "Deploy Application"

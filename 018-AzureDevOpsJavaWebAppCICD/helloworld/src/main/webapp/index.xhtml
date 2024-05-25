@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>World DB App</title>
+</h:head>
+<h:body>
+
+    <p:layout fullPage="true">
+        <p:layoutUnit style="background-color: black; position: relative; height: 100px;" position="north" size="100"
+                      resizable="false" closable="false" collapsible="true">
+            <div class="header-task" style="margin: 50px; padding: 20px;">
+                <p:outputLabel
+                        style="color: #808080; font-size: 2em; position: absolute;top: 50%; -webkit-transform : translateY(-50%); transform : translateY(-50%);"
+                        value="My Tasks"/>
+            </div>
+        </p:layoutUnit>
+
+        <p:layoutUnit position="center">
+            <h:form id="updateForm">
+                <div class="task-lists" style="margin: 50px; padding: 20px;">
+                    <p:outputLabel value="My ToDo List" style="font-size: 3em;"/>
+                    <p/>
+
+                    <p:dataTable id="itemTables" var="item" value="#{todocontroller.todoItems}"
+                                 disabledSelection="#{item.complete == true}"
+                                 selection="#{todocontroller.selectedItems}" rowKey="#{item.id}" paginator="true"
+                                 paginatorPosition="bottom" rows="20">
+
+                        <p:column headerText="Name">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+
+                        <p:column headerText="Category">
+                            <h:outputText value="#{item.category}"/>
+                        </p:column>
+
+                        <p:column headerText="Complete" selectionMode="multiple" style="text-align:center"/>
+
+                    </p:dataTable>
+
+                    <div class="updatataks" style="margin: 15px">
+                        <p:commandButton value="Update Task" id="updatatask" update="itemTables"
+                                         action="#{todocontroller.buttonUpdateAction()}" style="margin-right:20px;"
+                                         styleClass="ui-priority-primary"/>
+                    </div>
+                </div>
+
+
+                <hr style="margin: 50px;"/>
+
+
+                <div class="task-add" style="margin: 50px; padding: 20px;">
+                    <h:panelGrid columns="2" cellpadding="5">
+                        <p:outputLabel style="font-size: 1.4em;" value="Task Name :"/>
+                        <p:inputText style="font-size: 1.4em;" id="name" value="#{todocontroller.name}"/>
+
+
+                        <p:outputLabel style="font-size: 1.4em;" value="Task Category : "/>
+                        <p:inputText style="font-size: 1.4em;" id="category" value="#{todocontroller.category}"/>
+                    </h:panelGrid>
+                    <p/>
+                    <p:commandButton update="itemTables" value="Add Task" id="addtask"
+                                     action="#{todocontroller.buttonAddAction()}"
+                                     style="margin-right:20px;" styleClass="ui-priority-primary"/>
+                </div>
+            </h:form>
+        </p:layoutUnit>
+    </p:layout>
+</h:body>
+</html>

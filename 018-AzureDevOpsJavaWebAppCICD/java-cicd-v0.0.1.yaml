@@ -1,0 +1,85 @@
+trigger:
+- none
+
+
+variables:
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'azuredevopsdocker20240516'
+  imageRepository: 'hello-world-java'
+  containerRegistry: 'azuredevopsdocker20240516'
+  dockerfilePath: 'java/helloworld/Dockerfile'
+  tag: '$(Build.BuildId)'
+  azureSubscription: 'azuredevops-test-rg'
+  resourceGroup: 'azuredevops-test'
+
+  javaVersion: '11'
+  mavenVersion: '3.6.3'
+  projectName: 'devopsdaydayup'
+  feedName: 'helloworld-package'
+  packageName: 'hello-world-java'
+  appName: 'hello-world-java20240524'
+  packageVersion: '*'
+  
+
+stages:
+- stage: Build
+  pool:
+    name: chancelenovo
+  jobs:
+  - job: MavenPackage
+    steps:
+    - script: |
+        echo "Debugging"
+      displayName: "Debugging"
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'java/helloworld/pom.xml'
+        mavenOptions: '-Xmx1024m'
+        javaHomeOption: 'Path'
+        jdkDirectory: '/home/chance/labs/jdk/jdk-13.0.1'
+        jdkArchitectureOption:  'x64' 
+        mavenVersionOption: 'Path'
+        mavenDirectory: '/home/chance/labs/jdk/apache-maven-3.9.6/'
+        goals: 'package'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/java/helloworld/target'
+        Contents: '*.war'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    - task: UniversalPackages@0
+      displayName: Publish a Universal Package
+      inputs:
+        command: publish
+        publishDirectory: '$(Build.ArtifactStagingDirectory)'
+        vstsFeedPublish: '$(projectName)/$(feedName)'
+        vstsFeedPackagePublish: '$(packageName)'
+        packagePublishDescription: 'Maven Package'
+
+- stage: Deploy
+  displayName: Deploy
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy to Azure Container Instance
+    environment: 'dev'
+    pool:
+      name: chancelenovo
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: UniversalPackages@0
+            inputs:
+              command: 'download'
+              vstsFeed: '$(projectName)/$(feedName)'
+              vstsFeedPackage: '$(packageName)'
+              vstsPackageVersion: '$(packageVersion)'
+              downloadDirectory: '$(Build.ArtifactStagingDirectory)'
+              feedsToUse: 'internal'
+            displayName: 'Download Artifacts'
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: 'webAppLinux'
+              appName: '$(appName)'
+              package: '$(Build.ArtifactStagingDirectory)/*.war'
+            displayName: 'Deploy to Azure Web App'
