@@ -1,0 +1,82 @@
+parameters:
+  - name: listWorkspaces
+    type: object
+    default:
+
+    - workspace:
+      - name: dev
+      environments:
+        - name: dev01
+          ado_pipeline_environment: dev01
+          locations:
+          - name: canada-center
+            workspace_path: dev/dev01/canada-center
+            module_path: modules/dev
+            terraform_security_file_name: dev01-security-file
+        - name: dev02
+          ado_pipeline_environment: dev02
+          locations:
+          - name: canada-center
+            workspace_path: dev/dev02/canada-center
+            module_path: modules/dev
+            terraform_security_file_name: dev02-security-file
+        
+    - workspace:
+      - name: qa
+      environments:
+        - name: qa01
+          ado_pipeline_environment: qa01
+          locations:
+          - name: canada-center
+            workspace_path: qa/qa01/canada-center
+            module_path: modules/qa
+            terraform_security_file_name: qa01-security-file
+        - name: qa02
+          ado_pipeline_environment: qa02
+          locations:
+          - name: canada-center
+            workspace_path: qa/qa02/canada-center
+            module_path: modules/qa
+            terraform_security_file_name: qa02-security-file
+
+variables:
+  tf_version: "1.0.5"
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - '*'
+  paths:
+    include:
+    - dev/**/**/*
+    - modules/**/*
+    - "*.tf"
+    exclude:
+    - "*.md"
+    - "VERSION"
+
+stages:
+  - stage: setWorkspaceStage
+    displayName: 'Workspace Check'
+    pool:
+      name: chancelenovo
+    jobs:
+      - job: setWorkspaceStage
+        displayName: Workspace Check
+        steps:
+        - checkout: self
+          fetchDepth: 0
+        - ${{ each workspace in parameters.listWorkspaces }}:
+          - ${{ echo environment in workspace.environments }}:
+            - bash: |
+                if [[ ${{ variables['Build.SourceBranch'] }} == *"main"* ]]; then
+                  branch="HEAD^"
+                else
+                  branch="origin/main"
+                fi
+
+                echo "branch_name: " ${{ variables['Build.SourceBranch'] }}
+                echo "Environment Name: " ${{ environment.name}}
+    
+    
