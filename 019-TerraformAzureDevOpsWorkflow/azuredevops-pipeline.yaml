@@ -9,54 +9,57 @@ parameters:
         - name: dev01
           ado_pipeline_environment: dev01
           locations:
-            - name: canada-center
-              workspace_path: dev/dev01/canada-center
+            - name: cc
+              workspace_path: dev/dev01/cc
               module_path: modules/dev
               terraform_security_file_name: dev01-security-file
-            - name: canada-east
-              workspace_path: dev/dev01/canada-east
+            - name: ce
+              workspace_path: dev/dev01/ce
               module_path: modules/dev
               terraform_security_file_name: dev01-security-file
         - name: dev02
           ado_pipeline_environment: dev02
           locations:
-            - name: canada-center
-              workspace_path: dev/dev02/canada-center
+            - name: cc
+              workspace_path: dev/dev02/cc
               module_path: modules/dev
               terraform_security_file_name: dev02-security-file
-            - name: canada-east
-              workspace_path: dev/dev02/canada-east
+            - name: ce
+              workspace_path: dev/dev02/ce
               module_path: modules/dev
               terraform_security_file_name: dev02-security-file
         
     - workspace:
       - name: qa
       environments:
-        - name: qa02
+        - name: qa01
           ado_pipeline_environment: qa01
           locations:
-            - name: canada-center
-              workspace_path: qa/qa01/canada-center
+            - name: cc
+              workspace_path: qa/qa01/cc
               module_path: modules/qa
               terraform_security_file_name: qa01-security-file
-            - name: canada-east
-              workspace_path: qa/qa01/canada-east
+            - name: ce
+              workspace_path: qa/qa01/ce
               module_path: modules/qa
               terraform_security_file_name: qa01-security-file
         - name: qa02
           ado_pipeline_environment: qa02
           locations:
-            - name: canada-center
-              workspace_path: qa/qa02/canada-center
+            - name: cc
+              workspace_path: qa/qa02/cc
               module_path: modules/qa
               terraform_security_file_name: qa02-security-file
-            - name: canada-east
-              workspace_path: qa/qa02/canada-east
+            - name: ce
+              workspace_path: qa/qa02/ce
               module_path: modules/qa
               terraform_security_file_name: qa02-security-file
 
 variables:
-  tf_version: "1.0.5"
+  - name: tf_version 
+    value: "1.0.5"
+  - name: pool_name
+    value: "chancelenovo"
 
 trigger:
   batch: true
@@ -76,38 +79,64 @@ stages:
   - stage: setWorkspaceStage
     displayName: 'Workspace Check'
     pool:
-      name: chancelenovo
+      name: $(pool_name)
     jobs:
-      - job: setWorkspaceStage
+      - job: setWorkspaceJob
         displayName: Workspace Check
         steps:
         - checkout: self
           fetchDepth: 0
         - ${{ each workspace in parameters.listWorkspaces }}:
-          - ${{ each environment in workspace.environments }}:
-            - ${{ each env_location in environment.locations }}:
-              - bash: |
-                  if [[ ${{ variables['Build.SourceBranch'] }} == *"master"* ]]; then
-                    branch="HEAD^"
-                  else
-                    branch="origin/master"
-                  fi
+            - ${{ each environment in workspace.environments }}:
+                - ${{ each env_location in environment.locations }}:
+                    - bash: |
+                        # Debug Begin
+                        pwd
+                        ls -l
 
-                  echo "branch_name: " ${{ variables['Build.SourceBranch'] }}
-                  echo "Environment: " ${{ environment.name}}
-                  echo "Location: " ${{ env_location.name }}
-                  echo "Workspace Path: " ${{ env_location.workspace_path }}
-                  echo "Module Path: " ${{ env_location.module_path }}
+                        # Debug Finish
 
-                  if git diff --quiet $branch -- ${{ env_location.workspace_path }} ${{ env_location.module_path }}; then
-                    echo "${{ env_location.workspace_path }}: NOT changed"
-                    echo "##vso[task.setvariable variable=isChange;isOutput=true]false"
-                  else
-                    echo "##[warning]WARNING: ${{ env_location.workspace_path }}: changed"
-                    echo "##vso[task.setvariable variable=isChange;isOutput=true]true"
-                  fi
+                        if [[ ${{ variables['Build.SourceBranch'] }} == *"master"* ]]; then
+                          branch="HEAD^"
+                        else
+                          branch="origin/master"
+                        fi
 
-            name: setWorkspaceTask_${{ environment.name }}_${{ env_location.name}}
-            displayName: ${{ environment.name }}-${{ env_location.name}}
+                        echo "branch_name: " ${{ variables['Build.SourceBranch'] }}
+                        echo "Environment: " ${{ environment.name }}
+                        echo "Location: " ${{ env_location.name }}
+                        echo "Workspace Path: " ${{ env_location.workspace_path }}
+                        echo "Module Path: " ${{ env_location.module_path }}
+
+                        if git diff --quiet $branch -- ${{ env_location.workspace_path }} ${{ env_location.module_path }}; then
+                          echo "${{ env_location.workspace_path }}: NOT changed"
+                          echo "##vso[task.setvariable variable=isChange;isOutput=true]false"
+                        else
+                          echo "##[warning]WARNING: ${{ env_location.workspace_path }}: changed"
+                          echo "##vso[task.setvariable variable=isChange;isOutput=true]true"
+                        fi
+
+                      name: setWorkspaceTask_${{ environment.name }}_${{ env_location.name }}
+                      displayName: ${{ environment.name }}-${{ env_location.name }}
     
+  - ${{ each workspace in parameters.listWorkspaces }}:
+    - ${{ each environment in workspace.environments }}:
+      - ${{ each env_location in environment.locations }}:
+        - stage: terraform_plan_${{ env_location.name }}_${{ environment.name }}
+          displayName: "${{ env_location.name }}-${{ environment.name }} TF Plan"
+          pool: $(pool_name)
+          dependsOn: setWorkspaceStage
+          condition: |
+            and 
+            (
+              succeeded(),
+              eq(stageDependencies.setWorkspaceStage.outputs['setWorkspaceJob.setWorkspaceTask_${{ environment.name }}_${{ env_location.name }}.isChange'], 'true')
+            )
+          jobs:
+            - job: terraform_plan_job_${{ env_location.name }}_${{ environment.name }}
+              displayName: "TF Plan ${{ env_location.name }} ${{ environment.name }}"
+              steps:
+              - bash: |
+                  echo "This is testing"
+
     
