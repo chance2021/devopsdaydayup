@@ -3,7 +3,7 @@ name: Build, Scan, and Push Docker Image with Commit Hash
 on:
   push:
     paths:
-      - '020-GithubActionJavaDockerfileCICD/**'
+      - '020-GithubActionJavaDockerfileCI/**'
   workflow_dispatch:
 
 jobs:
