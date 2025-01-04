@@ -1,18 +1,25 @@
-package com.example;
-
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
-public class CurrentTime {
-    public static void main(String[] args) {
-        // Get the current time
-        LocalTime currentTime = LocalTime.now();
+public class CurrentTimeServer {
+    public static void main(String[] args) throws IOException {
+        // Create an HTTP server listening on port 80
+        HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
 
-        // Format the time
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String formattedTime = currentTime.format(formatter);
+        // Define the handler for the root path
+        server.createContext("/", exchange -> {
+            String response = "Current Time: " + LocalTime.now();
+            exchange.sendResponseHeaders(200, response.getBytes().length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        });
 
-        // Display the current time
-        System.out.println("Current Time: " + formattedTime);
+        // Start the server
+        System.out.println("Server is running...");
+        server.start();
     }
 }
