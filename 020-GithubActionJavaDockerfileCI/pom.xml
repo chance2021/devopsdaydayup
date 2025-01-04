@@ -24,7 +24,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.example.CurrentTime</mainClass> <!-- Replace with your main class -->
+                            <mainClass>com.example.CurrentTimeServer</mainClass> <!-- Replace with your main class -->
                         </manifest>
                     </archive>
                 </configuration>
