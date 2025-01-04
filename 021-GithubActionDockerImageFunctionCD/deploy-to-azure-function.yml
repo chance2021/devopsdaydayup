@@ -1,7 +1,14 @@
 name: Deploy Docker Image to Azure Function
 
 on:
+  push:
+    paths:
+      - '021-GithubActionDockerImageFunctionCD/**'
   workflow_dispatch: # Allows manual triggering of the workflow
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
