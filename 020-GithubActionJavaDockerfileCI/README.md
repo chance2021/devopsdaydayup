@@ -1,5 +1,3 @@
-Here’s the document in proper Markdown format:
-
 # Continuous Integration (CI) Pipeline for Dockerized Java Application
 
 This project demonstrates a **Continuous Integration (CI)** pipeline using **GitHub Actions** to build and push a Docker image for a Java application. The pipeline performs the following tasks:
