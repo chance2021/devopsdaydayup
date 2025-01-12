@@ -17,7 +17,7 @@ This document outlines the design and configuration for a CI/CD pipeline workflo
 
 ### 1. DEV Workflow
 
-Trigger: Code pushed to feature or develop branches.
+Trigger: Code pushed to `feature` or `develop` branches.
 
 #### Feature Branch CI:
 Steps:
@@ -30,8 +30,8 @@ Outcome: Validates the feature branch for integration.
 #### Develop Branch CI:
 Steps:
 1.	Run unit tests.
-2.	Run security scans (e.g., Snyk, Trivy).
-3.	Build Docker image and push to the image registry (tagged as dev-latest).
+2.	Build Docker image and push to the image registry (tagged as dev-latest).
+3.	Run security scans (e.g., Snyk, Trivy).
 4.	Deploy to dev environment (Azure Function).
 5.	Notify developers on successful deployment.
 
@@ -50,7 +50,7 @@ Outcome: Ensures code readiness for staging.
 
 ### 3. Staging Workflow
 
-Trigger: Release branch creation by the SRE team.
+Trigger: Release branch creation by the SRE team and trigger the pipeline manually.
 
 Steps:
 1.	Run unit tests, integration tests, and code scans.
@@ -72,9 +72,9 @@ Steps:
 
 Outcome: Ensures controlled and stable production deployment.
 
-CI/CD Pipeline Configuration
+## CI/CD Pipeline Configuration
 
-Pipeline Structure
+### Pipeline Structure
 
 Environment	Trigger	CI Steps	CD Steps
 Dev	Push to develop	Unit tests, security scans, Docker build, push to registry (dev)	Deploy to dev environment
