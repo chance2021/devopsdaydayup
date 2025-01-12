@@ -31,7 +31,7 @@ env:
 jobs:
   # 1. CI for Feature Branch
   feature-ci:
-    if: github.ref_name startsWith('feature/')
+    if: ${{ github.ref_name && startsWith(github.ref_name, 'refs/heads/feature/') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
