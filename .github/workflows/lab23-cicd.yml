@@ -41,6 +41,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin' # Specify the JDK distribution
 
       - name: Run Unit Tests with JUnit
         run: |
