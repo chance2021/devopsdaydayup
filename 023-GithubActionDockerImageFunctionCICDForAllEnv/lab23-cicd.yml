@@ -81,7 +81,7 @@ jobs:
 
       - name: Push Docker Image to GitHub Package
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+          echo "${{ secrets.YOUR_GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
           docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:dev-latest
 
   # 3. Deployment Workflow
@@ -102,7 +102,7 @@ jobs:
 
       - name: Push Tagged Image
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+          echo "${{ secrets.YOUR_GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
           docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.environment }}-latest
 
       - name: Deploy to ${{ github.event.inputs.environment }} Environment
