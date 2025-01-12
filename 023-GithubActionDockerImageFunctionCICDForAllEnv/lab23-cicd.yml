@@ -20,9 +20,9 @@ on:
         required: true
         type: string
 
-env:
-  DOCKER_IMAGE_NAME: devopsdaydayup-docker-image  # Docker image name
-  REGISTRY: ghcr.io/chance2021  # GitHub Container Registry URL
+#env:
+#  DOCKER_IMAGE_NAME: devopsdaydayup-docker-image  # Docker image name
+#  REGISTRY: ghcr.io/chance2021  # GitHub Container Registry URL
 
 jobs:
   # 1. CI for Feature Branch
