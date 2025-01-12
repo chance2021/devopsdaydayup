@@ -86,10 +86,10 @@ jobs:
 
   # 3. Deployment Workflow
   deploy:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.ref_name == 'refs/heads/develop' || github.ref_name startsWith('release/') || github.ref_name == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.inputs.environment }}
+      name: ${{ github.ref_name == 'refs/heads/develop' && 'dev' || github.event.inputs.environment }}
       url: ${{ github.event.inputs.environment == 'qa' && 'https://qa.example.com' || github.event.inputs.environment == 'staging' && 'https://staging.example.com' || github.event.inputs.environment == 'prod' && 'https://prod.example.com' }}
       protection_rules:
         - required_approvers: ${{ github.event.inputs.environment == 'qa' && 'qa_deployer' || github.event.inputs.environment == 'staging' && 'staging_deployer' || github.event.inputs.environment == 'prod' && 'prod_deployer' }}
