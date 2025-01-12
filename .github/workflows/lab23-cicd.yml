@@ -5,6 +5,10 @@ on:
     branches:
       - feature/*     # CI for feature branches
       - develop       # CI/CD for develop branch
+      - lab22/entireCICDGithub
+    paths:
+      - '.github/workflows/lab23-cicd.yml'
+      - '023-GithubActionDockerImageFunctionCICDForAllEnv/*'
   workflow_dispatch:
     inputs:
       environment:
