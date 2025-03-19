@@ -55,7 +55,9 @@ jobs:
             echo "ENVIRONMENT=PROD" >> $GITHUB_ENV
             echo "ENVIRONMENT=PROD" >> $GITHUB_OUTPUT
           else
-            echo "Invalid environment: ${{ github.event.inputs.environment }}"
+            echo "Invalid environment: ${{ github.event.inputs.environment }}. Defaulting to DEV."
+            echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
+            echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
           fi
 
   # CI for Feature Branch. Only run unit tests and docker image build to ensure the code quality.
