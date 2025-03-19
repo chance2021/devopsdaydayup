@@ -32,9 +32,11 @@ env:
 jobs:
   set_environment_variables:
     runs-on: ubuntu-latest
-    id: set-env
+    outputs:
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
     steps:
       - name: Set Environment Variables
+        id: set-env
         run: |
           if [ ${{ github.event.inputs.environment }} == "dev" ]; then
             echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
@@ -58,8 +60,10 @@ jobs:
     #if: ${{ github.ref_name && startsWith(github.ref_name, 'feature/') }}
     #if: ${{ github.ref_name && startsWith(github.ref_name, 'lab22/entireCICDGithub') }}
     needs: set_environment_variables
-    environment: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    environment: ${{ needs.set_environment_variables.outputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
+    env:
+      USERNAME: ${{ vars.DOCKER_USERNAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -68,6 +72,7 @@ jobs:
         uses: ./.github/actions/debug
         with:
           image_version: ${{ github.sha }}
+          username: ${{ env.USERNAME }}
 
 #      - name: Set up Java
 #        uses: actions/setup-java@v3

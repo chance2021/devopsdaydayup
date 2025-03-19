@@ -4,6 +4,9 @@ inputs:
   image_version:
     description: 'Docker image version to deploy (e.g., dev-latest, qa-latest, release-YYYYMMDD)'
     required: true
+  username:
+    description: 'Docker Hub username'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -12,3 +15,4 @@ runs:
       run: |
         echo "Debugging GitHub Actions"
         echo "image_version: ${{ inputs.image_version }}"
+        echo "Username: ${{ inputs.username }}"
