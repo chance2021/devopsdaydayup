@@ -38,16 +38,16 @@ jobs:
       - name: Set Environment Variables
         id: set-env
         run: |
-          if [ ${{ github.event.inputs.environment }} == "dev" ]; then
+          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
             echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
             echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
-          elif [ ${{ github.event.inputs.environment }} == "qa" ]; then
+          elif [[ "${{ github.event.inputs.environment }}" == "qa" ]]; then
             echo "ENVIRONMENT=QA" >> $GITHUB_ENV
             echo "ENVIRONMENT=QA" >> $GITHUB_OUTPUT
-          elif [ ${{ github.event.inputs.environment }} == "staging" ]; then
+          elif [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
             echo "ENVIRONMENT=STAGING" >> $GITHUB_ENV
             echo "ENVIRONMENT=STAGING" >> $GITHUB_OUTPUT
-          elif [ ${{ github.event.inputs.environment }} == "prod" ]; then
+          elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
             echo "ENVIRONMENT=PROD" >> $GITHUB_ENV
             echo "ENVIRONMENT=PROD" >> $GITHUB_OUTPUT
           else
