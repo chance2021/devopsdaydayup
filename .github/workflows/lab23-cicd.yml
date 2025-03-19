@@ -57,6 +57,7 @@ jobs:
     # TODO: Uncomment the following line to enable CI for feature branches
     #if: ${{ github.ref_name && startsWith(github.ref_name, 'feature/') }}
     #if: ${{ github.ref_name && startsWith(github.ref_name, 'lab22/entireCICDGithub') }}
+    needs: set_environment_variables
     environment: ${{ steps.set-env.outputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     steps:
