@@ -15,6 +15,7 @@ on:
         description: 'Deployment environment (qa, staging, prod). Note: dev environment is auto-deployed.'
         required: true
         type: choice
+        default: dev
         options:
           - qa
           - staging
@@ -29,33 +30,79 @@ env:
   REGISTRY: ghcr.io/chance2021  # GitHub Container Registry URL
 
 jobs:
-  # 1. CI for Feature Branch
-  feature-ci:
-    if: ${{ github.ref_name && startsWith(github.ref_name, 'refs/heads/feature/') }}
+  set_environment_variables:
     runs-on: ubuntu-latest
+    outputs:
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    steps:
+      - name: Set Environment Variables
+        id: set-env
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+            echo "ENVIRONMENT=DEV"
+            echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
+            echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "qa" ]]; then
+            echo "ENVIRONMENT=QA"
+            echo "ENVIRONMENT=QA" >> $GITHUB_ENV
+            echo "ENVIRONMENT=QA" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
+            echo "ENVIRONMENT=STAGING"
+            echo "ENVIRONMENT=STAGING" >> $GITHUB_ENV
+            echo "ENVIRONMENT=STAGING" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+            echo "ENVIRONMENT=PROD"
+            echo "ENVIRONMENT=PROD" >> $GITHUB_ENV
+            echo "ENVIRONMENT=PROD" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid environment: ${{ github.event.inputs.environment }}. Defaulting to DEV."
+            echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
+            echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
+          fi
+
+  # CI for Feature Branch. Only run unit tests and docker image build to ensure the code quality.
+  feature-ci:
+    # TODO: Uncomment the following line to enable CI for feature branches
+    #if: ${{ github.ref_name && startsWith(github.ref_name, 'feature/') }}
+    #if: ${{ github.ref_name && startsWith(github.ref_name, 'lab22/entireCICDGithub') }}
+    needs: set_environment_variables
+    environment: ${{ needs.set_environment_variables.outputs.ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    env:
+      USERNAME: ${{ vars.DOCKER_USERNAME }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Debugging GitHub Actions
+        uses: ./.github/actions/debug
         with:
-          java-version: '17'
+          image_version: ${{ github.sha }}
+          username: ${{ env.USERNAME }}
 
-      - name: Run Unit Tests with JUnit
-        run: |
-          mkdir -p test-results
-          java -cp ./build/classes/java/test:./build/libs/* org.junit.runner.JUnitCore com.example.MyTestSuite
-
-      - name: Publish JUnit Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: junit-test-results
-          path: test-results
-
-      - name: Build Docker Image
-        run: docker build -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} .
-
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin' # Specify the JDK distribution
+#
+#      - name: Run Unit Tests with JUnit
+#        run: |
+#          mkdir -p test-results
+#          java -cp ./build/classes/java/test:./build/libs/* org.junit.runner.JUnitCore com.example.MyTestSuite
+#
+#      - name: Publish JUnit Test Results
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: junit-test-results
+#          path: test-results
+#
+#      - name: Build application with Maven
+#        run: mvn clean package -DskipTests
+#
+#      - name: Build Docker Image
+#        run: docker build -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} .
+#
 #  # 2. CI/CD for Develop Branch
 #  develop-cicd:
 #    if: github.ref_name == 'develop'
