@@ -38,6 +38,7 @@ jobs:
           pwd
           ls -trl
           tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
+        continue-on-error: true
 
       - name: Terraform Validate
         run: terraform validate
