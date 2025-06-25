@@ -37,7 +37,7 @@ jobs:
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
           pwd
           ls -trl
-          ./tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
+          tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Validate
         run: terraform validate
