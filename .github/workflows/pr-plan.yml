@@ -26,11 +26,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'dev' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'dev' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Security Check (tfsec)
         run: |
@@ -39,10 +39,9 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'dev' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Plan
         run: terraform plan
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'dev' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
-        
