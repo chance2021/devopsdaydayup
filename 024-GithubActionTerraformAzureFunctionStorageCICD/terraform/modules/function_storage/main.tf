@@ -15,6 +15,7 @@ resource "azurerm_storage_account" "storage" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2"
 }
 
 resource "azurerm_app_service_plan" "plan" {
@@ -39,4 +40,5 @@ resource "azurerm_function_app" "function" {
   storage_account_access_key = azurerm_storage_account.storage.primary_access_key
   version                    = "~4"
   os_type                    = "linux"
+  https_only                 = true
 }
