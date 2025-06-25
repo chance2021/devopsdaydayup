@@ -45,5 +45,5 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan.binary
-        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.pull_request.head.ref }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
