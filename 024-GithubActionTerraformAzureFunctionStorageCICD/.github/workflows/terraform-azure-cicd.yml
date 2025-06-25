@@ -29,13 +29,12 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
+    environment: ${{ github.event.inputs.environment }}
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      TF_VAR_environment: ${{ github.event.inputs.environment || 'dev' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -47,25 +46,25 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'prod' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'prod' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}
 
       - name: Terraform Security Check (tfsec)
         run: |
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
-          ./tfsec ./terraform/${{ github.event.inputs.environment || 'prod' }}
+          tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'prod' }}
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}
 
       - name: Terraform Plan
-        run: terraform plan
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'prod' }}
+        run: terraform plan -out=tfplan.binary
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./terraform/${{ github.event.inputs.environment || 'prod' }}
+        run: terraform apply -auto-approve tfplan.binary
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment }}

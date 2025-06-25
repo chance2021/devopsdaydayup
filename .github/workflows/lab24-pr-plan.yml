@@ -9,6 +9,7 @@ on:
 jobs:
   terraform-plan:
     runs-on: ubuntu-latest
+    environment: dev
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -43,6 +44,6 @@ jobs:
         working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Plan
-        run: terraform plan
-        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
+        run: terraform plan -out=tfplan.binary
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.pull_request.head.ref }}
 
