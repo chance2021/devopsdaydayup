@@ -35,7 +35,9 @@ jobs:
       - name: Terraform Security Check (tfsec)
         run: |
           curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
-          ./tfsec ./terraform/${{ github.event.inputs.environment || 'dev' }}
+          pwd
+          ls -trl
+          ./tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ github.event.inputs.environment || 'dev' }}
 
       - name: Terraform Validate
         run: terraform validate
