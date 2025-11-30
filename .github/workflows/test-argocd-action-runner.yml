@@ -1,8 +1,6 @@
 name: ArgoCDActions Runner Controller Demo
 on:
-  push:
-    paths:
-      - 'lab22/ArgoCDActionRunner'
+  workflow_dispatch:
 
 jobs:
   Explore-GitHub-Actions:
