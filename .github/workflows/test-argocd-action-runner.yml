@@ -1,4 +1,4 @@
-name: Actions Runner Controller Demo
+name: ArgoCDActions Runner Controller Demo
 on:
   push:
     paths:
