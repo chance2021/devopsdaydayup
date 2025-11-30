@@ -1,0 +1,105 @@
+# GitHub Actions Workflow for Azure Function/Storage Infra via Terraform
+# Covers full lifecycle: dev → qa → staging → prod
+
+name: Azure Function/Storage Terraform CICD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  detect-env:
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.setenv.outputs.env }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Get changed folders
+        id: diff
+        run: |
+          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E '^024-GithubActionTerraformAzureFunctionStorageCICD/terraform/(dev|qa|staging|prod)/' | awk -F'/' '{print $3}' | sort | uniq | paste -sd ',' -)
+          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
+      - name: Enforce single environment change
+        id: setenv
+        run: |
+          if [ -z "$CHANGED" ]; then
+            echo "No environment changes detected. Exiting."
+            echo "env=" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          IFS=',' read -ra ENVS <<< "$CHANGED"
+          if [ ${#ENVS[@]} -ne 1 ]; then
+            echo "Error: More than one environment folder changed: $CHANGED"
+            exit 1
+          fi
+          echo "env=${ENVS[0]}" >> $GITHUB_OUTPUT
+
+  terraform-plan:
+    needs: detect-env
+    if: ${{ needs.detect-env.outputs.env != '' }}
+    runs-on: ubuntu-latest
+    environment: ${{ needs.detect-env.outputs.env }}
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Terraform Security Check (tfsec)
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          tfsec ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan.binary
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Upload tfplan
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan-${{ needs.detect-env.outputs.env }}
+          path: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}/tfplan.binary
+
+  terraform-apply:
+    needs: terraform-plan
+    if: ${{ needs.detect-env.outputs.env != '' }}
+    runs-on: ubuntu-latest
+    environment: ${{ needs.detect-env.outputs.env }}
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Download tfplan
+        uses: actions/download-artifact@v3
+        with:
+          name: tfplan-${{ needs.detect-env.outputs.env }}
+          path: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan.binary
+        working-directory: ./024-GithubActionTerraformAzureFunctionStorageCICD/terraform/${{ needs.detect-env.outputs.env }}

@@ -1,0 +1,164 @@
+name: CICD Workflow
+
+on:
+  push:
+    branches:
+      - feature/*     # CI for feature branches
+      - develop       # CI/CD for develop branch
+      - lab22/entireCICDGithub
+    paths:
+      - '.github/workflows/lab23-cicd.yml'
+      - '023-GithubActionDockerImageFunctionCICDForAllEnv/*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment (qa, staging, prod). Note: dev environment is auto-deployed.'
+        required: true
+        type: choice
+        default: dev
+        options:
+          - qa
+          - staging
+          - prod
+      image_version:
+        description: 'Docker image version to deploy (e.g., dev-latest, qa-latest, release-YYYYMMDD)'
+        required: true
+        type: string
+
+env:
+  DOCKER_IMAGE_NAME: devopsdaydayup-docker-image  # Docker image name
+  REGISTRY: ghcr.io/chance2021  # GitHub Container Registry URL
+
+jobs:
+  set_environment_variables:
+    runs-on: ubuntu-latest
+    outputs:
+      ENVIRONMENT: ${{ steps.set-env.outputs.ENVIRONMENT }}
+    steps:
+      - name: Set Environment Variables
+        id: set-env
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+            echo "ENVIRONMENT=DEV"
+            echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
+            echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "qa" ]]; then
+            echo "ENVIRONMENT=QA"
+            echo "ENVIRONMENT=QA" >> $GITHUB_ENV
+            echo "ENVIRONMENT=QA" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "staging" ]]; then
+            echo "ENVIRONMENT=STAGING"
+            echo "ENVIRONMENT=STAGING" >> $GITHUB_ENV
+            echo "ENVIRONMENT=STAGING" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+            echo "ENVIRONMENT=PROD"
+            echo "ENVIRONMENT=PROD" >> $GITHUB_ENV
+            echo "ENVIRONMENT=PROD" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid environment: ${{ github.event.inputs.environment }}. Defaulting to DEV."
+            echo "ENVIRONMENT=DEV" >> $GITHUB_ENV
+            echo "ENVIRONMENT=DEV" >> $GITHUB_OUTPUT
+          fi
+
+  # CI for Feature Branch. Only run unit tests and docker image build to ensure the code quality.
+  feature-ci:
+    # TODO: Uncomment the following line to enable CI for feature branches
+    #if: ${{ github.ref_name && startsWith(github.ref_name, 'feature/') }}
+    #if: ${{ github.ref_name && startsWith(github.ref_name, 'lab22/entireCICDGithub') }}
+    needs: set_environment_variables
+    environment: ${{ needs.set_environment_variables.outputs.ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    env:
+      USERNAME: ${{ vars.DOCKER_USERNAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Debugging GitHub Actions
+        uses: ./.github/actions/debug
+        with:
+          image_version: ${{ github.sha }}
+          username: ${{ env.USERNAME }}
+
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin' # Specify the JDK distribution
+#
+#      - name: Run Unit Tests with JUnit
+#        run: |
+#          mkdir -p test-results
+#          java -cp ./build/classes/java/test:./build/libs/* org.junit.runner.JUnitCore com.example.MyTestSuite
+#
+#      - name: Publish JUnit Test Results
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: junit-test-results
+#          path: test-results
+#
+#      - name: Build application with Maven
+#        run: mvn clean package -DskipTests
+#
+#      - name: Build Docker Image
+#        run: docker build -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} .
+#
+#  # 2. CI/CD for Develop Branch
+#  develop-cicd:
+#    if: github.ref_name == 'develop'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#
+#      - name: Run Unit Tests with JUnit
+#        run: |
+#          mkdir -p test-results
+#          java -cp ./build/classes/java/test:./build/libs/* org.junit.runner.JUnitCore com.example.MyTestSuite
+#
+#      - name: Publish JUnit Test Results
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: junit-test-results
+#          path: test-results
+#
+#      - name: Build Docker Image
+#        run: docker build -t ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:dev-latest .
+#
+#      - name: Push Docker Image to GitHub Package
+#        run: |
+#          echo "${{ secrets.YOUR_GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+#          docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:dev-latest
+#
+#  # 3. Deployment Workflow
+#  deploy:
+#    if: ${{ github.ref_name == 'refs/heads/develop' || github.ref_name startsWith('release/') || github.ref_name == 'refs/heads/main' }}
+#    runs-on: ubuntu-latest
+#    environment:
+#      name: ${{ github.ref_name == 'refs/heads/develop' && 'dev' || github.event.inputs.environment }}
+#      url: ${{ github.event.inputs.environment == 'qa' && 'https://qa.example.com' || github.event.inputs.environment == 'staging' && 'https://staging.example.com' || github.event.inputs.environment == 'prod' && 'https://prod.example.com' }}
+#      protection_rules:
+#        - required_approvers: ${{ github.event.inputs.environment == 'qa' && 'qa_deployer' || github.event.inputs.environment == 'staging' && 'staging_deployer' || github.event.inputs.environment == 'prod' && 'prod_deployer' }}
+#
+#    steps:
+#      - name: Pull Docker Image
+#        run: |
+#          docker pull ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.image_version }}
+#          docker tag ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.image_version }} ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.environment }}-latest
+#
+#      - name: Push Tagged Image
+#        run: |
+#          echo "${{ secrets.YOUR_GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+#          docker push ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.environment }}-latest
+#
+#      - name: Deploy to ${{ github.event.inputs.environment }} Environment
+#        run: |
+#          az functionapp config container set \
+#            --name ${{ secrets[github.event.inputs.environment | upper | append("_FUNCTION_APP_NAME")] }} \
+#            --resource-group ${{ secrets[github.event.inputs.environment | upper | append("_RESOURCE_GROUP")] }} \
+#            --docker-custom-image-name ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.event.inputs.environment }}-latest
