@@ -2,11 +2,7 @@
 
 This Learning Lab teaches you how to deploy **GitHub Actions self-hosted runners** using  
 **Actions Runner Controller (ARC)** with **Runner Scale Sets** on a local Kubernetes cluster (Minikube).
-
-The guide is fully hands-on and designed to follow open-source documentation best practices.
-
 ---
-
 ## 📘 Table of Contents
 
 1. [Architecture Overview](#architecture-overview)  
@@ -48,26 +44,24 @@ Start a cluster:
 minikube start --cpus=4 --memory=8g
 ```
 
-### Helm
+### ✔Helm
 Install guide: https://helm.sh/docs/intro/install/
 
-### kubectl
+### ✔kubectl
 Install guide: https://kubernetes.io/docs/tasks/tools/
 
-### GitHub App
+### ✔GitHub App
 ARC requires a GitHub App.
 Follow the official instructions to create one:
 https://github.com/actions/actions-runner-controller/blob/master/docs/getting-started/gh-app.md
 
 Record these values:
-	•	App ID
-	•	Installation ID
-	•	Private Key (.pem file)
+- App ID
+- Installation ID
+- Private Key (.pem file)
 
-⸻
-
+---
 ## Step 1 — Install ARC Scale Set Controller
-
 Install the controller into its own namespace:
 ```bash
 helm upgrade --install arc oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
@@ -82,31 +76,29 @@ Expected output (example):
 ```bash
 arc-gha-runner-scale-set-controller-xxxxx   Running
 ````
-
-⸻
-
 ## Step 2 — Create GitHub App Secret
 
 Update these variables with your own values:
 ```bash
 INSTALLATION_NAME="arc-runner-set"
 ```
-### Replace with your repo
+Replace with your repo
+```bash
 GITHUB_CONFIG_URL="https://github.com/<your-org-or-user>/<your-repo>"
-
-### Replace placeholders below
+```
+Replace placeholders below
+```bash
 GITHUB_APP_ID="<YOUR_GITHUB_APP_ID>"
 GITHUB_APP_INSTALLATION_ID="<YOUR_INSTALLATION_ID>"
 GITHUB_APP_PRIVATE_KEY_PATH="/path/to/your/private-key.pem"
-
 NAMESPACE="arc-runners"
 SECRET_NAME="github-app-secret"
-
-### Create the namespace
+```
+Create the namespace
 ```bash
 kubectl create namespace ${NAMESPACE}
 ```
-### Create the secret
+Create the secret
 ```bash
 kubectl create secret generic ${SECRET_NAME} \
   --namespace=${NAMESPACE} \
@@ -118,8 +110,6 @@ Verify:
 ```bash
 kubectl get secret ${SECRET_NAME} -n ${NAMESPACE}
 ```
-
-⸻
 
 ## Step 3 — Deploy Runner Scale Set
 
@@ -141,19 +131,13 @@ You should see something like:
 arc-runner-set-xxxxx
 ```
 
-⸻
-
 ## Step 4 — Validate Setup
 
-1. Validate ARC connected to GitHub
-
-Navigate to:
+1. Validate ARC connected to GitHub. Navigate to:
 
 GitHub → Repository Settings → Actions → Runners
 
 You should see your Runner Scale Set registered.
-
-⸻
 
 2. Trigger a Workflow
 
@@ -185,7 +169,7 @@ kubectl get pods -n ${NAMESPACE} -w
 
 ⸻
 
-## References
+# References
 - ARC Documentation
 https://github.com/actions/actions-runner-controller
 - GitHub App for ARC
