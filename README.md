@@ -26,6 +26,11 @@ We **encourage everyone to contribute to this repository**. Whether you are a se
 - **Lab 13**: [Deploy A Java Application In K8s, Monitoring ConfigMap File Change](https://github.com/chance2021/devopsdaydayup/tree/main/013-JavaMonitoryConfigmapMinikube)
 - **Lab 14**: [Deploy Vault as SideCar](https://github.com/chance2021/devopsdaydayup/tree/main/014-VaultInjectorMinikube)
 - **Lab 15**: [Remove Large Files from Git Commit History](https://github.com/chance2021/devopsdaydayup/tree/main/015-GitRemoveLargeFile)
+- **Lab 16**: [Deploy Function via Terraform](https://github.com/chance2021/devopsdaydayup/tree/main/016-AzureFunctionTerraform)
+- **Lab 17**: [Azure Key Vault Solution](https://github.com/chance2021/devopsdaydayup/tree/main/017-AzureLogicalAppTerraform)
+- **Lab 20**: [Continuous Integration (CI) Pipeline for Dockerized Java Application](https://github.com/chance2021/devopsdaydayup/tree/main/020-GithubActionJavaDockerfileCI/README.md)
+- **Lab 21**: [Deploy Docker Image to Azure Function Using GitHub Actions](https://github.com/chance2021/devopsdaydayup/tree/main/021-GithubActionDockerImageFunctionCD/)
+- **Lab 22**: [Deploy a GitHub Actions Runner Scale Set (ARC) on Kubernetes Using Minikube](https://github.com/chance2021/devopsdaydayup/tree/main/022-ActionRunnerSaleSetMinitkube)
 
 
 - **AKS Related Lab**: [AKS Upgrade](https://github.com/chance2021/devopsdaydayup/tree/main/aks/aks-upgrade)
