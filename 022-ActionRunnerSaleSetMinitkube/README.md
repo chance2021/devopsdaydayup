@@ -151,10 +151,11 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: arc-runner-set
     steps:
       - run: echo "Runner is working!"
 ```
+Note: `runs-on` needs to use the same name as $INSTALLATION_NAME set above.
 Dispatch the workflow in GitHub → Actions.
 
 ARC will:
