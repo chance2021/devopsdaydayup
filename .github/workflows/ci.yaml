@@ -60,6 +60,13 @@ jobs:
             kv/data/ci/nexus password | NEXUS_PASSWORD ;
             kv/data/ci/sonarqube token   | SONAR_TOKEN
 
+
+      - name: Debug Vault secrets
+        run: |
+            echo $NEXUS_USERNAME
+            echo $NEXUS_PASSWORD
+            echo $SONAR_TOKEN
+
       # 3. Setup Java (Maven)
       - name: Set up JDK
         uses: actions/setup-java@v4
