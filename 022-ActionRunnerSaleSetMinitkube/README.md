@@ -171,12 +171,11 @@ kubectl get pods -n ${NAMESPACE} -w
 
 # References
 - ARC Documentation
-https://github.com/actions/actions-runner-controller
-- GitHub App for ARC
-https://github.com/actions/actions-runner-controller/blob/master/docs/getting-started/gh-app.md
+https://docs.github.com/en/actions/tutorials/use-actions-runner-controller/quickstart
+- Authenticating ARC to the GitHub API
+https://docs.github.com/en/actions/tutorials/use-actions-runner-controller/authenticate-to-the-api#deploying-using-personal-access-token-classic-authentication
 - Runner Scale Set Concepts
-https://docs.github.com/en/actions/hosting-your-own-runners/runner-scale-sets
-
+https://docs.github.com/en/actions/concepts/runners/runner-scale-sets
 ⸻
 
 🎉 You have successfully deployed GitHub Actions Runner Scale Sets on Kubernetes with ARC and Minikube!
