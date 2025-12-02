@@ -1,0 +1,149 @@
+name: ci-java-with-vault-nexus-sonar-security
+
+on:
+  push:
+    branches: [ 025-GithubActionCI ]
+
+permissions:
+  contents: read
+  id-token: write   # often needed for auth to cloud / secrets backends
+  security-events: write
+
+env:
+  APP_NAME: my-java-app
+  DOCKER_IMAGE_NAME: my-java-app
+  MAVEN_SETTINGS_PATH: .maven/settings.xml  # you’ll create this
+  # Use Nexus as Maven repo & Docker registry
+  NEXUS_MAVEN_REPO_URL: https://nexus.example.com/repository/maven-releases/
+  NEXUS_DOCKER_REGISTRY: nexus.example.com
+  SONAR_PROJECT_KEY: my-org_my-java-app
+  SONAR_PROJECT_NAME: my-java-app
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Pull secrets from Vault
+      # Assumes HashiCorp Vault is accessible and GitHub runner has auth (GitHub OIDC / token / etc.)
+      - name: Import secrets from Vault
+        id: vault
+        uses: hashicorp/vault-action@v3
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          # Example: Nexus & Sonar credentials stored in Vault
+          secrets: |
+            kv/data/ci/nexus username | NEXUS_USERNAME ;
+            kv/data/ci/nexus password | NEXUS_PASSWORD ;
+            kv/data/ci/sonarqube token   | SONAR_TOKEN
+
+      # 3. Setup Java (Maven)
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # 4. Generate Maven settings.xml pointing to Nexus
+      - name: Configure Maven settings for Nexus
+        run: |
+          mkdir -p .maven
+          cat <<EOF > ${MAVEN_SETTINGS_PATH}
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        http://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>nexus-releases</id>
+                <username>${env.NEXUS_USERNAME}</username>
+                <password>${env.NEXUS_PASSWORD}</password>
+              </server>
+            </servers>
+            <mirrors>
+              <mirror>
+                <id>nexus</id>
+                <mirrorOf>*</mirrorOf>
+                <url>${env.NEXUS_MAVEN_REPO_URL}</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
+      # 5. Maven build (dependencies pulled via Nexus)
+      - name: Build with Maven
+        run: mvn -B -s ${MAVEN_SETTINGS_PATH} clean package
+
+      # 6. Publish JAR to Nexus (using Maven deploy)
+      - name: Deploy JAR to Nexus
+        run: mvn -B -s ${MAVEN_SETTINGS_PATH} deploy
+
+      # 7. SonarQube scan (assumes sonar-project.properties or config via CLI args)
+      - name: SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        run: |
+          mvn -B -s ${MAVEN_SETTINGS_PATH} \
+            sonar:sonar \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.login=${SONAR_TOKEN} \
+            -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} \
+            -Dsonar.projectName=${{ env.SONAR_PROJECT_NAME }}
+
+      # 8. Dependency scan (example: OWASP Dependency-Check)
+      - name: Dependency scan (OWASP Dependency-Check)
+        uses: dependency-check/Dependency-Check_Action@v4
+        with:
+          project: ${{ env.APP_NAME }}
+          path: .
+          format: 'ALL'
+          out: 'dependency-check-report'
+      - name: Upload dependency scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report
+
+      # 9. Build container image
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Nexus Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.NEXUS_DOCKER_REGISTRY }}
+          username: ${{ env.NEXUS_USERNAME }}
+          password: ${{ env.NEXUS_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          docker build \
+            -t ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${IMAGE_TAG} \
+            -t ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest \
+            .
+
+      # 10. Image scan (example: Trivy)
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          format: 'table'
+          exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # 11. Push Docker image to Nexus
+      - name: Push Docker image to Nexus
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${IMAGE_TAG}
+          docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
