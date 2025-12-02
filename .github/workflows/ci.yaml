@@ -2,7 +2,7 @@ name: ci-java-with-vault-nexus-sonar-security
 
 on:
   push:
-    branches: [ 025-GithubActionCI ]
+    branches: [ 023-GitHubActionCI ]
 
 permissions:
   contents: read
