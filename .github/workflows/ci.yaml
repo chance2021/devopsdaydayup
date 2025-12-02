@@ -34,7 +34,7 @@ jobs:
         id: vault
         uses: hashicorp/vault-action@v3
         with:
-          url: https://vault-0.vault:8200
+          url: https://vault.vault:8200
           method: jwt
           role: "myproject-ci"
           # Example: Nexus & Sonar credentials stored in Vault
