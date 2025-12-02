@@ -28,6 +28,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug GitHub OIDC token audience
+        run: |
+            echo "Requesting GitHub OIDC token..."
+            TOKEN_RESPONSE=$(curl -sSL \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}?audience=https://token.actions.githubusercontent.com")
+
+            TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r .value)
+
+            echo "===== RAW JWT ====="
+            echo "$TOKEN"
+
+            echo ""
+            echo "===== DECODED PAYLOAD ====="
+            echo "$TOKEN" | cut -d '.' -f2 | base64 --decode 2>/dev/null | jq .
+
+
       # 2. Pull secrets from Vault
       # Assumes HashiCorp Vault is accessible and GitHub runner has auth (GitHub OIDC / token / etc.)
       - name: Import secrets from Vault
