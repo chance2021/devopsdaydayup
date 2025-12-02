@@ -34,7 +34,7 @@ jobs:
         id: vault
         uses: hashicorp/vault-action@v3
         with:
-          url: http://vault.vault:8200
+          url: http://10.103.109.179:8200
           method: jwt
           role: "myproject-ci"
           # Example: Nexus & Sonar credentials stored in Vault
@@ -51,7 +51,7 @@ jobs:
           java-version: '17'
           cache: maven
 
-          
+
     #   # 4. Generate Maven settings.xml pointing to Nexus
     #   - name: Configure Maven settings for Nexus
     #     run: |
