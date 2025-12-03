@@ -56,15 +56,16 @@ jobs:
           role: "myproject-ci"
           # Example: Nexus & Sonar credentials stored in Vault
           secrets: |
-            kv/data/ci/nexus username | NEXUS_USERNAME ;
-            kv/data/ci/nexus password | NEXUS_PASSWORD ;
+            kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
+            kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
+            kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
             kv/data/ci/sonarqube token   | SONAR_TOKEN
 
 
       - name: Debug Vault secrets
         run: |
-            echo $NEXUS_USERNAME
-            echo $NEXUS_PASSWORD
+            echo $ARTIFACTORY_USERNAME
+            echo $ARTIFACTORY_PASSWORD
             echo $SONAR_TOKEN
 
       # 3. Setup Java (Maven)
@@ -76,35 +77,79 @@ jobs:
           cache: maven
 
 
-    #   # 4. Generate Maven settings.xml pointing to Nexus
-    #   - name: Configure Maven settings for Nexus
-    #     run: |
-    #       mkdir -p .maven
-    #       cat <<EOF > ${MAVEN_SETTINGS_PATH}
-    #       <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-    #                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    #                 xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-    #                                     http://maven.apache.org/xsd/settings-1.0.0.xsd">
-    #         <servers>
-    #           <server>
-    #             <id>nexus-releases</id>
-    #             <username>${env.NEXUS_USERNAME}</username>
-    #             <password>${env.NEXUS_PASSWORD}</password>
-    #           </server>
-    #         </servers>
-    #         <mirrors>
-    #           <mirror>
-    #             <id>nexus</id>
-    #             <mirrorOf>*</mirrorOf>
-    #             <url>${env.NEXUS_MAVEN_REPO_URL}</url>
-    #           </mirror>
-    #         </mirrors>
-    #       </settings>
-    #       EOF
+      # 4. Generate Maven settings.xml to use Artifactory
+      - name: Generate Maven settings.xml (force Nexus)
+        run: |
+          mkdir -p ~/.m2
 
-    #   # 5. Maven build (dependencies pulled via Nexus)
-    #   - name: Build with Maven
-    #     run: mvn -B -s ${MAVEN_SETTINGS_PATH} clean package
+          cat > ~/.m2/settings.xml <<EOF
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>artifactory</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              <server>
+                <id>artifactory-releases</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              <server>
+                <id>artifactory-snapshots</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+            </servers>
+
+            <mirrors>
+              <mirror>
+                <id>artifactory-mirror</id>
+                <name>artifactory mirror</name>
+                <mirrorOf>*</mirrorOf>
+                <url>${ARTIFACTORY_URL_PUBLIC}</url>
+              </mirror>
+            </mirrors>
+
+            <profiles>
+              <profile>
+                <id>artifactory</id>
+                <repositories>
+                  <repository>
+                    <id>central</id>
+                    <name>Central via Artifactory</name>
+                    <url>${ARTIFACTORY_URL_PUBLIC}</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </repository>
+                </repositories>
+                <pluginRepositories>
+                  <pluginRepository>
+                    <id>central</id>
+                    <name>Central Plugins via Artifactory</name>
+                    <url>${ARTIFACTORY_URL_PUBLIC}</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </pluginRepository>
+                </pluginRepositories>
+              </profile>
+            </profiles>
+
+            <activeProfiles>
+              <activeProfile>artifactory</activeProfile>
+            </activeProfiles>
+          </settings>
+          EOF
+
+          echo "Generated ~/.m2/settings.xml:"
+          cat ~/.m2/settings.xml
+
+      # 5. Maven build (dependencies pulled via Artifactory)
+      - name: Build with Maven
+        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean verify
 
     #   # 6. Publish JAR to Nexus (using Maven deploy)
     #   - name: Deploy JAR to Nexus
@@ -144,8 +189,8 @@ jobs:
     #     uses: docker/login-action@v3
     #     with:
     #       registry: ${{ env.NEXUS_DOCKER_REGISTRY }}
-    #       username: ${{ env.NEXUS_USERNAME }}
-    #       password: ${{ env.NEXUS_PASSWORD }}
+    #       username: ${{ env.ARTIFACTORY_USERNAME }}
+    #       password: ${{ env.ARTIFACTORY_PASSWORD }}
 
     #   - name: Build Docker image
     #     run: |
