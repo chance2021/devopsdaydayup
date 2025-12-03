@@ -50,13 +50,5 @@
         </dependency>
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/chance2021/devopsdaydayup</url>
-        </repository>
-    </distributionManagement>
-
 </project>
 
