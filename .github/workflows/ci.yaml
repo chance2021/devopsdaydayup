@@ -150,7 +150,7 @@ jobs:
 
       # 5. Maven build (dependencies pulled via Artifactory)
       - name: Build with Maven
-        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean verify
+        run: cd 025-GithubActionCI && mvn -X -s ~/.m2/settings.xml -B clean verify
 
     #   # 6. Publish JAR to Nexus (using Maven deploy)
     #   - name: Deploy JAR to Nexus
