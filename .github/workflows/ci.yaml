@@ -120,6 +120,20 @@ jobs:
               </mirror>
             </mirrors>
 
+            <distributionManagement>
+            <repository>
+                <id>artifactory-releases</id>
+                <name>Artifactory Releases</name>
+                <url>${ARTIFACTORY_URL_PUBLIC}/artifactory/libs-release-local</url>
+            </repository>
+
+            <snapshotRepository>
+                <id>artifactory-snapshots</id>
+                <name>Artifactory Snapshots</name>
+                <url>${ARTIFACTORY_URL_PUBLIC}/artifactory/libs-snapshot-local</url>
+            </snapshotRepository>
+            </distributionManagement>
+
             <profiles>
               <profile>
                 <id>artifactory</id>
@@ -155,11 +169,8 @@ jobs:
 
       # 5. Maven build (dependencies pulled via Artifactory)
       - name: Build with Maven
-        run: cd 025-GithubActionCI && mvn -X -s ~/.m2/settings.xml -B clean verify
+        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy
 
-    #   # 6. Publish JAR to Nexus (using Maven deploy)
-    #   - name: Deploy JAR to Nexus
-    #     run: mvn -B -s ${MAVEN_SETTINGS_PATH} deploy
 
     #   # 7. SonarQube scan (assumes sonar-project.properties or config via CLI args)
     #   - name: SonarQube scan
