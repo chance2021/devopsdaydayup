@@ -80,7 +80,7 @@ jobs:
       # 4. Generate Maven settings.xml to use Artifactory
       - name: Generate Maven settings.xml (force Artifactory))
         run: |
-          sudp apt-get update && sudo apt-get install -y maven
+          sudo apt-get update && sudo apt-get install -y maven
           mkdir -p ~/.m2
 
           cat > ~/.m2/settings.xml <<EOF
