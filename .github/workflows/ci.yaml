@@ -104,7 +104,12 @@ jobs:
                 <username>${ARTIFACTORY_USERNAME}</username>
                 <password>${ARTIFACTORY_PASSWORD}</password>
               </server>
-            </servers>
+              <server>
+                <id>artifactory-mirror</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              </servers>
 
             <mirrors>
               <mirror>
