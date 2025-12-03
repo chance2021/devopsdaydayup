@@ -217,4 +217,3 @@ jobs:
     #       IMAGE_TAG=${GITHUB_SHA::7}
     #       docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${IMAGE_TAG}
     #       docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-    
