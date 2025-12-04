@@ -59,7 +59,10 @@ jobs:
             kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
             kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
             kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
-            kv/data/ci/sonarqube token   | SONAR_TOKEN
+            kv/data/ci/sonarqube token   | SONAR_TOKEN;
+            kv/data/ci/sonarqube host_url | SONAR_HOST_URL;
+            kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
+            kv/data/ci/sonarqube project_name | SONAR_PROJECT_NAME;
 
 
       - name: Debug Vault secrets
@@ -119,7 +122,7 @@ jobs:
                 <url>${ARTIFACTORY_URL_PUBLIC}</url>
               </mirror>
             </mirrors>
-            
+
             <profiles>
               <profile>
                 <id>artifactory</id>
@@ -153,22 +156,22 @@ jobs:
           echo "Generated ~/.m2/settings.xml:"
           cat ~/.m2/settings.xml
 
-      # 5. Maven build (dependencies pulled via Artifactory)
-      - name: Build with Maven
-        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
+    #   # 5. Maven build (dependencies pulled via Artifactory)
+    #   - name: Build with Maven
+    #     run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
 
 
-    #   # 7. SonarQube scan (assumes sonar-project.properties or config via CLI args)
-    #   - name: SonarQube scan
-    #     env:
-    #       SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-    #     run: |
-    #       mvn -B -s ${MAVEN_SETTINGS_PATH} \
-    #         sonar:sonar \
-    #         -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-    #         -Dsonar.login=${SONAR_TOKEN} \
-    #         -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }} \
-    #         -Dsonar.projectName=${{ env.SONAR_PROJECT_NAME }}
+      # 7. SonarQube scan (assumes sonar-project.properties or config via CLI args)
+      - name: SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        run: |
+          mvn -B -s ~/.m2/settings.xml \
+            sonar:sonar \
+            -Dsonar.host.url=${SONAR_HOST_URL} \
+            -Dsonar.login=${SONAR_TOKEN} \
+            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+            -Dsonar.projectName=${SONAR_PROJECT_NAME}
 
     #   # 8. Dependency scan (example: OWASP Dependency-Check)
     #   - name: Dependency scan (OWASP Dependency-Check)
