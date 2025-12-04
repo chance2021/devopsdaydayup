@@ -204,9 +204,9 @@ jobs:
           DOCKER_IMAGE_NAME="java-with-vault-nexus-sonar-security"
           IMAGE_TAG=${GITHUB_SHA::7}
           cd 025-GithubActionCI
-          docker login --username "$ARTIFACTORY_USERNAME" \
-                      --password "$ARTIFACTORY_PASSWORD" \
-                      $ARTIFACTORY_DOCKER_REGISTRY
+          # docker login --username "$ARTIFACTORY_USERNAME" \
+          #             --password "$ARTIFACTORY_PASSWORD" \
+          #             $ARTIFACTORY_DOCKER_REGISTRY
           docker build \
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
