@@ -59,6 +59,7 @@ jobs:
             kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
             kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
             kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
+            kv/data/ci/artifactory docker_registry | ARTIFACTORY_DOCKER_REGISTRY ;
             kv/data/ci/sonarqube token   | SONAR_TOKEN;
             kv/data/ci/sonarqube host_url | SONAR_HOST_URL;
             kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
