@@ -208,7 +208,6 @@ jobs:
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
 
-
     #   # 10. Image scan (example: Trivy)
     #   - name: Scan Docker image with Trivy
     #     uses: aquasecurity/trivy-action@0.28.0
