@@ -118,7 +118,7 @@ jobs:
               <mirror>
                 <id>artifactory-mirror</id>
                 <name>artifactory mirror</name>
-                <mirrorOf>*</mirrorOf>
+                <mirrorOf>*,!sonar-plugins</mirrorOf>
                 <url>${ARTIFACTORY_URL_PUBLIC}</url>
               </mirror>
             </mirrors>
