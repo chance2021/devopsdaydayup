@@ -195,9 +195,9 @@ jobs:
       - name: Login to Nexus Docker registry
         uses: docker/login-action@v3
         with:
-          registry: ${ARTIFACTORY_DOCKER_REGISTRY}
-          username: ${ARTIFACTORY_USERNAME}
-          password: ${ARTIFACTORY_PASSWORD}
+          registry: ${{ steps.vault.outputs.ARTIFACTORY_DOCKER_REGISTRY }}
+          username: ${{ steps.vault.outputs.ARTIFACTORY_USERNAME }}
+          password: ${{ steps.vault.outputs.ARTIFACTORY_PASSWORD }}
 
       - name: Build Docker image
         run: |
@@ -208,15 +208,15 @@ jobs:
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
             -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
 
-    #   # 10. Image scan (example: Trivy)
-    #   - name: Scan Docker image with Trivy
-    #     uses: aquasecurity/trivy-action@0.28.0
-    #     with:
-    #       image-ref: ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-    #       format: 'table'
-    #       exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
-    #       vuln-type: 'os,library'
-    #       severity: 'CRITICAL,HIGH'
+      # 10. Image scan (example: Trivy)
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${ARTIFACTORY_DOCKER_REGISTRY}/java-with-vault-nexus-sonar-security:latest
+          format: 'table'
+          exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
     #   # 11. Push Docker image to Nexus
     #   - name: Push Docker image to Nexus
