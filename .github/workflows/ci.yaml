@@ -215,7 +215,7 @@ jobs:
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ${ARTIFACTORY_DOCKER_REGISTRY}/java-with-vault-nexus-sonar-security:latest
+          image-ref: ${steps.vault.outputs.ARTIFACTORY_DOCKER_REGISTRY}/java-with-vault-nexus-sonar-security:latest
           format: 'table'
           exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
           vuln-type: 'os,library'
