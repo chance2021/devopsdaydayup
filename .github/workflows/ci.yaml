@@ -24,7 +24,6 @@ jobs:
     runs-on: arc-runner-set
 
     steps:
-
       # 1. Checkout
       - name: Checkout
         uses: actions/checkout@v4
