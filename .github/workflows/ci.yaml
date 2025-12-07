@@ -211,6 +211,8 @@ jobs:
           DOCKER_IMAGE_NAME="java-with-vault-nexus-sonar-security"
           IMAGE_TAG=${GITHUB_SHA::7}
           echo "DOCKER_ADDRESS=${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           cd 025-GithubActionCI
           # docker login --username "$ARTIFACTORY_USERNAME" \
           #             --password "$ARTIFACTORY_PASSWORD" \
@@ -233,9 +235,9 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-    #   # 11. Push Docker image to Nexus
-    #   - name: Push Docker image to Nexus
-    #     run: |
-    #       IMAGE_TAG=${GITHUB_SHA::7}
-    #       docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${IMAGE_TAG}
-    #       docker push ${{ env.NEXUS_DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+      # 11. Push Docker image to Nexus
+      - name: Push Docker image to Nexus
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          docker push ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
+          docker push ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}/${{ steps.build-image.outputs.DOCKER_IMAGE_NAME }}:latest
