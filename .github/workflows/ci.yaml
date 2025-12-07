@@ -24,6 +24,10 @@ jobs:
     runs-on: arc-runner-set
 
     steps:
+
+      - name: Pending Pod
+        run: sleep infinity
+        shell: bash
       # 1. Checkout
       - name: Checkout
         uses: actions/checkout@v4
