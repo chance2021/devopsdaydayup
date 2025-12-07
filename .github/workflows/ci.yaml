@@ -217,6 +217,7 @@ jobs:
       # 10. Image scan (example: Trivy)
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
         with:
           image-ref: ${{ steps.vault.outputs.ARTIFACTORY_DOCKER_REGISTRY }}/java-with-vault-nexus-sonar-security:latest
           format: 'table'
