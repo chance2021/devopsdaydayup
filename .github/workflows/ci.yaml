@@ -63,7 +63,9 @@ jobs:
             kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
             kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
             kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
-            kv/data/ci/artifactory docker_registry | ARTIFACTORY_DOCKER_REGISTRY ;
+            kv/data/ci/github username | GITHUB_USERNAME ;
+            kv/data/ci/github password | GITHUB_PASSWORD ;
+            kv/data/ci/github docker_registry | GITHUB_DOCKER_REGISTRY ;
             kv/data/ci/sonarqube token   | SONAR_TOKEN;
             kv/data/ci/sonarqube host_url | SONAR_HOST_URL;
             kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
@@ -199,21 +201,23 @@ jobs:
       - name: Login to Artifactory Docker registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ steps.vault.outputs.ARTIFACTORY_DOCKER_REGISTRY }}
-          username: ${{ steps.vault.outputs.ARTIFACTORY_USERNAME }}
-          password: ${{ steps.vault.outputs.ARTIFACTORY_PASSWORD }}
+          registry: ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}
+          username: ${{ steps.vault.outputs.GITHUB_USERNAME }}
+          password: ${{ steps.vault.outputs.GITHUB_PASSWORD }}
 
       - name: Build Docker image
+        id: build-image
         run: |
           DOCKER_IMAGE_NAME="java-with-vault-nexus-sonar-security"
           IMAGE_TAG=${GITHUB_SHA::7}
+          echo "DOCKER_ADDRESS=${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
           cd 025-GithubActionCI
           # docker login --username "$ARTIFACTORY_USERNAME" \
           #             --password "$ARTIFACTORY_PASSWORD" \
           #             $ARTIFACTORY_DOCKER_REGISTRY
           docker build \
-            -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
-            -t ${ARTIFACTORY_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
+            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
+            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
 
       - name: Show Docker images
         run: docker images
@@ -223,7 +227,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
-          image-ref: ${{ steps.vault.outputs.ARTIFACTORY_DOCKER_REGISTRY }}/java-with-vault-nexus-sonar-security:latest
+          image-ref: ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
           format: 'table'
           exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
           vuln-type: 'os,library'
