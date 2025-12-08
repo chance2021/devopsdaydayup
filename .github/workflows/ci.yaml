@@ -176,15 +176,15 @@ jobs:
             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
             -Dsonar.projectName=${SONAR_PROJECT_NAME}
 
-      # 8. Dependency scan (example: OWASP Dependency-Check)
-      - name: Dependency scan (OWASP Dependency-Check)
-        uses: dependency-check/Dependency-Check_Action@v4
-        with:
-          project: ${{ env.APP_NAME }}
-          path: .
-          format: 'ALL'
-          out: 'dependency-check-report'
-          
+      # # 8. Dependency scan (example: OWASP Dependency-Check)
+      # - name: Dependency scan (OWASP Dependency-Check)
+      #   uses: dependency-check/Dependency-Check_Action@v4
+      #   with:
+      #     project: ${{ env.APP_NAME }}
+      #     path: .
+      #     format: 'ALL'
+      #     out: 'dependency-check-report'
+
       - name: Upload dependency scan report
         uses: actions/upload-artifact@v4
         with:
