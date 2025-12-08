@@ -159,36 +159,37 @@ jobs:
           echo "Generated ~/.m2/settings.xml:"
           cat ~/.m2/settings.xml
 
-    #   # 5. Maven build (dependencies pulled via Artifactory)
-    #   - name: Build with Maven
-    #     run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
+      # 5. Maven build (dependencies pulled via Artifactory)
+      - name: Build with Maven
+        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
 
 
       # 7. SonarQube scan (assumes sonar-project.properties or config via CLI args)
-      # - name: SonarQube scan
-      #   env:
-      #     SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-      #   run: |
-      #     mvn -B -s ~/.m2/settings.xml \
-      #       sonar:sonar \
-      #       -Dsonar.host.url=${SONAR_HOST_URL} \
-      #       -Dsonar.login=${SONAR_TOKEN} \
-      #       -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-      #       -Dsonar.projectName=${SONAR_PROJECT_NAME}
+      - name: SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        run: |
+          mvn -B -s ~/.m2/settings.xml \
+            sonar:sonar \
+            -Dsonar.host.url=${SONAR_HOST_URL} \
+            -Dsonar.login=${SONAR_TOKEN} \
+            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+            -Dsonar.projectName=${SONAR_PROJECT_NAME}
 
-    #   # 8. Dependency scan (example: OWASP Dependency-Check)
-    #   - name: Dependency scan (OWASP Dependency-Check)
-    #     uses: dependency-check/Dependency-Check_Action@v4
-    #     with:
-    #       project: ${{ env.APP_NAME }}
-    #       path: .
-    #       format: 'ALL'
-    #       out: 'dependency-check-report'
-    #   - name: Upload dependency scan report
-    #     uses: actions/upload-artifact@v4
-    #     with:
-    #       name: dependency-check-report
-    #       path: dependency-check-report
+      # 8. Dependency scan (example: OWASP Dependency-Check)
+      - name: Dependency scan (OWASP Dependency-Check)
+        uses: dependency-check/Dependency-Check_Action@v4
+        with:
+          project: ${{ env.APP_NAME }}
+          path: .
+          format: 'ALL'
+          out: 'dependency-check-report'
+          
+      - name: Upload dependency scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report
 
       # 9. Build container image
       - name: Set up Docker Buildx
