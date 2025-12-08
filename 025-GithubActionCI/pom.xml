@@ -54,13 +54,13 @@
         <repository>
             <id>artifactory-releases</id>
             <name>Artifactory Releases</name>
-            <url>http://artifactory-oss-artifactory-nginx.artifactory-oss/artifactory/libs-release-local</url>
+            <url>http://artifactory-oss-artifactory-nginx.artifactory-oss/artifactory/example-repo-local</url>
         </repository>
 
         <snapshotRepository>
             <id>artifactory-snapshots</id>
             <name>Artifactory Snapshots</name>
-            <url>http://artifactory-oss-artifactory-nginx.artifactory-oss/artifactory/libs-snapshot-local</url>
+            <url>http://artifactory-oss-artifactory-nginx.artifactory-oss/artifactory/example-repo-local</url>
         </snapshotRepository>
     </distributionManagement>
 
