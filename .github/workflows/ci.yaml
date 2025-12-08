@@ -169,7 +169,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         run: |
-          mvn -B -s ~/.m2/settings.xml \
+          cd 025-GithubActionCI && mvn -B -s ~/.m2/settings.xml \
             sonar:sonar \
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.login=${SONAR_TOKEN} \
