@@ -81,6 +81,16 @@ jobs:
           java-version: '17'
           cache: maven
 
+      # 初始化 CodeQL
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
+
+      # 运行 CodeQL 分析
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        
 
       # 4. Generate Maven settings.xml to use Artifactory
       - name: Generate Maven settings.xml (force Artifactory))
