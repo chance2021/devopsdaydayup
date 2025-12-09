@@ -173,7 +173,8 @@ jobs:
             -Dsonar.host.url=${SONAR_HOST_URL} \
             -Dsonar.login=${SONAR_TOKEN} \
             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-            -Dsonar.projectName=${SONAR_PROJECT_NAME}
+            -Dsonar.projectName=${SONAR_PROJECT_NAME} \
+            -Dsonar.branch.name="${GITHUB_HEAD_REF}"
 
       # # 8. Dependency scan (example: OWASP Dependency-Check) 
       # - name: Dependency scan (OWASP Dependency-Check)
