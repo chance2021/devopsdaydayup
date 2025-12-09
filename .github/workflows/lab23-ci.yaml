@@ -1,0 +1,220 @@
+name: ci-java-with-vault-nexus-sonar-security
+
+on:
+  push:
+    branches: [ 023-GitHubActionCI ]
+
+permissions:
+  contents: read
+  id-token: write   # often needed for auth to cloud / secrets backends
+  security-events: write
+
+env:
+  APP_NAME: my-java-app
+  DOCKER_IMAGE_NAME: my-java-app
+  MAVEN_SETTINGS_PATH: .maven/settings.xml  # you’ll create this
+  # Use Nexus as Maven repo & Docker registry
+  NEXUS_MAVEN_REPO_URL: https://nexus.example.com/repository/maven-releases/
+  NEXUS_DOCKER_REGISTRY: nexus.example.com
+  SONAR_PROJECT_KEY: my-org_my-java-app
+  SONAR_PROJECT_NAME: my-java-app
+
+jobs:
+  build-and-scan:
+    runs-on: arc-runner-set
+
+    steps:
+      # 1. Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug GitHub OIDC token audience
+        run: |
+            echo "Requesting GitHub OIDC token..."
+            TOKEN_RESPONSE=$(curl -sSL \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}?audience=https://token.actions.githubusercontent.com")
+
+            TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r .value)
+
+            echo "===== RAW JWT ====="
+            echo "$TOKEN"
+
+            echo ""
+            echo "===== DECODED PAYLOAD ====="
+            echo "$TOKEN" | cut -d '.' -f2 | base64 --decode 2>/dev/null | jq .
+
+
+      # 2. Pull secrets from Vault
+      # Assumes HashiCorp Vault is accessible and GitHub runner has auth (GitHub OIDC / token / etc.)
+      - name: Import secrets from Vault
+        id: vault
+        uses: hashicorp/vault-action@v3
+        with:
+          url: http://vault.vault:8200
+          method: jwt
+          role: "myproject-ci"
+          # Example: Nexus & Sonar credentials stored in Vault
+          secrets: |
+            kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
+            kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
+            kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
+            kv/data/ci/github username | GITHUB_USERNAME ;
+            kv/data/ci/github password | GITHUB_PASSWORD ;
+            kv/data/ci/github docker_registry | GITHUB_DOCKER_REGISTRY ;
+            kv/data/ci/sonarqube token   | SONAR_TOKEN;
+            kv/data/ci/sonarqube host_url | SONAR_HOST_URL;
+            kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
+            kv/data/ci/sonarqube project_name | SONAR_PROJECT_NAME;
+
+      - name: Debug Vault secrets
+        run: |
+            echo $ARTIFACTORY_USERNAME
+            echo $ARTIFACTORY_PASSWORD
+            echo $SONAR_TOKEN
+
+      # 3. Setup Java (Maven)
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      # 4. Generate Maven settings.xml to use Artifactory
+      - name: Generate Maven settings.xml (force Artifactory))
+        run: |
+          sudo apt-get update && sudo apt-get install -y maven
+          mkdir -p ~/.m2
+
+          cat > ~/.m2/settings.xml <<EOF
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>artifactory</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              <server>
+                <id>artifactory-releases</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              <server>
+                <id>artifactory-snapshots</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              <server>
+                <id>artifactory-mirror</id>
+                <username>${ARTIFACTORY_USERNAME}</username>
+                <password>${ARTIFACTORY_PASSWORD}</password>
+              </server>
+              </servers>
+
+            <mirrors>
+              <mirror>
+                <id>artifactory-mirror</id>
+                <name>artifactory mirror</name>
+                <mirrorOf>*,!sonar-plugins</mirrorOf>
+                <url>${ARTIFACTORY_URL_PUBLIC}</url>
+              </mirror>
+            </mirrors>
+
+            <profiles>
+              <profile>
+                <id>artifactory</id>
+                <repositories>
+                  <repository>
+                    <id>central</id>
+                    <name>Central via Artifactory</name>
+                    <url>${ARTIFACTORY_URL_PUBLIC}</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </repository>
+                </repositories>
+                <pluginRepositories>
+                  <pluginRepository>
+                    <id>central</id>
+                    <name>Central Plugins via Artifactory</name>
+                    <url>${ARTIFACTORY_URL_PUBLIC}</url>
+                    <releases><enabled>true</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </pluginRepository>
+                </pluginRepositories>
+              </profile>
+            </profiles>
+
+            <activeProfiles>
+              <activeProfile>artifactory</activeProfile>
+            </activeProfiles>
+          </settings>
+          EOF
+
+          echo "Generated ~/.m2/settings.xml:"
+          cat ~/.m2/settings.xml
+
+      # 5. Maven build (dependencies pulled via Artifactory)
+      - name: Build with Maven
+        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
+
+      # 6. SonarQube scan (assumes sonar-project.properties or config via CLI args)
+      - name: SonarQube scan
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+        run: |
+          cd 025-GithubActionCI && mvn -B -s ~/.m2/settings.xml \
+            sonar:sonar \
+            -Dsonar.host.url=${SONAR_HOST_URL} \
+            -Dsonar.login=${SONAR_TOKEN} \
+            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+            -Dsonar.projectName=${SONAR_PROJECT_NAME} \
+            -Dsonar.branch.name="${GITHUB_HEAD_REF}"
+
+      # 8. Build container image
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}
+          username: ${{ steps.vault.outputs.GITHUB_USERNAME }}
+          password: ${{ steps.vault.outputs.GITHUB_PASSWORD }}
+  
+      - name: Build Docker image
+        id: build-image
+        run: |
+          DOCKER_IMAGE_NAME="java-with-vault-nexus-sonar-security"
+          IMAGE_TAG=${GITHUB_SHA::7}
+          echo "DOCKER_ADDRESS=${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          cd 025-GithubActionCI
+          docker build \
+            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
+            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
+
+      - name: Show Docker images
+        run: docker images
+
+      # 9. Image scan (example: Trivy)
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
+        with:
+          image-ref: ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
+          format: 'table'
+          exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # 10. Push Docker image to GitHub Container Registry
+      - name: Push Docker image to Nexus
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          docker push ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
+          docker push ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}/${{ steps.build-image.outputs.DOCKER_IMAGE_NAME }}:latest
