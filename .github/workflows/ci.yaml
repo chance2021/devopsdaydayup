@@ -67,7 +67,6 @@ jobs:
             kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
             kv/data/ci/sonarqube project_name | SONAR_PROJECT_NAME;
 
-
       - name: Debug Vault secrets
         run: |
             echo $ARTIFACTORY_USERNAME
