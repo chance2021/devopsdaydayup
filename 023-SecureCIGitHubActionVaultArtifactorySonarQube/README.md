@@ -30,7 +30,7 @@ All steps are designed to follow **GitHub open source documentation best practic
 7. [Part 5 – Configure Vault for GitHub OIDC & CI Secrets](#part-5--configure-vault-for-github-oidc--ci-secrets)  
 8. [Part 6 – Install Artifactory OSS](#part-6--install-artifactory-oss)  
 9. [Part 7 – Install SonarQube](#part-7--install-sonarqube)  
-10. [Part 8 – (Optional) Issue TLS Certs from Vault & Trust in DinD](#part-8--optional-issue-tls-certs-from-vault--trust-in-dind)  
+10. [Part 8 – Setup CI Workflow](#part-8--setup-ci-workflow)  
 11. [References](#references)  
 
 ---
