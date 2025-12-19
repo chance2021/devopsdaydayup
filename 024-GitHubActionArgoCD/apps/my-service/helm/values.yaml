@@ -1,0 +1,25 @@
+replicaCount: 2
+image:
+  repository: ghcr.io/chance2021/lab24-argo-cicd
+  pullPolicy: IfNotPresent
+  tag: "a76878336743"
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+service:
+  type: ClusterIP
+  port: 80
+rollout:
+  revisionHistoryLimit: 3
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause:
+            duration: 30s
+        - setWeight: 50
+        - pause: {}
+      trafficRouting: {}

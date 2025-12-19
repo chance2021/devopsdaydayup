@@ -1,0 +1,197 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: git-build-push
+  namespace: cicd
+spec:
+  serviceAccountName: workflow-runner
+  arguments:
+    parameters:
+      - name: gitrepo
+      - name: gitrevision
+      - name: gitbefore
+      - name: imagename
+      - name: imagetag
+      - name: watchpath
+        value: apps/my-service/app
+  entrypoint: main
+  templates:
+    - name: main
+      steps:
+        - - name: detectchanges
+            template: detectchanges
+            arguments:
+              parameters:
+                - name: gitrepo
+                  value: "{{workflow.parameters.gitrepo}}"
+                - name: gitrevision
+                  value: "{{workflow.parameters.gitrevision}}"
+                - name: gitbefore
+                  value: "{{workflow.parameters.gitbefore}}"
+                - name: imagename
+                  value: "{{workflow.parameters.imagename}}"
+                - name: imagetag
+                  value: "{{workflow.parameters.imagetag}}"
+                - name: watchpath
+                  value: "{{workflow.parameters.watchpath}}"
+        - - name: build-image
+            template: build-image
+            arguments:
+              parameters:
+                - name: gitrepo
+                  value: "{{workflow.parameters.gitrepo}}"
+                - name: gitrevision
+                  value: "{{workflow.parameters.gitrevision}}"
+                - name: imagename
+                  value: "{{workflow.parameters.imagename}}"
+                - name: imagetag
+                  value: "{{workflow.parameters.imagetag}}"
+            when: "{{steps.detectchanges.outputs.parameters.should_build}} == true"
+        - - name: update-values
+            template: update-values
+            arguments:
+              parameters:
+                - name: gitrepo
+                  value: "{{workflow.parameters.gitrepo}}"
+                - name: gitrevision
+                  value: "{{workflow.parameters.gitrevision}}"
+                - name: gitbefore
+                  value: "{{workflow.parameters.gitbefore}}"
+                - name: imagename
+                  value: "{{workflow.parameters.imagename}}"
+                - name: imagetag
+                  value: "{{workflow.parameters.imagetag}}"
+            when: "{{steps.detectchanges.outputs.parameters.should_build}} == true"
+
+    - name: detectchanges
+      inputs:
+        parameters:
+          - name: gitrepo
+          - name: gitrevision
+          - name: gitbefore
+          - name: imagename
+          - name: imagetag
+          - name: watchpath
+      script:
+        image: alpine/git:latest
+        command: [sh]
+        source: |
+          set -x
+          #set -euo pipefail
+          echo "Detecting changes in {{inputs.parameters.watchpath}}"
+          echo "Between {{inputs.parameters.gitbefore}} and {{inputs.parameters.gitrevision}}"
+          echo "Cloning repo {{inputs.parameters.gitrepo}}"
+          RESULT_FILE="/tmp/should-build"
+          echo "Result file: ${RESULT_FILE}"
+          git clone "{{inputs.parameters.gitrepo}}" repo >&2
+          cd repo
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          TARGET_INPUT="{{inputs.parameters.gitrevision}}"
+          BEFORE_INPUT="{{inputs.parameters.gitbefore}}"
+          TARGET="$(printf %s "$TARGET_INPUT" | tr -d '\r')"
+          BEFORE="$(printf %s "$BEFORE_INPUT" | tr -d '\r')"
+          echo "Target input: $TARGET_INPUT" >&2
+          echo "Before input: $BEFORE_INPUT" >&2
+          echo "Target commit: $TARGET" >&2
+          echo "Before commit: $BEFORE" >&2
+          if [ -z "$TARGET" ] || [ "$TARGET" = "$ZERO_SHA" ]; then
+            TARGET="$(git rev-parse HEAD)"
+            echo "No target commit specified, using local HEAD: $TARGET" >&2
+          else
+            git fetch origin "$TARGET" >&2 || true
+          fi
+          git checkout "$TARGET" >&2 || true
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "$ZERO_SHA" ]; then
+            if git rev-parse "${TARGET}^" >/dev/null 2>&1; then
+              BEFORE="$(git rev-parse "${TARGET}^")"
+              echo "Using parent commit ${BEFORE}" >&2
+            else
+              echo "No prior commit, forcing build" >&2
+              printf true > "$RESULT_FILE"
+              exit 0
+            fi
+          fi
+          echo git diff --name-only "$BEFORE" "$TARGET" -- "{{inputs.parameters.watchpath}}" >&2
+          if git diff --name-only "$BEFORE" "$TARGET" -- "{{inputs.parameters.watchpath}}" | grep -q .; then
+            echo "Changes detected in {{inputs.parameters.watchpath}}" >&2
+            printf true > "$RESULT_FILE"
+          else
+            echo "No changes detected in {{inputs.parameters.watchpath}}" >&2
+            printf false > "$RESULT_FILE"
+          fi
+      outputs:
+        parameters:
+          - name: should_build
+            valueFrom:
+              path: /tmp/should-build
+
+    - name: build-image
+      inputs:
+        parameters:
+          - name: gitrepo
+          - name: gitrevision
+          - name: imagename
+          - name: imagetag
+        artifacts:
+          - name: source
+            path: /workspace/src
+            git:
+              repo: "{{inputs.parameters.gitrepo}}"
+              revision: "{{inputs.parameters.gitrevision}}"
+      container:
+        image: gcr.io/kaniko-project/executor:v1.16.0
+        command: ["/kaniko/executor"]
+        args:
+          - "--context=dir:///workspace/src/apps/my-service"
+          - "--destination={{inputs.parameters.imagename}}:{{inputs.parameters.imagetag}}"
+          - "--dockerfile=Dockerfile"
+          - "--snapshotMode=redo"
+          - "--cleanup"
+        volumeMounts:
+          - name: docker-config
+            mountPath: /kaniko/.docker
+      volumes:
+        - name: docker-config
+          secret:
+            secretName: ghcr-creds
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+
+    - name: update-values
+      inputs:
+        parameters:
+          - name: gitrepo
+          - name: gitrevision
+          - name: gitbefore
+          - name: imagename
+          - name: imagetag
+      script:
+        image: alpine:3.19
+        command: [sh]
+        env:
+          - name: GITHUB_USER
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: username
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: token
+        source: |
+          set -euo pipefail
+          apk add --no-cache git yq >/dev/null
+          git clone "{{inputs.parameters.gitrepo}}" repo
+          cd repo
+          git checkout "{{inputs.parameters.gitrevision}}"
+          yq -i ".image.repository = \"{{inputs.parameters.imagename}}\"" apps/my-service/helm/values.yaml
+          yq -i ".image.tag = \"{{inputs.parameters.imagetag}}\"" apps/my-service/helm/values.yaml
+          git config user.name "${GITHUB_USER}"
+          git config user.email "workflow@example.com"
+          git commit -am "[workflow] update rollout image to {{inputs.parameters.imagetag}}"
+          REMOTE_URL="{{inputs.parameters.gitrepo}}"
+          REMOTE_HOST_PATH="${REMOTE_URL#https://}"
+          git remote set-url origin "https://${GITHUB_USER}:${GITHUB_TOKEN}@${REMOTE_HOST_PATH}"
+          git push origin HEAD:main

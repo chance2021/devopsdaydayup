@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argo-workflows-controller
+  namespace: cicd
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, pods/exec, configmaps, secrets, persistentvolumeclaims]
+    verbs: [create, get, list, watch, update, patch, delete]
+  - apiGroups: ["argoproj.io"]
+    resources: [workflows, workflowtemplates, clusterworkflowtemplates]
+    verbs: [create, get, list, watch, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argo-workflows-controller
+  namespace: cicd
+subjects:
+  - kind: ServiceAccount
+    name: argo-workflow-controller
+    namespace: argo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argo-workflows-controller

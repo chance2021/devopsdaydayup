@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: github-webhook
+  namespace: argo-events
+spec:
+  service:
+    ports:
+      - name: webhook
+        port: 12000
+        targetPort: 12000
+  template:
+    serviceAccountName: argo-events-sa
+  webhook:
+    repo-push:
+      port: "12000"
+      method: POST
+      endpoint: /payload
+      # authSecret:
+      #   name: github-webhook-secret
+      #   key: token
