@@ -1,50 +1,61 @@
-# DevOpsDaydayup DevOps Practices
-This repository contains a collection of **hands-on labs** and **exercises** that are designed to help **DevOps** and **developers** professionals gain familiarity with common **DevOps tasks** and **practices**. The labs cover a range of topics, including 
-- **container** (Docker/Docker Compose/K8s)
-- **IaC** (Terraform)
-- **Cloud** (Azure)
-- **configuration management** (Ansible)
-- **continuous integration** (Jenkins/Gitlab/Github)
-- **monitoring/log** (ELK/EFK/Grafana/Prometheus)
-- and more... </br>
+# DevOpsDaydayup Labs
 
-We **encourage everyone to contribute to this repository**. Whether you are a seasoned DevOps professional or a developer looking to learn more about the field, we welcome your contributions and ideas. Your contributions will help make this a valuable resource for the entire community.
+Hands-on labs that teach DevOps practices across CI/CD, IaC, Kubernetes, observability, and cloud platforms. Every lab is runnable end-to-end with clearly marked prerequisites, placeholders for secrets, validation steps, cleanup, and troubleshooting tips.
 
-## Labs
-- **Lab 1**: [Deploy ELK to Monitoring a VM](https://github.com/chance2021/devopsdaydayup/tree/main/001-ELKMonitoring)
-- **Lab 2**: [Deploy Jenkins CICD Pipeline](https://github.com/chance2021/devopsdaydayup/tree/main/002-JenkinsCICD)
-- **Lab 3**: [Deploy Gitlab CICD Pipeline](https://github.com/chance2021/devopsdaydayup/tree/main/003-GitlabCICD)
-- **Lab 4**: [Deploy a Docker Container via Terraform Script](https://github.com/chance2021/devopsdaydayup/tree/main/004-TerraformDockerDeployment)
-- **Lab 5**: [Deploy Jenkins CICD to Retrieve Secret from Vault](https://github.com/chance2021/devopsdaydayup/tree/main/005-VaultJenkinsCICD)
-- **Lab 6**: [Deploy Jenkins CICD to Deploy Java from Nexus Repository](https://github.com/chance2021/devopsdaydayup/tree/main/006-NexusJenkinsVagrantCICD)
-- **Lab 7**: [Configure Vault to be authenticated from FreeIPA](https://github.com/chance2021/devopsdaydayup/tree/main/007-VaultFreeIPAVagrantIAM)
-- **Lab 8**: [Deploy Jenkins via Ansible (Ansible Role)](https://github.com/chance2021/devopsdaydayup/tree/main/008-AnsibleVagrantJenkinsDeployment)
-- **Lab 9**: [Deploy Helm Chart in Minikube](https://github.com/chance2021/devopsdaydayup/tree/main/009-MinikubeHelmDeployment)
-- **Lab 10**: [Deploy Prometheus/Grafana on Minikube and Monitor The Health of Containers and VMs](https://github.com/chance2021/devopsdaydayup/tree/main/010-MinikubeGrafanaPrometheusMultipassMonitoring)
-- **Lab 11**: [Create Read Only Kubeconfig File](https://github.com/chance2021/devopsdaydayup/tree/main/011-KinDKubeconfigRBACConfiguration)
-- **Lab 12**: [Deploy A Cronjob to Backup Vault Data](https://github.com/chance2021/devopsdaydayup/tree/main/012-CronjobVaultBackupHelmMinikube)
-- **Lab 13**: [Deploy A Java Application In K8s, Monitoring ConfigMap File Change](https://github.com/chance2021/devopsdaydayup/tree/main/013-JavaMonitoryConfigmapMinikube)
-- **Lab 14**: [Deploy Vault as SideCar](https://github.com/chance2021/devopsdaydayup/tree/main/014-VaultInjectorMinikube)
-- **Lab 15**: [Remove Large Files from Git Commit History](https://github.com/chance2021/devopsdaydayup/tree/main/015-GitRemoveLargeFile)
-- **Lab 16**: [Deploy Function via Terraform](https://github.com/chance2021/devopsdaydayup/tree/main/016-AzureFunctionTerraform)
-- **Lab 17**: [Azure Key Vault Solution](https://github.com/chance2021/devopsdaydayup/tree/main/017-AzureLogicalAppTerraform)
-- **Lab 20**: [Continuous Integration (CI) Pipeline for Dockerized Java Application](https://github.com/chance2021/devopsdaydayup/tree/main/020-GithubActionJavaDockerfileCI/README.md)
-- **Lab 21**: [Deploy Docker Image to Azure Function Using GitHub Actions](https://github.com/chance2021/devopsdaydayup/tree/main/021-GithubActionDockerImageFunctionCD/)
-- **Lab 22**: [Deploy a GitHub Actions Runner Scale Set (ARC) on Kubernetes Using Minikube](https://github.com/chance2021/devopsdaydayup/tree/main/022-ActionRunnerSaleSetMinitkube)
+- Topics: Docker, Kubernetes, Helm, Terraform, Vault, Jenkins, GitLab, GitHub Actions, Azure, monitoring/observability, and more.
+- Contributions welcome—see [CONTRIBUTING.md](CONTRIBUTING.md) and follow the lab template for consistency.
+- Security first—no real secrets. Use placeholders like `YOUR_GITHUB_TOKEN` and see [SECURITY.md](SECURITY.md).
 
+## Getting Started
 
-- **AKS Related Lab**: [AKS Upgrade](https://github.com/chance2021/devopsdaydayup/tree/main/aks/aks-upgrade)
-- **AKS Related Lab**: [AKS Backup Solution - Velero](https://github.com/chance2021/devopsdaydayup/tree/main/aks/backup-solution-velero)
+1. Clone the repo: `git clone https://github.com/chance2021/devopsdaydayup.git`
+2. Pick a lab folder (e.g., `024-GitHubActionArgoCD`) and read its `README.md`.
+3. Export secrets as environment variables or store them in a secret manager. Never commit real credentials.
+4. Run the lab steps in order, verify using the provided validation checks, then perform cleanup.
 
-- **Keycloak Related Lab**: [Integrate FreeIPA into Keycloak](https://github.com/chance2021/devopsdaydayup/tree/main/keycloak-integration)
-- **Keyclaok Related Lab**: [Upgrade Keycloak v16 to v20](https://github.com/chance2021/devopsdaydayup/tree/main/keycloak-integration)
-## Reference
-- [Kubernetes API Extension](https://kubebuilder.io)
-- [Compose File Version 2](https://docs.docker.com/compose/compose-file/compose-file-v2/#cap_add-cap_drop) </br>
-- [Composerize](https://www.composerize.com/) </br>
-- [DevOps Resource from bregman-arie](https://github.com/bregman-arie/devops-resources)</br>
-- [DevOps Exercises from bregman-arie](https://github.com/bregman-arie/devops-exercises)</br>
-- [Grafana Awesome Alert](https://awesome-prometheus-alerts.grep.to/)</br>
+## Lab Catalog
 
-## Useful Resources
-[Cron AI](https://cron-ai.vercel.app)
+| # | Lab | Path |
+| --- | --- | --- |
+| 1 | Deploy ELK to monitor a VM | 001-ELKMonitoring |
+| 2 | Jenkins CI/CD pipeline | 002-JenkinsCICD |
+| 3 | GitLab CI/CD pipeline | 003-GitlabCICD |
+| 4 | Deploy a Docker container with Terraform | 004-TerraformDockerDeployment |
+| 5 | Jenkins CI/CD pulling secrets from Vault | 005-VaultJenkinsCICD |
+| 6 | Jenkins CI/CD deploying Java from Nexus | 006-NexusJenkinsVagrantCICD |
+| 7 | Vault authentication with FreeIPA | 007-VaultFreeIPAVagrantIAM |
+| 8 | Jenkins via Ansible role | 008-AnsibleVagrantJenkinsDeployment |
+| 9 | Helm chart deployment on Minikube | 009-MinikubeHelmDeployment |
+| 10 | Prometheus/Grafana on Minikube | 010-MinikubeGrafanaPrometheusMultipassMonitoring |
+| 11 | Read-only kubeconfig creation | 011-KinDKubeconfigRBACConfiguration |
+| 12 | CronJob backup for Vault | 012-CronjobVaultBackupHelmMinikube |
+| 13 | Java app on Kubernetes with ConfigMap reload | 013-JavaMonitoryConfigmapMinikube |
+| 14 | Vault sidecar injector | 014-VaultInjectorMinikube |
+| 15 | Remove large files from Git history | 015-GitRemoveLargeFile |
+| 16 | Azure Function deployment with Terraform | 016-AzureFunctionTerraform |
+| 17 | Azure Key Vault integration | 017-AzureLogicalAppTerraform |
+| 18 | Azure DevOps Java web app CI/CD | 018-AzureDevOpsJavaWebAppCICD |
+| 19 | Terraform + Azure DevOps workflow | 019-TerraformAzureDevOpsWorkflow |
+| 20 | Dockerized Java app CI on GitHub Actions | 020-GithubActionJavaDockerfileCI |
+| 21 | Deploy Docker image to Azure Function via GitHub Actions | 021-GithubActionDockerImageFunctionCD |
+| 22 | Actions Runner Scale Set (ARC) on Minikube | 022-ActionRunnerSaleSetMinitkube |
+| 23 | Secure CI with GitHub Actions, Vault, Artifactory, SonarQube | 023-SecureCIGitHubActionVaultArtifactorySonarQube |
+| 24 | Argo Events → Workflows → Argo CD → Rollouts | 024-GitHubActionArgoCD |
+
+Additional topics:
+- AKS: `aks/aks-upgrade`, `aks/backup-solution-velero`
+- Keycloak: `keycloak-integration`
+- Helm on Oracle Cloud: `HelmOracleCloudK8s`
+- Terraform on Oracle Cloud: `TerraformOracleCloudVM`
+- Learning notes and scripts: `python/`, `linux/`, `cloud/`, `docs/`
+
+## Lab Template
+
+Use `README.md.template` as a starting point and include: Title, Overview, Prerequisites, Architecture/Diagram (when helpful), Setup, Steps, Validation, Cleanup, Troubleshooting, References. Keep instructions copy-pasteable and note tested versions.
+
+## Contributing & Support
+
+- Contributions are welcome—see [CONTRIBUTING.md](CONTRIBUTING.md).
+- Code of Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- Security reports: [SECURITY.md](SECURITY.md)
+- License: [LICENSE](LICENSE)

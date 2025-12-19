@@ -8,6 +8,16 @@ This project demonstrates a **Continuous Integration (CI)** pipeline using **Git
 4. **Scan the Docker image** for security vulnerability.
 5. **Push the Docker image** to **GitHub Container Registry (GHCR)**.
 
+## Quickstart (Lab 20)
+
+- Prerequisites: GitHub repo with this folder, PAT with `write:packages`/`read:packages`, Docker installed locally (optional).
+- Steps:
+  1. Copy `.github/workflows/docker-build-scan.yml` (from this folder) into your repo.
+  2. Add `YOUR_GITHUB_TOKEN` as a repository secret.
+  3. Push a change under `020-GithubActionJavaDockerfileCI/` to trigger the workflow.
+- Validation: Workflow succeeds; image is available at `ghcr.io/<OWNER>/<REPO>:<commit-hash>`; optional `docker pull`/`docker run` works.
+- Cleanup: Remove the workflow or delete the GHCR image if you no longer need it.
+
 ---
 
 **Table of Contents**
