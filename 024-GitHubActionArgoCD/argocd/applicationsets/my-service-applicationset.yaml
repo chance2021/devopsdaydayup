@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: my-service
+  namespace: argocd    # where your Argo CD is installed
+spec:
+  generators:
+    - list:
+        elements:
+          - env: dev
+            namespace: my-service-dev
+            server: https://kubernetes.default.svc
+          - env: staging
+            namespace: my-service-staging
+            server: https://kubernetes.default.svc
+          - env: prod
+            namespace: my-service-prod
+            server: https://kubernetes.default.svc
+  template:
+    metadata:
+      name: my-service-{{env}}
+      labels:
+        app.kubernetes.io/name: my-service
+        app.kubernetes.io/part-of: my-service
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/component: backend
+        env: "{{env}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/chance2021/lab24-argo-cicd.git
+        targetRevision: main
+        path: apps/my-service/helm
+        helm:
+          releaseName: my-service-{{env}}
+          valueFiles:
+            # These are relative to the chart path above
+            - values.yaml
+            - values-{{env}}.yaml
+          parameters:
+            # Optional helm --set equivalents
+            - name: env
+              value: "{{env}}"
+      destination:
+        server: "{{server}}"
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+          - PruneLast=true

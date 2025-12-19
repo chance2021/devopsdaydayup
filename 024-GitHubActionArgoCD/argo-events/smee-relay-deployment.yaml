@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smee-relay
+  namespace: argo-events
+  labels:
+    app: smee-relay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smee-relay
+  template:
+    metadata:
+      labels:
+        app: smee-relay
+    spec:
+      serviceAccountName: argo-events-sa
+      containers:
+        - name: smee-relay
+          image: ghcr.io/chance2021/smee-relay:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SMEE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: smee-relay-url
+                  key: url
+            - name: SMEE_TARGET
+              value: http://github-webhook-eventsource-svc.argo-events.svc.cluster.local:12000/payload

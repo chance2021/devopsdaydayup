@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: appsets-root
+  namespace: argocd        # Argo CD namespace
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/chance2021/lab24-argo-cicd.git   # ⬅️ change this
+    targetRevision: main                                        # ⬅️ branch/tag
+    path: argocd/applicationsets                                # ⬅️ folder with ApplicationSets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
