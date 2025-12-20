@@ -1,110 +1,68 @@
-# Project Name: Deploy Function via Terraform
+# Lab 16 — Azure Function Infrastructure with Terraform
 
-## Project Goal
+Provision the Azure resources for a Function App (resource group, storage accounts, App Service plan, Function App) using Terraform, then optionally deploy the sample Python/Node function code under `app/`.
 
-## Table of Contents
-- [Project Name: Deploy Function via Terraform](#project-name-deploy-function-via-terraform)
-  - [Project Goal](#project-goal)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Project Steps](#project-steps)
-    - [1. **Initiate** the test environment](#1-initiate-the-test-environment)
-    - [2. **Remove** the Large File](#2-remove-the-large-file)
-    - [3. Clean the Database](#3-clean-the-database)
-    - [4. **Find** Out the Location of The Large File in packfiles](#4-find-out-the-location-of-the-large-file-in-packfiles)
-    - [5. **Remove** the File from History](#5-remove-the-file-from-history)
-  - [Post Project](#post-project)
-  - [Troubleshooting](#troubleshooting)
-  - [Reference](#reference)
+> Replace every subscription ID, tenant ID, storage account name, and access key with your own values. Do not commit real secrets.
 
-## <a name="prerequisites">Prerequisites</a>
-- An Azure subscription
-- Azure CLI
-- Azure DevOps account
-- Terraform
-- Github Repository
+## Prerequisites
 
+- Azure subscription with owner/contributor rights
+- Azure CLI (`az`) logged in: `az login` and `az account set --subscription <SUBSCRIPTION_ID>`
+- Terraform 1.x
+- (Optional) Azure Functions Core Tools if you want to publish the sample function code
 
-## <a name="project_steps">Project Steps</a>
+## Steps
 
-### 1. **Initiate** the test environment
-Run below command to initiate a git repo
-```
-mkdir git-test
-cd git-test
-git init
-echo "Init setup" > file1
-git add file1
-git commit -m "Version 1"
-du -sh ./
-
-curl -L https://www.kernel.org/pub/software/scm/git/git-2.1.0.tar.gz > git.tgz
-du -sh ./
-
-git add git.tgz
-git commit -m 'Add git tarball'
-du -sh ./
+1) Clone and move into the lab
+```bash
+git clone https://github.com/chance2021/devopsdaydayup.git
+cd devopsdaydayup/016-AzureFunctionTerraform/function-apps/dev-working
 ```
 
-### 2. **Remove** the Large File
-```
-git rm git.tgz
-git commit -m "Remove large tarball"
-du -sh ./
+2) Update variables and locals
+- Edit `main.auto.tfvars` with your subscription/tenant, resource group name, location, and naming values.
+- In `storage_accounts.tf` and `function-apps.tf`, change the sample storage account names, Function App name, and `storage_account_access_key` to your own values. Use Azure Key Vault or environment variables instead of hardcoding keys in real environments.
+
+3) Initialize Terraform
+```bash
+terraform init
 ```
 
-### 3. Clean the Database
-```
-git gc
-du -sh
-git count-objects -v
+4) Create a plan
+```bash
+terraform plan -var-file=main.auto.tfvars
 ```
 
-### 4. **Find** Out the Location of The Large File in packfiles
-You can find the SHA for the largest file in packfile
-```
-git verify-pack -v .git/objects/pack/<index name>.idx | sort -k 3 -n | tail -3
-```
-Note: Please replace **<index name>** with actual index name under `.git/objects/pack` folder. <br/>
-
-Run below command to find out what the file name of the blob:
-```
-git rev-list --objects --all|grep 82c99a3
-```
-Note: `82c99a3` is the SHA you found in previous command. It may be different in your scenario.
-
-### 5. **Remove** the File from History
-We are going to use `git-filter-repo` command to rewrite the git history. This doesn't come with the original setup and you have to install it seperately. You can follow [this document](https://github.com/newren/git-filter-repo/blob/main/INSTALL.md) to download the tool. <br/>
-
-Since the tool has to be used in a repo which has clean clone, you may need to below step to clone it to another repo in order to use it:
-```
-cd ..
-git clone git-test git-test-new
-```
-Then run below command to remove the file from the git history
-```
-cd git-test-new
-git filter-repo --invert-paths --path git.tgz
-git gc
-```
-Then you should be able to see the size is reduced
-```
-du -sh
-git count-objects -v
-```
-Last, you can push the change to the remote repo to finish this lab
-```
-git push origin --force --all
+5) Apply the infrastructure
+```bash
+terraform apply -var-file=main.auto.tfvars
 ```
 
-## <a name="post_project">Post Project</a>
-Just remove the repo folders
-```
-rm -rf git-test git-test-new
+6) (Optional) Deploy sample function code
+- From `app/ChancePythonProject2`, install dependencies and publish to the Function App you created:
+  ```bash
+  cd ../../app/ChancePythonProject2
+  python -m venv .venv && source .venv/bin/activate
+  pip install -r requirements.txt
+  func azure functionapp publish <YOUR_FUNCTION_APP_NAME> --python
+  ```
+
+## Validation
+
+- `az functionapp show --name <YOUR_FUNCTION_APP_NAME> --resource-group <RG_NAME>` returns `state: Running`.
+- `az storage account show --name <STORAGE_ACCOUNT_NAME> --resource-group <RG_NAME>` succeeds.
+- Portal > Function App shows the app running and (if published) the sample function endpoint is reachable.
+
+## Cleanup
+
+Destroy the lab resources to avoid charges:
+```bash
+cd devopsdaydayup/016-AzureFunctionTerraform/function-apps/dev-working
+terraform destroy -var-file=main.auto.tfvars
 ```
 
-## <a name="troubleshooting">Troubleshooting</a>
+## Troubleshooting
 
-## <a name="reference">Reference</a>
-- [Git Pro - Git 内部原理之维护与数据恢复](https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E7%BB%B4%E6%8A%A4%E4%B8%8E%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D)
-- [Removing sensitive data from a repository](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
+- **Name already taken**: Storage account and Function App names must be globally unique; adjust locals before applying.
+- **Auth errors**: Ensure `az login` succeeded and the configured subscription ID matches the one in `main.auto.tfvars`.
+- **Function publish fails**: Confirm the Function App is on Linux (matches your runtime), and that `FUNCTIONS_EXTENSION_VERSION`/`FUNCTIONS_WORKER_RUNTIME` are set if you customize the code.

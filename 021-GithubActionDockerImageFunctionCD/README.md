@@ -2,6 +2,17 @@
 
 This guide provides a step-by-step process to set up a GitHub Actions pipeline for deploying a Docker image to an Azure Function. The pipeline uses an Azure Service Principal with a federated credential for secure, passwordless authentication via OpenID Connect (OIDC).
 
+## Quickstart (Lab 21)
+
+- Prerequisites: Azure subscription with an existing Function App (custom container), GitHub PAT for GHCR pull, Azure AD app/service principal with federated credentials, `deploy-to-azure-function.yml` in `.github/workflows/`.
+- Steps:
+  1. Create the Function App (container-based) and set `DOCKER_REGISTRY_SERVER_*` app settings to your GHCR credentials.
+  2. Create a service principal, grant it access to the Function App, and add GitHub federated credentials for the branches you want to deploy.
+  3. Add secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` and variables `RESOURCE_GROUP_NAME`, `FUNCTION_APP_NAME`, `IMAGE_NAME`, `IMAGE_TAG` in your repo.
+  4. Push a change under `021-GithubActionDockerImageFunctionCD/` or run the workflow manually.
+- Validation: Workflow logs show a successful Azure login and container update; Azure Portal shows the Function App running the new image.
+- Cleanup: Remove the Function App/resource group or disable the workflow and delete GHCR images if this was a test.
+
 **Table of Contents**
 - [Deploy Docker Image to Azure Function Using GitHub Actions](#deploy-docker-image-to-azure-function-using-github-actions)
   - [Overview](#overview)

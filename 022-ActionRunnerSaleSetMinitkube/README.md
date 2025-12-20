@@ -2,6 +2,16 @@
 
 This Learning Lab teaches you how to deploy **GitHub Actions self-hosted runners** using  
 **Actions Runner Controller (ARC)** with **Runner Scale Sets** on a local Kubernetes cluster (Minikube).
+
+## Quickstart (Lab 22)
+- Prerequisites: Minikube running (4 CPU/8GB), `kubectl`, `helm`, GitHub App with App ID/Installation ID/private key.
+- Steps:
+  1. Install ARC scale set controller with Helm in namespace `arc-systems`.
+  2. Create a secret in `arc-runners` with your GitHub App credentials.
+  3. Deploy a runner scale set pointing at your repo via `helm upgrade --install <INSTALLATION_NAME> ... --set githubConfigUrl=...`.
+  4. Add a test workflow with `runs-on: <INSTALLATION_NAME>` and dispatch it.
+- Validation: Repo Settings → Actions → Runners shows the scale set; workflow succeeds and pods appear in Minikube while it runs.
+- Cleanup: `helm uninstall` both releases and delete the namespaces; stop Minikube.
 ---
 ## 📘 Table of Contents
 

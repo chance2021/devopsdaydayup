@@ -1,68 +1,66 @@
-# Project Name: Azure Key Vault Solution
+# Lab 17 — Azure Logic App + Key Vault Alerts with Terraform
 
-## Project Goal
-In this guide, you will learn how to respond to Azure Key Vault events that are received via Azure Event Grid by using Azure Logic Apps via Terraform.
+Provision the infrastructure for a Logic App Standard that can process Key Vault secret-expiry events delivered via Event Grid and a Storage Queue. Terraform creates the resource group, storage accounts, App Service plan, and Logic App plumbing; you wire the workflow to your Key Vault and Event Grid subscription afterward.
 
-## Table of Contents
-- [Project Name: Azure Key Vault Solution](#project-name-azure-key-vault-solution)
-  - [Project Goal](#project-goal)
-  - [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Project Steps](#project-steps)
-    - [1. Login Azure](#1-login-azure)
-    - [2. Run the Terraform init](#2-run-the-terraform-init)
-    - [3. Run the Terraform plan](#3-run-the-terraform-plan)
-    - [4. Apply the changes](#4-apply-the-changes)
-    - [5. Test](#5-test)
-  - [Post Project](#post-project)
-  - [Troubleshooting](#troubleshooting)
-  - [Reference](#reference)
+> Use your own subscription IDs, tenant IDs, and unique resource names. Do not commit secrets.
 
-## <a name="prerequisites">Prerequisites</a>
-- An Azure subscription
-- Azure CLI
-- Terraform
-- Github Repository
+## Prerequisites
 
-## <a name="project_steps">Project Steps</a>
+- Azure subscription with permissions to create RG, Storage Account, App Service Plan, Logic App
+- Azure CLI authenticated: `az login` and `az account set --subscription <SUBSCRIPTION_ID>`
+- Terraform 1.x
 
-### 1. Login Azure
-Login to your Azure account
-```
-az login
-az account list
-```
+## Steps
 
-### 2. Run the Terraform init
-Run below command
-```
+1) Clone and move into the Terraform code
+```bash
 git clone https://github.com/chance2021/devopsdaydayup.git
-cd devopsdaydayup/017-AzureKeyVaultSecretExpirySolution/terraform/dev
+cd devopsdaydayup/017-AzureLogicalAppTerraform/terraform/dev
+```
+
+2) Configure variables
+- Edit `main.auto.tfvars` with your subscription ID, tenant ID, resource group name, location, and naming values.
+- Update locals for unique names as needed:
+  - `storage_accounts.tf` (two storage accounts are declared)
+  - `app-service-plan.tf` (App Service plan name/sku)
+  - `logic-app-standard.tf` (Logic App name and storage account binding)
+
+3) Initialize Terraform
+```bash
 terraform init
 ```
 
-### 3. Run the Terraform plan
-Run the plan to make sure all required resources will be created
-```
-terraform plan
-```
-
-### 4. Apply the changes
-Apply the changes to Azure
-```
-terraform apply
+4) Plan the deployment
+```bash
+terraform plan -var-file=main.auto.tfvars
 ```
 
-### 5. Test
-Go to [Azure Portal](https://portal.azure.com) and check if all resources have been created under `devopsdaydayup` resource group
-
-## <a name="post_project">Post Project</a>
-Destroy all resources
-```
-terraform destroy
+5) Apply the infrastructure
+```bash
+terraform apply -var-file=main.auto.tfvars
 ```
 
-## <a name="troubleshooting">Troubleshooting</a>
+6) Wire Logic App to Key Vault events (portal)
+- Create an Event Grid subscription on your Key Vault for secret expiration/near-expiry events that sends messages to the Storage Queue created above.
+- In the Logic App Standard, add a trigger that watches the Storage Queue and a step to send notifications (email, Teams, etc.).
 
-## <a name="reference">Reference</a>
-[Use Logic Apps to receive email about status changes of key vault secrets](https://learn.microsoft.com/en-us/azure/key-vault/general/event-grid-logicapps)
+## Validation
+
+- Portal shows the resource group with storage accounts, App Service plan, and Logic App.
+- Logic App designer can access the Storage Queue and the trigger saves without errors.
+- Create a test secret with a near-expiry date; Event Grid pushes to the queue and the Logic App processes the message.
+
+## Cleanup
+
+```bash
+terraform destroy -var-file=main.auto.tfvars
+```
+
+## Troubleshooting
+
+- **Name already taken**: Storage account and Logic App names must be globally unique.
+- **Logic App cannot see queue**: Confirm the storage account name/access key values in `logic-app-standard.tf` match the deployed storage account.
+- **Event Grid delivery fails**: Ensure the queue endpoint is reachable and the Event Grid system topic is enabled for Key Vault events.
+
+## Reference
+- Use Logic Apps to receive email about status changes of Key Vault secrets: https://learn.microsoft.com/en-us/azure/key-vault/general/event-grid-logicapps

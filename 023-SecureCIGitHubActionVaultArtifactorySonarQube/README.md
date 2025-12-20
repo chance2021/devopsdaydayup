@@ -1,70 +1,47 @@
-# Lab 23 – Secure CI with GitHub Actions, ARC, Vault, Artifactory & SonarQube
+# Lab 23 – Secure CI with GitHub Actions, ARC, Vault, Artifactory, and SonarQube
 
-This lab walks you through building a **local DevSecOps CI environment** on top of:
+Stand up a local DevSecOps toolchain on Minikube: Actions Runner Controller (ARC) hosts DinD runners for GitHub Actions, Vault issues short-lived secrets via GitHub OIDC, Artifactory OSS serves Maven artifacts, and SonarQube performs code-quality scans. The workflow builds a sample Java app, pulls secrets from Vault, publishes to Artifactory/GHCR, and runs a scan.
 
-- GitHub Actions + Actions Runner Controller (ARC) with **DinD runners**
-- HashiCorp Vault with **GitHub Actions OIDC (JWT) auth**
-- JFrog Artifactory OSS as **Maven repository**
-- SonarQube as **code quality & security scan** service
+> Use placeholders only (for example `YOUR_GITHUB_TOKEN`, `YOUR_SONAR_TOKEN`). Never commit real tokens, private keys, or unseal keys. Store secrets in environment variables or a secret manager.
 
-All steps are designed to follow **GitHub open source documentation best practices**:
+## Architecture
 
-- No real secrets or private keys are committed  
-- Sensitive values are represented as **placeholders**  
-- Commands are split into **clear, reproducible steps**
-
-> ⚠️ **Important:**  
-> Replace all `<PLACEHOLDER>` values with your own **test credentials**.  
-> Never commit real tokens, passwords, unseal keys, or private keys to a public repo.
-
----
-
-## Table of Contents
-
-1. [Prerequisites](#prerequisites)  
-2. [Part 0 – Prepare Minikube Cluster](#part-0--prepare-minikube-cluster)  
-3. [Part 1 – Install Actions Runner Controller](#part-1--install-actions-runner-controller)  
-4. [Part 2 – Create a Runner Scale Set (DinD mode)](#part-2--create-a-runner-scale-set-dind-mode)  
-5. [Part 3 – Install Vault](#part-3--install-vault)  
-6. [Part 4 – Initialize & Unseal Vault](#part-4--initialize--unseal-vault)  
-7. [Part 5 – Configure Vault for GitHub OIDC & CI Secrets](#part-5--configure-vault-for-github-oidc--ci-secrets)  
-8. [Part 6 – Install Artifactory OSS](#part-6--install-artifactory-oss)  
-9. [Part 7 – Install SonarQube](#part-7--install-sonarqube)  
-10. [Part 8 – Setup CI Workflow](#part-8--setup-ci-workflow)  
-11. [References](#references)  
-
----
+- GitHub Actions workflow uses ARC-managed self-hosted runners (`arc-runner-set`) in DinD mode.
+- Vault authenticates runners with GitHub OIDC (`auth/jwt`) and returns CI secrets from `kv/ci/*`.
+- Artifactory OSS hosts a remote Maven repository for build dependencies.
+- SonarQube Developer Edition (example) performs static analysis with a project token.
+- Docker images are pushed to GHCR (or your preferred registry).
 
 ## Prerequisites
 
-- A GitHub account and repository (example used: `chance2021/devopsdaydayup`)
-- A GitHub App installed on your org/repo (for ARC authentication)
-- Local tools:
-  - `kubectl`
-  - `helm`
-  - `minikube`
-  - `jq`
-  - `docker`
-- A machine with enough resources (e.g. >= 16 GB RAM recommended for Minikube)
+- GitHub repository and GitHub App for ARC authentication (App ID, installation ID, private key path)
+- Tools: `kubectl`, `helm`, `minikube`, `jq`, `docker`, `openssl`
+- Resources: Minikube with >= 4 CPUs and 12–16 GB RAM (Vault, Artifactory, SonarQube, runners)
+- Personal access token for GHCR with `write:packages`
+- Test credentials for Artifactory and SonarQube (created during the lab)
 
----
-## Part 0 – Prepare Minikube Cluster
-
-Install Minikube by following the instruction: https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Farm64%2Fstable%2Fbinary+download
-
-Once installed, increase Minikube memory to avoid `OOMKill` issues when running multiple components (Vault, Artifactory, SonarQube, runners).
+Suggested environment variables:
 
 ```bash
-# Increase default memory and restart Minikube
-minikube config set memory 15360
-minikube delete && minikube start
+export GITHUB_USER="YOUR_GITHUB_USER"
+export GITHUB_REPO="YOUR_GITHUB_USER/devopsdaydayup"
+export GITHUB_APP_ID="YOUR_GITHUB_APP_ID"
+export GITHUB_APP_INSTALLATION_ID="YOUR_INSTALLATION_ID"
+export GITHUB_APP_PRIVATE_KEY_PATH="PATH/TO/APP_PRIVATE_KEY.pem"
+export GHCR_REGISTRY="ghcr.io/${GITHUB_USER}"
 ```
 
-> Note: For **Part 1** and **Part 2**, you can refer to Lab 22. The only difference is that Part 2 will enable DinD mode, which is needed when building image.
+## Steps
 
-## Part 1 – Install Actions Runner Controller
+### 1) Prepare Minikube
 
-Install the ARC controller into a dedicated namespace:
+```bash
+minikube config set memory 15360
+minikube start
+```
+
+### 2) Install Actions Runner Controller
+
 ```bash
 helm upgrade --install arc \
   oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
@@ -72,366 +49,193 @@ helm upgrade --install arc \
   --create-namespace
 ```
 
-## Part 2 – Create a Runner Scale Set (DinD mode)
-
-This section configures ARC to manage a runner scale set for your GitHub repo, in DinD (Docker-in-Docker) mode.
-
-### 2.1 Define variables
-
-ℹ️ Replace the values in angle brackets (<...>) with your own.
-
-```bash
-INSTALLATION_NAME="arc-runner-set"
-GITHUB_CONFIG_URL="https://github.com/chance2021/devopsdaydayup"
-
-# From your GitHub App configuration
-GITHUB_APP_ID="<YOUR_GITHUB_APP_ID>"
-GITHUB_APP_INSTALLATION_ID="<YOUR_GITHUB_APP_INSTALLATION_ID>"
-GITHUB_APP_PRIVATE_KEY_PATH="<PATH_TO_YOUR_GITHUB_APP_PRIVATE_KEY_PEM>"
-
-NAMESPACE="arc-runners"
-SECRET_NAME="pre-defined-secret"
-```
-
-### 2.2 Create the namespace
-
-```bash
-kubectl create namespace "${NAMESPACE}"
-```
-
-### 2.3 Store GitHub App credentials as a Kubernetes Secret
-
->  ⚠️ Never commit your real app ID, installation ID, or private key file.
-They should live only in your local environment or secure secret manager.
-
-```bash
-kubectl create secret generic "${SECRET_NAME}" \
-  --namespace="${NAMESPACE}" \
-  --from-literal=github_app_id="${GITHUB_APP_ID}" \
-  --from-literal=github_app_installation_id="${GITHUB_APP_INSTALLATION_ID}" \
-  --from-file=github_app_private_key="${GITHUB_APP_PRIVATE_KEY_PATH}"
-```
-
-You can verify the secret keys:
-
-```bash
-kubectl get secret "${SECRET_NAME}" -n "${NAMESPACE}" -o jsonpath='{.data}' | jq keys
-```
-
-### 2.4 Create a values-dind-custom.yaml for the runner scale set
+### 3) Create a DinD runner scale set
 
 ```bash
 cat > values-dind-custom.yaml <<EOF
-githubConfigUrl: "${GITHUB_CONFIG_URL}"
-githubConfigSecret: "${SECRET_NAME}"
-runnerScaleSetName: "${INSTALLATION_NAME}"
-
+githubConfigUrl: "https://github.com/${GITHUB_REPO}"
+githubConfigSecret: "arc-github-app"
+runnerScaleSetName: "arc-runner-set"
 containerMode:
   type: "dind"
 EOF
-```
 
-> 💡 For real projects, you may also configure labels, GitHub org-level scope, and extra environment variables in this values file.
+kubectl create namespace arc-runners
 
-### 2.5 Install the runner scale set
+kubectl create secret generic arc-github-app \
+  --namespace arc-runners \
+  --from-literal=github_app_id="${GITHUB_APP_ID}" \
+  --from-literal=github_app_installation_id="${GITHUB_APP_INSTALLATION_ID}" \
+  --from-file=github_app_private_key="${GITHUB_APP_PRIVATE_KEY_PATH}"
 
-```bash
-helm upgrade --install "${INSTALLATION_NAME}" \
+helm upgrade --install arc-runner-set \
   oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
-  --namespace "${NAMESPACE}" \
+  --namespace arc-runners \
   --create-namespace \
   -f values-dind-custom.yaml
 ```
 
-At this point, ARC should spin up GitHub self-hosted runners in DinD mode when your GitHub Actions workflow requests them.
+Verify a runner pod appears when a job is queued: `kubectl -n arc-runners get pods`.
 
-## Part 3 – Install Vault
-
-Add the HashiCorp Helm repo and install Vault in server mode:
+### 4) Install Vault (lab settings)
 
 ```bash
 helm repo add hashicorp https://helm.releases.hashicorp.com
 helm repo update
 
-# Install with non-TLS mode for local lab purposes (do not use this in production):
 helm upgrade --install vault hashicorp/vault \
   --namespace vault \
+  --create-namespace \
   --set 'server.extraArgs=-tls-disable=true' \
   --set server.extraEnvironmentVars.VAULT_API_ADDR=http://0.0.0.0:8200 \
   --set server.extraEnvironmentVars.VAULT_CLUSTER_ADDR=http://0.0.0.0:8201
 ```
-## Part 4 – Initialize & Unseal Vault
 
-### 4.1 Initialize Vault
+Initialize and unseal (store keys securely; do not commit):
 
 ```bash
 kubectl -n vault exec -ti vault-0 -- vault operator init
+kubectl -n vault exec -ti vault-0 -- vault operator unseal YOUR_UNSEAL_KEY_1
+kubectl -n vault exec -ti vault-0 -- vault operator unseal YOUR_UNSEAL_KEY_2
+kubectl -n vault exec -ti vault-0 -- vault operator unseal YOUR_UNSEAL_KEY_3
 ```
 
-The output will include:
-- Multiple unseal keys
-- An initial root token
-
-> ⚠️ Do not commit these values.
-Store them securely (for example in a password manager) and rotate after testing.
-
-### 4.2 Unseal Vault (lab example)
-
-Use three of the unseal keys until the key threshold is reached (default: 3):
-
-```bash
-# Example – replace with your own unseal keys
-kubectl -n vault exec -ti vault-0 -- vault operator unseal <UNSEAL_KEY_1>
-kubectl -n vault exec -ti vault-0 -- vault operator unseal <UNSEAL_KEY_2>
-kubectl -n vault exec -ti vault-0 -- vault operator unseal <UNSEAL_KEY_3>
-```
-## Part 5 – Configure Vault for GitHub OIDC & CI Secrets
-
-### 5.1 Login to Vault pod
+Configure auth and secrets inside the pod:
 
 ```bash
 kubectl -n vault exec -ti vault-0 -- sh
-```
-Inside the pod:
-```bash
-vault login <VAULT_ROOT_TOKEN>
-```
 
-### 5.2 Enable JWT auth method for GitHub Actions OIDC
-
-```bash
+vault login YOUR_VAULT_ROOT_TOKEN
 vault auth enable jwt
-
 vault write auth/jwt/config \
   bound_issuer="https://token.actions.githubusercontent.com" \
   oidc_discovery_url="https://token.actions.githubusercontent.com"
-```
 
-### 5.3 Enable KV v2 for CI secrets
-```bash
 vault secrets enable -path=kv -version=2 kv
-```
 
-### 5.4 Store CI-related secrets
-
-> ⚠️ Use test credentials only and never commit real passwords or tokens.
-
-#### 5.4.1 Artifactory credentials
-
-```bash
 vault kv put kv/ci/artifactory \
-  username="<ARTIFACTORY_USERNAME>" \
-  password="<ARTIFACTORY_PASSWORD>" \
+  username="YOUR_ARTIFACTORY_USER" \
+  password="YOUR_ARTIFACTORY_PASSWORD" \
   url_public="http://artifactory-oss-artifactory-nginx.artifactory-oss.svc/artifactory/maven-remote/"
-```
 
-### 5.4.2 GitHub / container registry credentials
-Example for GHCR:
-```bash
 vault kv put kv/ci/github \
-  username="<GITHUB_USERNAME>" \
-  password="<GHCR_PERSONAL_ACCESS_TOKEN>" \
-  docker_registry="ghcr.io/<GITHUB_USERNAME>"
-```
-You can later retrieve and debug secrets with:
-```bash
-vault kv get -format=json kv/ci/artifactory
-vault kv get -format=json kv/ci/github
-```
+  username="${GITHUB_USER}" \
+  password="YOUR_GHCR_TOKEN" \
+  docker_registry="${GHCR_REGISTRY}"
 
-### 5.5 Create Vault policy for CI
+vault kv put kv/ci/sonarqube \
+  token="YOUR_SONARQUBE_PROJECT_TOKEN" \
+  host_url="http://sonarqube-sonarqube.sonarqube:9000" \
+  project_key="devopsdaydayup-local" \
+  project_name="devopsdaydayup"
 
-```bash
 vault policy write myproject-ci - <<EOF
-# Read-only permission on 'kv/data/ci/*' path
 path "kv/data/ci/*" {
-  capabilities = [ "read" ]
+  capabilities = ["read"]
 }
 EOF
-```
 
-### 5.6 Create a JWT role bound to your GitHub repo
-
-Bind the role to your repository and GitHub audience:
-
-```bash
 vault write auth/jwt/role/myproject-ci -<<EOF
 {
   "role_type": "jwt",
   "user_claim": "actor",
   "bound_claims": {
-    "repository": "chance2021/devopsdaydayup"
+    "repository": "${GITHUB_REPO}"
   },
-  "bound_audiences": "https://github.com/chance2021",
+  "bound_audiences": "https://github.com/${GITHUB_USER}",
   "policies": ["myproject-ci"],
   "ttl": "10m"
 }
 EOF
-```
-Exit the pod shell when done:
-```
 exit
 ```
 
-## Part 6 – Install Artifactory OSS
+### 5) Install Artifactory OSS
 
-Add and update the JFrog Helm repo:
 ```bash
 helm repo add jfrog https://charts.jfrog.io
 helm repo update
-```
-Install Artifactory OSS (lab values):
-```bash
-helm upgrade --install artifactory-oss \
-  --set artifactory.postgresql.auth.password="<ARTIFACTORY_DB_PASSWORD>" \
-  --set nginx.https.enabled=true \
-  --set nginx.tlsSecretName=artifactory-tls \
+
+helm upgrade --install artifactory-oss jfrog/artifactory-oss \
   --namespace artifactory-oss \
   --create-namespace \
-  jfrog/artifactory-oss
+  --set artifactory.postgresql.auth.password="YOUR_ARTIFACTORY_DB_PASSWORD" \
+  --set nginx.https.enabled=true \
+  --set nginx.tlsSecretName=artifactory-tls
+
+kubectl -n artifactory-oss port-forward svc/artifactory-oss-artifactory-nginx 8080:80
 ```
-Port-forward to access the UI locally:
-```bash
-kubectl --namespace artifactory-oss \
-  port-forward svc/artifactory-oss-artifactory-nginx 8080:80
-```
-Then open browser with the address:
-- http://127.0.0.1:8080￼
 
-From the UI:
-1. Log in with the default admin account (change password immediately).
-2. Create a remote Maven repository named maven-remote.
-3.	Create a test user and grant permissions to maven-remote.
+In the UI (`http://127.0.0.1:8080`):
 
-Use those test credentials in Vault (kv/ci/artifactory).
+1. Sign in with the default admin user and change the password.
+2. Create a remote Maven repository named `maven-remote`.
+3. Create a test user with access to `maven-remote`. Store those credentials in Vault (`kv/ci/artifactory`).
 
-## Part 7 – Install SonarQube
+### 6) Install SonarQube
 
-> Example tested on macOS with Apple M2, but the commands are generic.
-
-Add the SonarQube Helm repo:
 ```bash
 helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
 helm repo update
-```
-Set a monitoring passcode:
-```bash
-export MONITORING_PASSCODE="yourPasscode123"
-```
-Install SonarQube (Community edition, embedded Postgres):
-```bash
-helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube \
+
+export MONITORING_PASSCODE="YOUR_MONITORING_PASSCODE"
+
+helm upgrade --install sonarqube sonarqube/sonarqube \
+  --namespace sonarqube \
   --create-namespace \
-  --set edition=developer,monitoringPasscode=$MONITORING_PASSCODE \
+  --set edition=developer \
+  --set monitoringPasscode=${MONITORING_PASSCODE} \
   --set postgresql.enabled=true \
   --set postgresql.image.tag=17.4.0
-```
-Get the Pod name:
-```bash
-export POD_NAME=$(kubectl get pods --namespace sonarqube \
-  -l "app=sonarqube,release=sonarqube" \
-  -o jsonpath="{.items[0].metadata.name}")
-```
-Port-forward:
-```bash
-echo "Visit http://127.0.0.1:8081 to use SonarQube"
-kubectl port-forward $POD_NAME 8081:9000 -n sonarqube
-```
-Open http://127.0.0.1:8081￼ and log in (default admin / admin in a fresh install; you’ll be asked to change it).
 
-### 7.1 Import GitHub repo into SonarQube
-1.	Configure a GitHub App / OAuth integration (App ID, client ID, client secret).
-2.	Import the GitHub repository chance2021/devopsdaydayup as a project.
-3.	Generate a project analysis token for that project.
-
-### 7.2 Store SonarQube config in Vault
-```bash
-vault kv put kv/ci/sonarqube \
-  token="<SONARQUBE_PROJECT_TOKEN>" \
-  host_url="http://sonarqube-sonarqube.sonarqube:9000" \
-  project_key="devopsdaydayup-local" \
-  project_name="devopsdaydayup"
+export SONAR_POD=$(kubectl -n sonarqube get pods -l "app=sonarqube,release=sonarqube" -o jsonpath="{.items[0].metadata.name}")
+kubectl -n sonarqube port-forward "$SONAR_POD" 8081:9000
 ```
 
-## Part 8 - Setup CI Workflow
-Create a `ci.yaml` file under `.github/workflow` folder in your repo. Paste the following in the file:
+Open `http://127.0.0.1:8081`, log in (default admin/admin), change the password, create a project from your GitHub repo, and generate a project token. Store the token in Vault (`kv/ci/sonarqube`).
+
+### 7) Configure the GitHub Actions workflow
+
+Create `.github/workflows/ci.yaml` in your fork:
+
 ```yaml
-name: ci-java-with-vault-nexus-sonar-security
+name: ci-java-with-vault-artifactory-sonar
 
 on:
   push:
-    branches: [ <YOUR_FEATURE_BRANCH_NAME> ]
+    branches: [ main ]
 
 permissions:
   contents: read
-  id-token: write   # often needed for auth to cloud / secrets backends
+  id-token: write
   security-events: write
-
-env:
-  APP_NAME: my-java-app
-  DOCKER_IMAGE_NAME: my-java-app
-  MAVEN_SETTINGS_PATH: .maven/settings.xml  # you’ll create this
-  # Use Nexus as Maven repo & Docker registry
-  NEXUS_MAVEN_REPO_URL: https://nexus.example.com/repository/maven-releases/
-  NEXUS_DOCKER_REGISTRY: nexus.example.com
-  SONAR_PROJECT_KEY: my-org_my-java-app
-  SONAR_PROJECT_NAME: my-java-app
 
 jobs:
   build-and-scan:
     runs-on: arc-runner-set
-
     steps:
-      # 1. Checkout
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug GitHub OIDC token audience
-        run: |
-            echo "Requesting GitHub OIDC token..."
-            TOKEN_RESPONSE=$(curl -sSL \
-            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}?audience=https://token.actions.githubusercontent.com")
-
-            TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r .value)
-
-            echo "===== RAW JWT ====="
-            echo "$TOKEN"
-
-            echo ""
-            echo "===== DECODED PAYLOAD ====="
-            echo "$TOKEN" | cut -d '.' -f2 | base64 --decode 2>/dev/null | jq .
-
-
-      # 2. Pull secrets from Vault
-      # Assumes HashiCorp Vault is accessible and GitHub runner has auth (GitHub OIDC / token / etc.)
-      - name: Import secrets from Vault
+      - name: Pull secrets from Vault (GitHub OIDC)
         id: vault
         uses: hashicorp/vault-action@v3
         with:
           url: http://vault.vault:8200
           method: jwt
           role: "myproject-ci"
-          # Example: Nexus & Sonar credentials stored in Vault
           secrets: |
             kv/data/ci/artifactory username | ARTIFACTORY_USERNAME ;
             kv/data/ci/artifactory password | ARTIFACTORY_PASSWORD ;
-            kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC;
+            kv/data/ci/artifactory url_public | ARTIFACTORY_URL_PUBLIC ;
             kv/data/ci/github username | GITHUB_USERNAME ;
             kv/data/ci/github password | GITHUB_PASSWORD ;
             kv/data/ci/github docker_registry | GITHUB_DOCKER_REGISTRY ;
-            kv/data/ci/sonarqube token   | SONAR_TOKEN;
-            kv/data/ci/sonarqube host_url | SONAR_HOST_URL;
-            kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY;
-            kv/data/ci/sonarqube project_name | SONAR_PROJECT_NAME;
+            kv/data/ci/sonarqube token | SONAR_TOKEN ;
+            kv/data/ci/sonarqube host_url | SONAR_HOST_URL ;
+            kv/data/ci/sonarqube project_key | SONAR_PROJECT_KEY ;
+            kv/data/ci/sonarqube project_name | SONAR_PROJECT_NAME ;
 
-      - name: Debug Vault secrets
-        run: |
-            echo $ARTIFACTORY_USERNAME
-            echo $ARTIFACTORY_PASSWORD
-            echo $SONAR_TOKEN
-
-      # 3. Setup Java (Maven)
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -439,40 +243,20 @@ jobs:
           java-version: '17'
           cache: maven
 
-      # 4. Generate Maven settings.xml to use Artifactory
-      - name: Generate Maven settings.xml (force Artifactory))
+      - name: Generate Maven settings.xml for Artifactory
         run: |
-          sudo apt-get update && sudo apt-get install -y maven
           mkdir -p ~/.m2
-
-          cat > ~/.m2/settings.xml <<EOF
+          cat > ~/.m2/settings.xml <<'EOF'
           <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
             <servers>
               <server>
                 <id>artifactory</id>
                 <username>${ARTIFACTORY_USERNAME}</username>
                 <password>${ARTIFACTORY_PASSWORD}</password>
               </server>
-              <server>
-                <id>artifactory-releases</id>
-                <username>${ARTIFACTORY_USERNAME}</username>
-                <password>${ARTIFACTORY_PASSWORD}</password>
-              </server>
-              <server>
-                <id>artifactory-snapshots</id>
-                <username>${ARTIFACTORY_USERNAME}</username>
-                <password>${ARTIFACTORY_PASSWORD}</password>
-              </server>
-              <server>
-                <id>artifactory-mirror</id>
-                <username>${ARTIFACTORY_USERNAME}</username>
-                <password>${ARTIFACTORY_PASSWORD}</password>
-              </server>
-              </servers>
-
+            </servers>
             <mirrors>
               <mirror>
                 <id>artifactory-mirror</id>
@@ -481,107 +265,99 @@ jobs:
                 <url>${ARTIFACTORY_URL_PUBLIC}</url>
               </mirror>
             </mirrors>
-
             <profiles>
               <profile>
                 <id>artifactory</id>
                 <repositories>
                   <repository>
                     <id>central</id>
-                    <name>Central via Artifactory</name>
                     <url>${ARTIFACTORY_URL_PUBLIC}</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
                   </repository>
                 </repositories>
-                <pluginRepositories>
-                  <pluginRepository>
-                    <id>central</id>
-                    <name>Central Plugins via Artifactory</name>
-                    <url>${ARTIFACTORY_URL_PUBLIC}</url>
-                    <releases><enabled>true</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                  </pluginRepository>
-                </pluginRepositories>
               </profile>
             </profiles>
-
             <activeProfiles>
               <activeProfile>artifactory</activeProfile>
             </activeProfiles>
           </settings>
           EOF
 
-          echo "Generated ~/.m2/settings.xml:"
-          cat ~/.m2/settings.xml
-
-      # 5. Maven build (dependencies pulled via Artifactory)
       - name: Build with Maven
-        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean deploy 
+        run: cd 025-GithubActionCI && mvn -s ~/.m2/settings.xml -B clean verify
 
-      # 6. SonarQube scan (assumes sonar-project.properties or config via CLI args)
       - name: SonarQube scan
         env:
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ steps.vault.outputs.SONAR_TOKEN }}
         run: |
-          cd 025-GithubActionCI && mvn -B -s ~/.m2/settings.xml \
-            sonar:sonar \
-            -Dsonar.host.url=${SONAR_HOST_URL} \
-            -Dsonar.login=${SONAR_TOKEN} \
-            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-            -Dsonar.projectName=${SONAR_PROJECT_NAME} \
-            -Dsonar.branch.name="${GITHUB_HEAD_REF}"
+          cd 025-GithubActionCI
+          mvn -s ~/.m2/settings.xml -B sonar:sonar \
+            -Dsonar.host.url=${{ steps.vault.outputs.SONAR_HOST_URL }} \
+            -Dsonar.login=${{ steps.vault.outputs.SONAR_TOKEN }} \
+            -Dsonar.projectKey=${{ steps.vault.outputs.SONAR_PROJECT_KEY }} \
+            -Dsonar.projectName=${{ steps.vault.outputs.SONAR_PROJECT_NAME }} \
+            -Dsonar.branch.name="${GITHUB_REF_NAME}"
 
-      # 8. Build container image
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        id: build-image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          IMAGE_NAME=${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}/java-with-vault-nexus-sonar-security
+          echo "IMAGE=${IMAGE_NAME}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest 025-GithubActionCI
 
-      - name: Login to Docker registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}
           username: ${{ steps.vault.outputs.GITHUB_USERNAME }}
           password: ${{ steps.vault.outputs.GITHUB_PASSWORD }}
-  
-      - name: Build Docker image
-        id: build-image
+
+      - name: Push image
         run: |
-          DOCKER_IMAGE_NAME="java-with-vault-nexus-sonar-security"
-          IMAGE_TAG=${GITHUB_SHA::7}
-          echo "DOCKER_ADDRESS=${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          echo "DOCKER_IMAGE_NAME=${DOCKER_IMAGE_NAME}" >> $GITHUB_OUTPUT
-          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          cd 025-GithubActionCI
-          docker build \
-            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${IMAGE_TAG} \
-            -t ${GITHUB_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:latest .
+          docker push ${{ steps.build-image.outputs.IMAGE }}
+          docker push ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}/java-with-vault-nexus-sonar-security:latest
 
-      - name: Show Docker images
-        run: docker images
-
-      # 9. Image scan (example: Trivy)
-      - name: Scan Docker image with Trivy
+      - name: Scan image with Trivy (optional)
         uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
-          image-ref: ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
-          format: 'table'
-          exit-code: '1'   # fail pipeline on HIGH/CRITICAL if you like—configurable
-          vuln-type: 'os,library'
+          image-ref: ${{ steps.build-image.outputs.IMAGE }}
           severity: 'CRITICAL,HIGH'
-
-      # 10. Push Docker image to GitHub Container Registry
-      - name: Push Docker image to Nexus
-        run: |
-          IMAGE_TAG=${GITHUB_SHA::7}
-          docker push ${{ steps.build-image.outputs.DOCKER_ADDRESS }}
-          docker push ${{ steps.vault.outputs.GITHUB_DOCKER_REGISTRY }}/${{ steps.build-image.outputs.DOCKER_IMAGE_NAME }}:latest
 ```
-Update `YOUR_FEATURE_BRANCH_NAME` to your branch. Once it is pushed to the remote, a build will be triggered based on this CI workflow.
+
+Commit the workflow to your fork to trigger a run on `main`. Adjust branches, registry, and project names as needed.
+
+## Validation
+
+- `kubectl -n arc-runners get pods` shows a runner when a workflow starts.
+- `vault kv get kv/ci/artifactory` (inside the pod) returns stored secrets.
+- Artifactory UI lists the `maven-remote` repo and accepts your test user credentials.
+- SonarQube shows a completed analysis for your project.
+- GHCR (or your registry) contains the built image tag.
+
+## Cleanup
+
+```bash
+helm uninstall arc -n arc-systems
+helm uninstall arc-runner-set -n arc-runners
+helm uninstall vault -n vault
+helm uninstall artifactory-oss -n artifactory-oss
+helm uninstall sonarqube -n sonarqube
+kubectl delete namespace arc-systems arc-runners vault artifactory-oss sonarqube
+minikube delete
+```
+
+## Troubleshooting
+
+- **Runner never starts**: Confirm ARC controller is healthy (`kubectl -n arc-systems get pods`) and your GitHub App credentials in `arc-github-app` are correct.
+- **Vault auth fails**: Ensure the role `myproject-ci` has the correct `repository` and `bound_audiences` values for your fork. Check the OIDC token audience in workflow logs.
+- **Artifactory 401**: Verify the test user/password and that the repo URL in Vault matches the Helm release service name.
+- **SonarQube auth fails**: Rotate the project token and update Vault. Confirm the host URL uses the in-cluster service when the runner executes inside Kubernetes.
+- **Image push denied**: PAT must have `write:packages` and the GHCR repository should be accessible (public for easiest local pulls).
 
 ## References
-- GitHub Docs – OIDC with HashiCorp Vault
-https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-hashicorp-vault￼
-- Artifactory OSS Helm chart on Artifact Hub
-https://artifacthub.io/packages/helm/jfrog/artifactory-oss￼
 
+- [GitHub Actions OIDC with HashiCorp Vault](https://docs.github.com/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#example-using-hashicorp-vault)
+- [Actions Runner Controller](https://github.com/actions/actions-runner-controller)
+- [Artifactory OSS Helm chart](https://artifacthub.io/packages/helm/jfrog/artifactory-oss)
+- [SonarQube Helm chart](https://github.com/SonarSource/helm-chart-sonarqube)
