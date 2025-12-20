@@ -6,6 +6,15 @@ Hands-on labs that teach DevOps practices across CI/CD, IaC, Kubernetes, observa
 - Contributions welcome—see [CONTRIBUTING.md](CONTRIBUTING.md) and follow the lab template for consistency.
 - Security first—no real secrets. Use placeholders like `YOUR_GITHUB_TOKEN` and see [SECURITY.md](SECURITY.md).
 
+## How to Use These Labs (Learn First, Then Compare)
+
+- Pick a single lab that matches your interest and read its goal first.
+- Try to complete the lab on your own before running any provided automation scripts—this is where the learning happens.
+- If you get stuck, consult the lab README or peek at the automation (Jenkinsfiles, GitHub Actions, Terraform, shell scripts) to spot what you missed.
+- After finishing, compare your approach with the provided scripts/manifests to see differences and alternatives.
+- Automation is there to verify and repeat quickly, but rely on it only after you’ve attempted the lab yourself.
+- Questions or feedback? Connect on LinkedIn: https://www.linkedin.com/in/chance-chen/ (feel free to add and discuss).
+
 ## Getting Started
 
 1. Clone the repo: `git clone https://github.com/chance2021/devopsdaydayup.git`
