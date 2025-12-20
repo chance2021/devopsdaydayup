@@ -18,7 +18,7 @@ Hands-on labs that teach DevOps practices across CI/CD, IaC, Kubernetes, observa
 ## Getting Started
 
 1. Clone the repo: `git clone https://github.com/chance2021/devopsdaydayup.git`
-2. Pick a lab folder (e.g., `024-GitHubActionArgoCD`) and read its `README.md`.
+2. Pick a lab folder (e.g., `024-ArgoCICD`) and read its `README.md`.
 3. Export secrets as environment variables or store them in a secret manager. Never commit real credentials.
 4. Run the lab steps in order, verify using the provided validation checks, then perform cleanup.
 
@@ -49,7 +49,7 @@ Hands-on labs that teach DevOps practices across CI/CD, IaC, Kubernetes, observa
 | 21 | Deploy Docker image to Azure Function via GitHub Actions | 021-GithubActionDockerImageFunctionCD |
 | 22 | Actions Runner Scale Set (ARC) on Minikube | 022-ActionRunnerSaleSetMinitkube |
 | 23 | Secure CI with GitHub Actions, Vault, Artifactory, SonarQube | 023-SecureCIGitHubActionVaultArtifactorySonarQube |
-| 24 | Argo Events → Workflows → Argo CD → Rollouts | 024-GitHubActionArgoCD |
+| 24 | Argo Events → Workflows → Argo CD → Rollouts | 024-ArgoCICD |
 
 Additional topics:
 - AKS: `aks/aks-upgrade`, `aks/backup-solution-velero`
