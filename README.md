@@ -1,4 +1,5 @@
 # DevOpsDaydayup Labs
+Test
 
 Hands-on labs that teach DevOps practices across CI/CD, IaC, Kubernetes, observability, and cloud platforms. Every lab is runnable end-to-end with clearly marked prerequisites, placeholders for secrets, validation steps, cleanup, and troubleshooting tips.
 
