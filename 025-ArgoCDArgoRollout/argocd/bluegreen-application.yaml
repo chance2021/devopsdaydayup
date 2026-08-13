@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: demo-bluegreen
+  namespace: argocd
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/chance2021/devopsdaydayup.git
+    targetRevision: lab/025-argocd
+    path: 025-ArgoCDArgoRollout/demo-app/bluegreen
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-bluegreen
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
