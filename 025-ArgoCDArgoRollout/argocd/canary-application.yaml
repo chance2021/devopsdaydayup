@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
-
 metadata:
-  name: demo-bluegreen
+  name: demo-canary
   namespace: argocd
-
 spec:
   project: default
   source:
-    repoURL: https://github.com/chance2021/devopsdaydayup.git
+    repoURL: https://github.com/chance2021/devopsdaydayup/025-ArgoCDArgoRollout
     targetRevision: lab/025-argocd
-    path: 025-ArgoCDArgoRollout/demo-app/bluegreen
+    path: 025-ArgoCDArgoRollout/demo-app/canary
+
   destination:
     server: https://kubernetes.default.svc
-    namespace: demo-bluegreen
+    namespace: demo-canary
+
   syncPolicy:
     automated: {}
     syncOptions:
