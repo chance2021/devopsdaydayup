@@ -15,7 +15,7 @@ spec:
     metadata:
       labels:
         app: demo-app
-        version: v2
+        version: v1
 
     spec:
       containers:
@@ -34,7 +34,7 @@ spec:
       volumes:
         - name: html
           configMap:
-            name: demo-html-v2
+            name: demo-html-v1
 
   strategy:
     blueGreen:
