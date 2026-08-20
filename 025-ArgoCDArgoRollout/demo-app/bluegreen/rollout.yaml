@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: demo-app
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: demo-app
+
+  template:
+    metadata:
+      labels:
+        app: demo-app
+        version: v1
+
+    spec:
+      containers:
+        - name: demo-app
+
+          image: nginx:alpine
+
+          ports:
+            - containerPort: 80
+
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+
+      volumes:
+        - name: html
+          configMap:
+            name: demo-html-v1
+
+  strategy:
+    blueGreen:
+
+      activeService: demo-active
+
+      previewService: demo-preview
+
+      autoPromotionEnabled: false
+
+      previewReplicaCount: 2
+
+      scaleDownDelaySeconds: 30

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: demo-html-v1
+
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Argo Rollouts Demo - v1</title>
+
+      <style>
+        body {
+          margin: 0;
+          height: 100vh;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          background-color: #1565c0;
+          color: white;
+
+          font-family: Arial, sans-serif;
+        }
+
+        .container {
+          text-align: center;
+        }
+
+        .version {
+          font-size: 120px;
+          font-weight: bold;
+        }
+
+        .title {
+          font-size: 32px;
+          margin-top: 20px;
+        }
+      </style>
+
+    </head>
+
+    <body>
+      <div class="container">
+
+        <div class="version">
+          v1
+        </div>
+
+        <div class="title">
+          Argo Rollouts Demo
+        </div>
+
+      </div>
+    </body>
+    </html>
