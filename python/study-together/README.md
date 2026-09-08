@@ -49,6 +49,7 @@
 4. Python快速入门：https://learnxinyminutes.com/docs/python/
 5. 免费工具: https://tinywow.com/
 6. 简历样本: https://www.kickresume.com/en/
+6b. ResumeAI (AI简历 + 免费ATS检测): https://withresumeai.com/
 7. 扩展阅读资源汇总：https://drive.google.com/drive/folders/19YTkdsXeI6m9NPW2I0v1LVg39iBrnZSG
 
 
